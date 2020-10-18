@@ -32,10 +32,6 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 
 
-# os.chdir('C:/Users/Steven/Desktop/Google Drive/Coronavirus stats')
-
-
-
 # Save saves Object as filename.pkl in the working directory
 
 def Save(Object, filename):
@@ -81,7 +77,7 @@ def importHospAd():
     # This takes the columns whose values are pandas timestamps, and makes the 
     # column labels the corresponding date.
     
-    df.columns = ['Date', 'Daily hospital admissions']
+    df.columns = ['Date', 'Daily hospital admissions England and Wales']
     
     # Make the row index equal to row number
     
@@ -151,12 +147,12 @@ def importMort():
     
     # Rename Total column to Deaths. 
     
-    df = df.rename(columns={"Total": "Weekly deaths"} )
+    df = df.rename(columns={"Total": "Weekly deaths England and Wales"} )
     
     
     # Coerce the deaths column to type int.
     
-    df.loc[:, 'Weekly deaths'] = df.loc[:, 'Weekly deaths'].astype(int)
+    df.loc[:, 'Weekly deaths England and Wales'] = df.loc[:, 'Weekly deaths England and Wales'].astype(int)
     
     # Make the row index equal to row number
     
@@ -195,7 +191,7 @@ def importGDP():
     
     # Rename columns appropriately
     
-    df.columns = ['Date', 'Monthly GDP index'] 
+    df.columns = ['Date', 'Monthly GDP index UK'] 
     
     # The actual numbers start from row 6 onwards, so drop everything before that.
     
@@ -250,7 +246,7 @@ def importOWID():
     
     # Rename 'date' to 'Date', just for consistency
     
-    df.columns = ['Date', 'Daily new cases', 'Daily coronavirus deaths', 'Daily new tests', 'Test positive rate'  ]
+    df.columns = ['Date', 'Daily new cases UK', 'Daily coronavirus deaths UK', 'Daily new tests UK', 'Test positive rate UK'  ]
     
   
     # Make the row index equal to row number
@@ -287,7 +283,7 @@ def importUC():
     
     # Rename columns appropriately
     
-    df.columns = [ 'Date', 'Weekly universal credit claims'  ]
+    df.columns = [ 'Date', 'Weekly universal credit claims UK'  ]
     
     # Some of the dates randomly have the string ' (r)' added at the end
     # so get rid of that.
@@ -335,7 +331,7 @@ def importIandP():
     
     # Rename columns
     
-    df.columns = [ 'Date', 'Yearly influenza and pneumonia deaths'  ] 
+    df.columns = [ 'Date', 'Yearly influenza and pneumonia deaths England and Wales'  ] 
     
     # Convert years into timedates
     
@@ -473,11 +469,11 @@ def createYearlyMort(Mort):
     # Start off with Dates from 2010 in the firs column, and weekly deaths
     # for 2010 in the second column.
     
-    yearlyMort = Mort[ Mort['Date'].dt.year == 2010 ][['Date', 'Weekly deaths']]
+    yearlyMort = Mort[ Mort['Date'].dt.year == 2010 ][['Date', 'Weekly deaths England and Wales']]
     
     # Rename columns appropriately.
     
-    yearlyMort = yearlyMort.rename(columns={"Weekly deaths": "2010"} )
+    yearlyMort = yearlyMort.rename(columns={"Weekly deaths England and Wales": "2010"} )
     
     # Make the row index equal to row number
     
@@ -488,13 +484,13 @@ def createYearlyMort(Mort):
 
     for year in range(2011, 2020):
     
-        yearlyMort[str(year)] = Mort[  Mort['Date'].dt.year == year ]['Weekly deaths'].values
+        yearlyMort[str(year)] = Mort[  Mort['Date'].dt.year == year ]['Weekly deaths England and Wales'].values
     
     # Add column for weekly deaths in 2020
     # This isn't so easy because 2020 isn't finished yet, so need to create
     # an array that has apropriate NaN's concatenated at the end
 
-    Mort2020 = Mort[  Mort['Date'].dt.year == 2020 ]['Weekly deaths'].values
+    Mort2020 = Mort[  Mort['Date'].dt.year == 2020 ]['Weekly deaths England and Wales'].values
 
 
     Mort2020End = np.empty(52- len(Mort2020)  )
@@ -507,7 +503,7 @@ def createYearlyMort(Mort):
     
     # Add a column that has weekly mean deaths for 2010-2019
 
-    yearlyMort['Mean weekly deaths 2010-2019'] = yearlyMort.iloc[:, 1:12].mean(axis=1)
+    yearlyMort['Mean weekly deaths 2010-2019 England and Wales'] = yearlyMort.iloc[:, 1:12].mean(axis=1)
     
     # Save the dataframe as a pickle object
     
@@ -533,21 +529,21 @@ lastDate =  str(df.iloc[-1,0]).strip(' 00:00:00')
 
 # totalCoronaDeaths is what it says.
 
-totalCoronaDeaths = int( OWID['Daily coronavirus deaths'].sum() )
+totalCoronaDeaths = int( OWID['Daily coronavirus deaths UK'].sum() )
 
 
 # Add a column to IandP and LCD that is constant and equal to total 
 # coronavirus deaths. This is useful for plotting purposes
 
-IandP['Coronavirus deaths 2020'] = totalCoronaDeaths
+IandP['Coronavirus deaths 2020 UK'] = totalCoronaDeaths
 
-LCD['Coronavirus deaths 2020'] = totalCoronaDeaths
+LCD['Coronavirus deaths 2020 UK'] = totalCoronaDeaths
 
 
 # This line is to make all the columns of IandP, LCD the same type, so they 
 # can be  plotted together on the same plot by plotly.
 
-IandP['Yearly influenza and pneumonia deaths'] = IandP['Yearly influenza and pneumonia deaths'].astype(np.int)
+IandP['Yearly influenza and pneumonia deaths England and Wales'] = IandP['Yearly influenza and pneumonia deaths England and Wales'].astype(np.int)
 
 
 LCD.iloc[:, 1:] = LCD.iloc[:, 1:].astype(np.int)
@@ -557,7 +553,7 @@ LCD.iloc[:, 1:] = LCD.iloc[:, 1:].astype(np.int)
 # Create all the figures.
 
 
-fig1 = px.bar(df, x="Date", y=['Daily coronavirus deaths', 'Daily hospital admissions', 'Daily new cases'], range_x=['2020-01-01',lastDate], \
+fig1 = px.bar(df, x="Date", y=['Daily coronavirus deaths UK', 'Daily hospital admissions England and Wales', 'Daily new cases UK'], range_x=['2020-01-01',lastDate], \
              template = "simple_white", color_discrete_sequence =['red', 'gold', 'blue'] )
 
 fig1.update_layout(
@@ -571,7 +567,7 @@ fig1.update_layout(
 
 
 
-testsFig = px.bar(df, x="Date", y=['Daily new tests'], range_x=['2020-01-01',lastDate], \
+testsFig = px.bar(df, x="Date", y=['Daily new tests UK'], range_x=['2020-01-01',lastDate], \
              template = "simple_white", color_discrete_sequence =['cadetblue' ] )
 
 testsFig.update_layout(
@@ -583,7 +579,7 @@ testsFig.update_layout(
 
 
 
-testPositiveFig = px.line(df, x="Date", y=['Test positive rate'], range_x=['2020-01-01',lastDate], \
+testPositiveFig = px.line(df, x="Date", y=['Test positive rate UK'], range_x=['2020-01-01',lastDate], \
              template = "simple_white", color_discrete_sequence =['indigo' ] )
 
 testPositiveFig.update_layout(
@@ -595,7 +591,7 @@ testPositiveFig.layout.yaxis.tickformat = ',.0%'
 
 
 
-UCFig = px.line(UC, x="Date", y=['Weekly universal credit claims'], range_x=['2020-01-01',lastDate], \
+UCFig = px.line(UC, x="Date", y=['Weekly universal credit claims UK'], range_x=['2020-01-01',lastDate], \
              template = "simple_white", color_discrete_sequence =['deeppink' ] )
 
 UCFig.update_layout(
@@ -607,7 +603,7 @@ UCFig.update_layout(
 
 
 
-GDPFig = px.line(GDP, x="Date", y=['Monthly GDP index'], range_x=['2020-01-01',lastDate], \
+GDPFig = px.line(GDP, x="Date", y=['Monthly GDP index UK'], range_x=['2020-01-01',lastDate], \
              template = "simple_white", color_discrete_sequence =['darkslategray' ] )
 
 GDPFig.update_layout(
@@ -619,7 +615,7 @@ GDPFig.update_layout(
 
 
 
-IandPFig = px.line(IandP, x="Date", y=['Yearly influenza and pneumonia deaths', 'Coronavirus deaths 2020'], \
+IandPFig = px.line(IandP, x="Date", y=['Yearly influenza and pneumonia deaths England and Wales', 'Coronavirus deaths 2020 UK'], \
              template = "simple_white", color_discrete_sequence =['teal', 'orange' ] )
 
 IandPFig.update_layout(
@@ -632,7 +628,7 @@ IandPFig.update_layout(
 
 
 
-meanDeathsFig = px.line(yearlyMort, x="Date", y= ['Mean weekly deaths 2010-2019', '2015', '2016', '2017', '2018', '2019', '2020' ], range_x=['2010-01-01','2011-01-01'], \
+meanDeathsFig = px.line(yearlyMort, x="Date", y= ['Mean weekly deaths 2010-2019 England and Wales', '2015', '2016', '2017', '2018', '2019', '2020' ], range_x=['2010-01-01','2011-01-01'], \
              template = "simple_white" )
 
 meanDeathsFig.update_layout(
@@ -655,7 +651,7 @@ LCDcols.remove('Date')
 LCDFig = px.line(LCD, x="Date", y= LCDcols, template = "simple_white" ) 
 
 LCDFig.update_layout(
-    yaxis_title="Yearly deaths",
+    yaxis_title="Yearly deaths UK",
     legend_title="Variable:",
 )
 
