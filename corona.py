@@ -20,6 +20,8 @@ import plotly.express as px
 
 import chart_studio.tools as tls
 
+import math
+
 import ssl
 
 
@@ -52,7 +54,6 @@ def Open(filename):
     return pickle.load(file)    
 
 
-
 # importHospAd imports the Hospital admissions data, puts it into a more useful 
 # format and saves it.
 
@@ -77,7 +78,7 @@ def importHospAd():
     # This takes the columns whose values are pandas timestamps, and makes the 
     # column labels the corresponding date.
     
-    df.columns = ['Date', 'Daily hospital admissions England and Wales']
+    df.columns = ['Date', 'Daily hospital admissions with coronavirus England and Wales']
     
     # Make the row index equal to row number
     
@@ -89,18 +90,9 @@ def importHospAd():
 
     return
 
-# importHospAd only needs to be run once, so it is commented out.
-
-importHospAd()
-
-
-HospAd = Open('HospAd')
-
 
 # importMort imports the mortality data, puts it into a more useful format
 # and saves it.
-
-
 
 
 def importMort():
@@ -164,12 +156,7 @@ def importMort():
     
     return
     
-# importMort only has to be run once, so it is commented out.
-    
-importMort()
 
-
-Mort = Open('Mort')
 
 
 # importGDP imports the GDP data, puts it into a more useful format
@@ -211,12 +198,7 @@ def importGDP():
     
     return
  
-# importGDP only has to be run once, so it is commented out.
-    
-importGDP()
 
-
-GDP = Open('GDP')
     
 # importOWID imports the OWID data, puts it into a more useful format
 # and saves it.
@@ -246,7 +228,7 @@ def importOWID():
     
     # Rename 'date' to 'Date', just for consistency
     
-    df.columns = ['Date', 'Daily new cases UK', 'Daily coronavirus deaths UK', 'Daily new tests UK', 'Test positive rate UK'  ]
+    df.columns = ['Date', 'Daily positive tests UK', 'Daily coronavirus deaths UK', 'Daily tests UK', 'Test positive rate UK'  ]
     
   
     # Make the row index equal to row number
@@ -259,13 +241,7 @@ def importOWID():
     
     return
     
-# importGDP only has to be run once, so it is commented out.
-    
-importOWID()
 
-
-OWID = Open('OWID')  
-    
     
 # importUC imports the Universal credit claims data, puts it into a more useful format
 # and saves it.  
@@ -306,12 +282,7 @@ def importUC():
     return
 
 
-# importUC only has to be run once, so it is commented out.
-    
-importUC()
 
-
-UC = Open('UC') 
 
 
 # importIandP imports influenza + pneumonia mortality data, puts it into a more 
@@ -350,12 +321,6 @@ def importIandP():
     return
     
     
-# importIandP only has to be run once, so it is commented out.
-    
-importIandP()
-
-
-IandP = Open('IandP') 
 
 
 
@@ -420,12 +385,121 @@ def importLCD():
     
     return
    
-# importLCD only has to be run once, so it is commented out.
+
+
+
+
+
+
+def importdeathByAge():
     
-importLCD()
+    df = pd.read_excel(r'Data/Deaths by age.xls')
+    
+    # Data starts in row 6
+
+    df = df.iloc[6:, :]
+    
+    # Label columns appropriately
+    
+    df.columns = ['Age', 'Male', 'Female']
+    
+    # Everything is strings. Makes relevant entries integers
+    
+    df.iloc[:, 1:] = df.iloc[:, 1:].astype(int)
+    
+    # Make a new column that adds together male and female deaths
+    
+    df['Deaths'] = df['Male'] + df['Female']
+    
+    # Make the row index equal to row number
+    
+    df.index = np.arange( len(df) )
+    
+     # Save the dataframe as a pickle object
+ 
+    Save(df, 'deathByAge')
+    
+    return
+
+
+
+
+
+
+# Import and format all the data
+
+
+
+# OWID data is updated daily
+# The file is downloaded automatically.
+    
+importOWID()
+
+
+OWID = Open('OWID')  
+
+
+# It's not clear how often relevant hospital admissions data is going to be
+# updated
+# The link need to be updated manually
+
+
+# importHospAd()
+
+
+HospAd = Open('HospAd')
+
+# Mortality data is updated weekly, on Thursdays.
+# The file is downloaded automatically
+    
+# importMort()
+
+
+Mort = Open('Mort')
+
+
+# Deaths by age is updated weekly, on Tuesdays.
+# The file needs to be downloaded manually.
+    
+# importdeathByAge()
+
+
+deathByAge = Open('deathByAge') 
+
+
+
+# UC data is updated weekly? Maybe on Thursdays?
+# The file needs to be downloaded manually.
+    
+# importUC()
+
+
+UC = Open('UC') 
+
+
+# GDP data is updated monthly, approximately around the 10th of each month
+# The file needs to be downloaded manually.
+
+# importGDP()
+
+
+GDP = Open('GDP')
+
+
+# IandP data is never updated
+    
+# importIandP()
+
+
+IandP = Open('IandP')
+
+# LCD data is never updated
+    
+# importLCD()
 
 
 LCD = Open('LCD') 
+
 
 
 
@@ -464,9 +538,9 @@ df = mergeFrames(OWID, HospAd )
 
 # createYearlyMort creates a dataframe of year by year mortality, and saves it.
 
-def createYearlyMort(Mort):
+def createYearlyMort(Mort, OWID):
     
-    # Start off with Dates from 2010 in the firs column, and weekly deaths
+    # Start off with Dates from 2010 in the first column, and weekly deaths
     # for 2010 in the second column.
     
     yearlyMort = Mort[ Mort['Date'].dt.year == 2010 ][['Date', 'Weekly deaths England and Wales']]
@@ -493,17 +567,63 @@ def createYearlyMort(Mort):
     Mort2020 = Mort[  Mort['Date'].dt.year == 2020 ]['Weekly deaths England and Wales'].values
 
 
-    Mort2020End = np.empty(52- len(Mort2020)  )
+    endMort2020 = np.empty(52- len(Mort2020)  )
 
-    Mort2020End[:] = np.nan
+    endMort2020[:] = np.nan
 
-    Mort2020 = np.concatenate( [Mort2020, Mort2020End] )
+    Mort2020 = np.concatenate( [Mort2020, endMort2020] )
 
     yearlyMort['2020'] = Mort2020
     
     # Add a column that has weekly mean deaths for 2010-2019
 
     yearlyMort['Mean weekly deaths 2010-2019 England and Wales'] = yearlyMort.iloc[:, 1:12].mean(axis=1)
+    
+    
+    
+    # Isolate coronavirus deaths in 2020
+    
+    OWIDDeaths2020 = OWID[ OWID.Date.dt.year ==2020 ][ 'Daily coronavirus deaths UK' ]
+    
+    # Make the row index equal to row number
+    
+    OWIDDeaths2020.index = np.arange( len(OWIDDeaths2020) )
+    
+    # These are useful for finding weekly coronavirus deaths
+    
+    lastWeekFloor = math.floor( len(OWIDDeaths2020)/7 ) 
+    
+    lastWeekCeil = math.ceil( len(OWIDDeaths2020)/7 ) 
+    
+    # Initialise weeklyCoronaDeaths
+    
+    weeklyCoronaDeaths = np.empty( lastWeekCeil )
+    
+    # Calculate weeklyCoronaDeaths by summing in groups of 7
+    # Have to take care of the fact that number of days may not be divisible by
+    # 7
+    
+    for week in range(lastWeekFloor ):
+        
+        weeklyCoronaDeaths[ week ] = OWIDDeaths2020.iloc[ 7*week : (7*week)+6 ].sum()
+        
+    if lastWeekCeil > lastWeekFloor:
+        
+        weeklyCoronaDeaths[ lastWeekFloor ] = OWIDDeaths2020.iloc[ 7*lastWeekFloor:  ].sum()
+       
+    # This fills out the rest of weeklyCoronaDeaths so it has 52 entries, one
+    # for each week. If the data for that week doesn't exist yet, it gets a NaN.
+       
+    endOWID2020 = np.empty(52- len(weeklyCoronaDeaths)  )
+
+    endOWID2020[:] = np.nan  
+    
+    weeklyCoronaDeaths = np.concatenate( [weeklyCoronaDeaths, endOWID2020] )
+    
+    # Add a column to yearlyMort that is mean deaths + coronavirus deaths
+    
+    yearlyMort['Mean weekly deaths 2010-2019 England and Wales plus coronavirus deaths 2020'] = \
+                weeklyCoronaDeaths + yearlyMort['Mean weekly deaths 2010-2019 England and Wales']
     
     # Save the dataframe as a pickle object
     
@@ -513,7 +633,7 @@ def createYearlyMort(Mort):
 
 # createYearlyMort only has to be run once, so it is commented out.
     
-createYearlyMort(Mort)
+createYearlyMort(Mort, OWID)
 
 
 
@@ -535,9 +655,10 @@ totalCoronaDeaths = int( OWID['Daily coronavirus deaths UK'].sum() )
 # Add a column to IandP and LCD that is constant and equal to total 
 # coronavirus deaths. This is useful for plotting purposes
 
-IandP['Coronavirus deaths 2020 UK'] = totalCoronaDeaths
 
-LCD['Coronavirus deaths 2020 UK'] = totalCoronaDeaths
+IandP.insert(1, 'Coronavirus deaths 2020 UK'  , totalCoronaDeaths  )
+
+LCD.insert(1, 'Coronavirus deaths 2020 UK'  , totalCoronaDeaths  )
 
 
 # This line is to make all the columns of IandP, LCD the same type, so they 
@@ -549,11 +670,24 @@ IandP['Yearly influenza and pneumonia deaths England and Wales'] = IandP['Yearly
 LCD.iloc[:, 1:] = LCD.iloc[:, 1:].astype(np.int)
 
 
+# Calculate total coronavirus excess deaths and total excess deaths this year.
+
+totalNonCoronaED = (yearlyMort['2020'] - yearlyMort['Mean weekly deaths 2010-2019 England and Wales plus coronavirus deaths 2020']).sum()
+
+totalED = (yearlyMort['2020'] - yearlyMort['Mean weekly deaths 2010-2019 England and Wales']).sum()
+
+
+
+
+
+
+
+
 
 # Create all the figures.
 
 
-fig1 = px.bar(df, x="Date", y=['Daily coronavirus deaths UK', 'Daily hospital admissions England and Wales', 'Daily new cases UK'], range_x=['2020-01-01',lastDate], \
+fig1 = px.bar(df, x="Date", y=['Daily coronavirus deaths UK', 'Daily hospital admissions with coronavirus England and Wales', 'Daily positive tests UK'], range_x=['2020-01-01',lastDate], \
              template = "simple_white", color_discrete_sequence =['red', 'gold', 'blue'] )
 
 fig1.update_layout(
@@ -567,7 +701,7 @@ fig1.update_layout(
 
 
 
-testsFig = px.bar(df, x="Date", y=['Daily new tests UK'], range_x=['2020-01-01',lastDate], \
+testsFig = px.bar(df, x="Date", y=['Daily tests UK'], range_x=['2020-01-01',lastDate], \
              template = "simple_white", color_discrete_sequence =['cadetblue' ] )
 
 testsFig.update_layout(
@@ -615,8 +749,8 @@ GDPFig.update_layout(
 
 
 
-IandPFig = px.line(IandP, x="Date", y=['Yearly influenza and pneumonia deaths England and Wales', 'Coronavirus deaths 2020 UK'], \
-             template = "simple_white", color_discrete_sequence =['teal', 'orange' ] )
+IandPFig = px.line(IandP, x="Date", y=['Coronavirus deaths 2020 UK', 'Yearly influenza and pneumonia deaths England and Wales' ], \
+             template = "simple_white", color_discrete_sequence =['orange' ,'teal' ] )
 
 IandPFig.update_layout(
     yaxis_title="",
@@ -626,10 +760,11 @@ IandPFig.update_layout(
 
 
 
+yearlyMortCols = list(yearlyMort.columns)
 
+yearlyMortCols = yearlyMortCols[9:] 
 
-meanDeathsFig = px.line(yearlyMort, x="Date", y= ['Mean weekly deaths 2010-2019 England and Wales', '2015', '2016', '2017', '2018', '2019', '2020' ], range_x=['2010-01-01','2011-01-01'], \
-             template = "simple_white" )
+meanDeathsFig = px.line(yearlyMort, x="Date", y= yearlyMortCols, range_x=['2010-01-01','2011-01-01'], template = "simple_white" )
 
 meanDeathsFig.update_layout(
     yaxis_title="Weekly deaths",
@@ -638,6 +773,17 @@ meanDeathsFig.update_layout(
 
 
 meanDeathsFig.update_layout(xaxis=dict(tickformat="%d-%m"))
+
+
+
+deathByAgeFig = px.bar(deathByAge, x="Age", y='Deaths' ,template = "simple_white",\
+  title = 'Coronavirus deaths England and Wales, 28th December 2019 to 2nd October 2020'      )
+
+deathByAgeFig.update_layout(
+    yaxis_title="Deaths",
+    legend_title="Variable:",
+)
+
 
 
 
@@ -676,14 +822,11 @@ pio.write_html(meanDeathsFig, file='HTML files/meanDeathsFig.html', auto_open=Tr
 
 pio.write_html(LCDFig, file='HTML files/LCDFig.html', auto_open=True)
 
+pio.write_html(deathByAgeFig, file='HTML files/deathByAgeFig.html', auto_open=True)
 
 
-# The following command is used to generate the iframe embed code for a figure
-# After uploading the html files above to github, get the github url and
-# paste it into this command. It will generate HTML iframe code that will
-# embed the graph in a webpage.
 
-# tls.get_embed('github url goes here')
+
 
 
 
