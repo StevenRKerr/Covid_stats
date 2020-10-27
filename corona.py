@@ -693,8 +693,14 @@ fig1 = px.bar(df, x="Date", y=['Daily coronavirus deaths UK', 'Daily hospital ad
 fig1.update_layout(
     yaxis_title="",
     legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="left",
+    x=0.05
 )
-
+    
+)
 
 
 # fig1.add_trace( go.Scatter(x = Mort["Date"], y = Mort["Excess deaths"]/7, mode = 'lines', name = 'Excess deaths', line=dict(color="green")) ) 
@@ -707,6 +713,12 @@ testsFig = px.bar(df, x="Date", y=['Daily tests UK'], range_x=['2020-01-01',last
 testsFig.update_layout(
     yaxis_title="",
     legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="left",
+    x=0.05
+)
 )
 
 
@@ -719,6 +731,12 @@ testPositiveFig = px.line(df, x="Date", y=['Test positive rate UK'], range_x=['2
 testPositiveFig.update_layout(
     yaxis_title="",
     legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="right",
+    x=0.99
+)
 )
 
 testPositiveFig.layout.yaxis.tickformat = ',.0%'
@@ -731,7 +749,15 @@ UCFig = px.line(UC, x="Date", y=['Weekly universal credit claims UK'], range_x=[
 UCFig.update_layout(
     yaxis_title="",
     legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="right",
+    x=0.99
 )
+)
+
+
 
 
 
@@ -743,7 +769,16 @@ GDPFig = px.line(GDP, x="Date", y=['Monthly GDP index UK'], range_x=['2020-01-01
 GDPFig.update_layout(
     yaxis_title="",
     legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="right",
+    x=0.99
 )
+)
+
+
+
 
 
 
@@ -755,7 +790,17 @@ IandPFig = px.line(IandP, x="Date", y=['Coronavirus deaths 2020 UK', 'Yearly inf
 IandPFig.update_layout(
     yaxis_title="",
     legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="right",
+    x=0.99
 )
+)
+
+
+
+
 
 
 
@@ -767,17 +812,25 @@ yearlyMortCols = yearlyMortCols[9:]
 meanDeathsFig = px.line(yearlyMort, x="Date", y= yearlyMortCols, range_x=['2010-01-01','2011-01-01'], template = "simple_white" )
 
 meanDeathsFig.update_layout(
-    yaxis_title="Weekly deaths",
-    legend_title="Variable:",
+    
 )
 
 
-meanDeathsFig.update_layout(xaxis=dict(tickformat="%d-%m"))
+meanDeathsFig.update_layout(xaxis=dict(tickformat="%d-%m"),
+            yaxis_title="Weekly deaths",
+            legend_title="Variable:",
+            legend=dict(
+            yanchor="top",
+            y=0.99,
+            xanchor="right",
+            x=0.99) 
+)
 
 
 
-deathByAgeFig = px.bar(deathByAge, x="Age", y='Deaths' ,template = "simple_white",\
-  title = 'Coronavirus deaths England and Wales, 28th December 2019 to 2nd October 2020'      )
+
+
+deathByAgeFig = px.bar(deathByAge, x="Age", y='Deaths' ,template = "simple_white")
 
 deathByAgeFig.update_layout(
     yaxis_title="Deaths",
@@ -799,7 +852,14 @@ LCDFig = px.line(LCD, x="Date", y= LCDcols, template = "simple_white" )
 LCDFig.update_layout(
     yaxis_title="Yearly deaths UK",
     legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="right",
+    x=0.99
 )
+)
+
 
 
 
