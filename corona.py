@@ -807,7 +807,11 @@ IandPFig.update_layout(
 
 yearlyMortCols = list(yearlyMort.columns)
 
-yearlyMortCols = yearlyMortCols[9:] 
+yearlyMortCols = yearlyMortCols[10:] 
+
+yearlyMortCols = [ yearlyMortCols[-2], yearlyMortCols[-1], yearlyMortCols[1], yearlyMortCols[0]]
+
+
 
 meanDeathsFig = px.line(yearlyMort, x="Date", y= yearlyMortCols, range_x=['2010-01-01','2011-01-01'], template = "simple_white" )
 
