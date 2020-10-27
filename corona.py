@@ -78,7 +78,7 @@ def importHospAd():
     # This takes the columns whose values are pandas timestamps, and makes the 
     # column labels the corresponding date.
     
-    df.columns = ['Date', 'Daily hospital admissions with <br> coronavirus England and Wales']
+    df.columns = ['Date', 'Daily hospital admissions with<br>coronavirus England and Wales']
     
     # Make the row index equal to row number
     
@@ -577,7 +577,7 @@ def createYearlyMort(Mort, OWID):
     
     # Add a column that has weekly mean deaths for 2010-2019
 
-    yearlyMort['Mean weekly deaths 2010-2019 <br> England and Wales'] = yearlyMort.iloc[:, 1:12].mean(axis=1)
+    yearlyMort['Mean weekly deaths 2010-2019<br>England and Wales'] = yearlyMort.iloc[:, 1:12].mean(axis=1)
     
     
     
@@ -622,8 +622,8 @@ def createYearlyMort(Mort, OWID):
     
     # Add a column to yearlyMort that is mean deaths + coronavirus deaths
     
-    yearlyMort['Mean weekly deaths 2010-2019 England <br> and  Wales plus coronavirus deaths 2020'] = \
-                weeklyCoronaDeaths + yearlyMort['Mean weekly deaths 2010-2019 <br> England and Wales']
+    yearlyMort['Mean weekly deaths 2010-2019 England<br>and  Wales plus coronavirus deaths 2020'] = \
+                weeklyCoronaDeaths + yearlyMort['Mean weekly deaths 2010-2019<br>England and Wales']
     
     # Save the dataframe as a pickle object
     
@@ -672,9 +672,9 @@ LCD.iloc[:, 1:] = LCD.iloc[:, 1:].astype(np.int)
 
 # Calculate total coronavirus excess deaths and total excess deaths this year.
 
-totalNonCoronaED = (yearlyMort['2020'] - yearlyMort['Mean weekly deaths 2010-2019 England <br> and  Wales plus coronavirus deaths 2020']).sum()
+totalNonCoronaED = (yearlyMort['2020'] - yearlyMort['Mean weekly deaths 2010-2019 England<br>and  Wales plus coronavirus deaths 2020']).sum()
 
-totalED = (yearlyMort['2020'] - yearlyMort['Mean weekly deaths 2010-2019 <br> England and Wales']).sum()
+totalED = (yearlyMort['2020'] - yearlyMort['Mean weekly deaths 2010-2019<br>England and Wales']).sum()
 
 
 
@@ -687,7 +687,7 @@ totalED = (yearlyMort['2020'] - yearlyMort['Mean weekly deaths 2010-2019 <br> En
 # Create all the figures.
 
 
-fig1 = px.bar(df, x="Date", y=['Daily coronavirus deaths UK', 'Daily hospital admissions with <br> coronavirus England and Wales', 'Daily positive tests UK'], range_x=['2020-01-01',lastDate], \
+fig1 = px.bar(df, x="Date", y=['Daily coronavirus deaths UK', 'Daily hospital admissions with<br>coronavirus England and Wales', 'Daily positive tests UK'], range_x=['2020-01-01',lastDate], \
              template = "simple_white", color_discrete_sequence =['red', 'gold', 'blue'] )
 
 fig1.update_layout(
