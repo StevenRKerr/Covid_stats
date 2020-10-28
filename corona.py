@@ -24,7 +24,7 @@ import math
 
 import ssl
 
-
+import json
 
 # This handles ssl certificates of urls we are downloading data from.
 
@@ -678,9 +678,14 @@ totalED = (yearlyMort['2020'] - yearlyMort['Mean weekly deaths 2010-2019<br>Engl
 
 
 
+deathDict = { "Total corona deaths": totalCoronaDeaths, 
+        "Total non-corona excess deaths": totalNonCoronaED,
+        "Total Excess deaths": totalED}
 
 
 
+with open('deaths.json', 'w') as file:
+    json.dump(deathDict, file)
 
 
 
