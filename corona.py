@@ -678,7 +678,7 @@ totalED = (yearlyMort['2020'] - yearlyMort['Mean weekly deaths 2010-2019<br>Engl
 
 # Create a dictionary with some death related variables of interest.
 
-deathDict = { "TCD": totalCoronaDeaths, 
+deathDict = { "TCD": '{:,}'.format(totalCoronaDeaths), 
         "TNCED": '{:,}'.format(round(totalNonCoronaED,2)),
         "TED": '{:,}'.format(round(totalED,2))}
 
