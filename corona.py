@@ -678,9 +678,9 @@ totalED = (yearlyMort['2020'] - yearlyMort['Mean weekly deaths 2010-2019<br>Engl
 
 
 
-deathDict = { "Total corona deaths": totalCoronaDeaths, 
-        "Total non-corona excess deaths": totalNonCoronaED,
-        "Total Excess deaths": totalED}
+deathDict = { "TCD": totalCoronaDeaths, 
+        "TNCED": totalNonCoronaED,
+        "TED": totalED}
 
 
 
