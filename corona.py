@@ -676,16 +676,18 @@ totalNonCoronaED = (yearlyMort['2020'] - yearlyMort['Mean weekly deaths 2010-201
 
 totalED = (yearlyMort['2020'] - yearlyMort['Mean weekly deaths 2010-2019<br>England and Wales']).sum()
 
-
+# Create a dictionary with some death related variables of interest.
 
 deathDict = { "TCD": totalCoronaDeaths, 
-        "TNCED": totalNonCoronaED,
-        "TED": totalED}
+        "TNCED": '{:,}'.format(round(totalNonCoronaED,2)),
+        "TED": '{:,}'.format(round(totalED,2))}
 
-
+# Save that dictinary in json format. This can then be passed to other
+# applications.
 
 with open('deaths.json', 'w') as file:
     json.dump(deathDict, file)
+
 
 
 
