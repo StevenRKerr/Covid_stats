@@ -228,7 +228,7 @@ def importOWID():
     
     # Rename 'date' to 'Date', just for consistency
     
-    df.columns = ['Date', 'Daily positive tests UK', 'Daily coronavirus deaths UK', 'Daily tests UK', 'Test positive rate UK'  ]
+    df.columns = ['Date', 'Daily positive tests UK', 'Daily coronavirus deaths UK', 'Daily tests UK', 'Positive test rate UK'  ]
     
   
     # Make the row index equal to row number
@@ -452,7 +452,7 @@ HospAd = Open('HospAd')
 # Mortality data is updated weekly, on Thursdays.
 # The file is downloaded automatically
     
-# importMort()
+#importMort()
 
 
 Mort = Open('Mort')
@@ -547,7 +547,7 @@ def createYearlyMort(Mort, OWID):
     
     # Rename columns appropriately.
     
-    yearlyMort = yearlyMort.rename(columns={"Weekly deaths England and Wales": "2010"} )
+    yearlyMort = yearlyMort.rename(columns={"Weekly deaths England and Wales": "Weekly deaths England<br>and Wales 2010"} )
     
     # Make the row index equal to row number
     
@@ -558,7 +558,7 @@ def createYearlyMort(Mort, OWID):
 
     for year in range(2011, 2020):
     
-        yearlyMort[str(year)] = Mort[  Mort['Date'].dt.year == year ]['Weekly deaths England and Wales'].values
+        yearlyMort['Weekly deaths England<br>and Wales ' + str(year)] = Mort[  Mort['Date'].dt.year == year ]['Weekly deaths England and Wales'].values
     
     # Add column for weekly deaths in 2020
     # This isn't so easy because 2020 isn't finished yet, so need to create
@@ -573,7 +573,7 @@ def createYearlyMort(Mort, OWID):
 
     Mort2020 = np.concatenate( [Mort2020, endMort2020] )
 
-    yearlyMort['2020'] = Mort2020
+    yearlyMort['Weekly deaths England<br>and Wales 2020'] = Mort2020
     
     # Add a column that has weekly mean deaths for 2010-2019
 
@@ -644,7 +644,7 @@ yearlyMort = Open('yearlyMort')
 # lastDate is the final data where there is data in the combined HospAd + OWID
 # data frame
 
-lastDate =  str(df.iloc[-1,0]).strip(' 00:00:00')
+lastDate =  str(df.iloc[-1,0])[:10]
 
 
 # totalCoronaDeaths is what it says.
@@ -672,9 +672,9 @@ LCD.iloc[:, 1:] = LCD.iloc[:, 1:].astype(np.int)
 
 # Calculate total coronavirus excess deaths and total excess deaths this year.
 
-totalNonCoronaED = (yearlyMort['2020'] - yearlyMort['Mean weekly deaths 2010-2019 England<br>and  Wales plus coronavirus deaths 2020']).sum()
+totalNonCoronaED = (yearlyMort['Weekly deaths England<br>and Wales 2020'] - yearlyMort['Mean weekly deaths 2010-2019 England<br>and  Wales plus coronavirus deaths 2020']).sum()
 
-totalED = (yearlyMort['2020'] - yearlyMort['Mean weekly deaths 2010-2019<br>England and Wales']).sum()
+totalED = (yearlyMort['Weekly deaths England<br>and Wales 2020'] - yearlyMort['Mean weekly deaths 2010-2019<br>England and Wales']).sum()
 
 # Create a dictionary with some death related variables of interest.
 
@@ -732,7 +732,7 @@ testsFig.update_layout(
 
 
 
-testPositiveFig = px.line(df, x="Date", y=['Test positive rate UK'], range_x=['2020-01-01',lastDate], \
+testPositiveFig = px.line(df, x="Date", y=['Positive test rate UK'], range_x=['2020-01-01',lastDate], \
              template = "simple_white", color_discrete_sequence =['indigo' ] )
 
 testPositiveFig.update_layout(
