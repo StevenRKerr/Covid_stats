@@ -26,6 +26,8 @@ import ssl
 
 import json
 
+from datetime import datetime
+
 # This handles ssl certificates of urls we are downloading data from.
 
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -77,8 +79,8 @@ def mergeFrames(df1, df2):
 
 
 
-# importHospAd imports the Hospital admissions data, puts it into a more useful 
-# format and saves it.
+# importHospAd imports the Hospital admissions data that records admissions
+# with coronavirus , puts it into a more useful format and saves it.
 
 
 def importHospAd():
@@ -101,7 +103,7 @@ def importHospAd():
     # This takes the columns whose values are pandas timestamps, and makes the 
     # column labels the corresponding date.
     
-    df.columns = ['Date', 'Daily hospital admissions with<br>coronavirus England and Wales']
+    df.columns = ['Date', 'Daily hospital admissions with<br>coronavirus England']
     
     # Make the row index equal to row number
     
@@ -113,6 +115,36 @@ def importHospAd():
 
     return
 
+
+# importHospAd2 imports the Hospital admissions data that records admissions
+# plus diagnoses with coronavirus , puts it into a more useful format and 
+# saves it.
+
+
+
+def importHospAd2():
+    
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2020/10/COVID-19-daily-admissions-20201030.xlsx'
+
+    df = pd.read_excel (url)
+
+    df = df.iloc[11:13, 2:   ].T
+    
+    # This takes the columns whose values are pandas timestamps, and makes the 
+    # column labels the corresponding date.
+    
+    df.columns = ['Date', 'Daily hospital admissions plus<br>hospital diagnoses with coronavirus England']
+    
+    # Make the row index equal to row number
+    
+    df.index = np.arange( len(df) )
+    
+    # Save the dataframe as a pickle object
+    
+    Save(df, 'HospAd2')
+    
+    return
+    
 
 # importMort imports the mortality data, puts it into a more useful format
 # and saves it.
@@ -502,7 +534,7 @@ def importGovSpending():
         
     df['Total value of CJRS and SEIS claims'] = df['Total value of claims made CJRS'] + df['Total value of claims made SEIS']
     
-    df['Total value of business loans'] = df['Value of facilities approved CBILS'] + df['Value of facilities approved CBLILS'] \
+    df['Total value of approved business loans'] = df['Value of facilities approved CBILS'] + df['Value of facilities approved CBLILS'] \
         + df['Value of facilities approved BBLS'] + df['Value of convertible loans approved FF'] + df['Total value of VAT deferred']
         
     df.insert(22, 'Total NHS spending UK 2018-2019'  , 152900000000  )
@@ -532,18 +564,19 @@ importOWID()
 OWID = Open('OWID')  
 
 
-# It's not clear how often relevant hospital admissions data is going to be
-# updated
-# The link need to be updated manually
+# The HospAd2 data series is updated daily.
+# The link need to be updated manually.
 
 
-# importHospAd()
+importHospAd2()
 
 
-HospAd = Open('HospAd')
+HospAd2 = Open('HospAd2')
+
+
 
 # Mortality data is updated weekly, on Thursdays.
-# The file is downloaded automatically
+# The file is downloaded automatically.
     
 #importMort()
 
@@ -553,7 +586,7 @@ Mort = Open('Mort')
 
 # Government spending data is updated roughly monthly.
     
-#importGovSpending()
+importGovSpending()
 
 
 govSpending = Open('govSpending')
@@ -569,7 +602,7 @@ deathByAge = Open('deathByAge')
 
 
 
-# UC data is updated sporadically rsdays?
+# UC data is updated sporadically.
 # The file needs to be downloaded manually.
     
 # importUC()
@@ -578,7 +611,7 @@ deathByAge = Open('deathByAge')
 UC = Open('UC') 
 
 
-# GDP data is updated monthly, approximately around the 10th of each month
+# GDP data is updated monthly, approximately around the 10th of each month.
 # The file needs to be downloaded manually.
 
 # importGDP()
@@ -587,21 +620,28 @@ UC = Open('UC')
 GDP = Open('GDP')
 
 
-# IandP data is never updated
+# IandP data is never updated.
     
 # importIandP()
 
 
 IandP = Open('IandP')
 
-# LCD data is never updated
+# LCD data is never updated.
     
 # importLCD()
 
 
 LCD = Open('LCD') 
 
+# HospAd never needs to be updated, because the data series of interest
+# has been terminated.
 
+
+# importHospAd()
+
+
+HospAd = Open('HospAd')
 
 
 
@@ -779,7 +819,7 @@ with open('deaths.json', 'w') as file:
 # Create all the figures.
 
 
-fig1 = px.bar(df, x="Date", y=['Daily coronavirus deaths UK', 'Daily hospital admissions with<br>coronavirus England and Wales', 'Daily positive tests UK'], range_x=['2020-01-01',lastDate], \
+fig1 = px.bar(df, x="Date", y=['Daily coronavirus deaths UK', 'Daily hospital admissions with<br>coronavirus England', 'Daily positive tests UK'], range_x=['2020-01-01',lastDate], \
              template = "simple_white", color_discrete_sequence =['red', 'gold', 'blue'] )
 
 fig1.update_layout(
@@ -959,7 +999,7 @@ LCDFig.update_layout(
 
 
 govSpendingFig = px.line(govSpending, x="Date", y=['Total value of CJRS and SEIS claims', \
-        'Total value of business loans', 'Total NHS spending UK 2018-2019'],template = "simple_white" )
+        'Total value of approved business loans', 'Total NHS spending UK 2018-2019'],template = "simple_white" )
 
 govSpendingFig.update_layout(
     yaxis_title="",
