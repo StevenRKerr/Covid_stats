@@ -133,7 +133,7 @@ def importHospAd2():
     # This takes the columns whose values are pandas timestamps, and makes the 
     # column labels the corresponding date.
     
-    df.columns = ['Date', 'Daily hospital admissions plus<br>hospital diagnoses with coronavirus England']
+    df.columns = ['Date', 'Daily hospital admissions<br>plus hospital diagnoses<br>with coronavirus England']
     
     # Make the row index equal to row number
     
@@ -822,7 +822,7 @@ with open('deaths.json', 'w') as file:
 
 
 fig1 = px.line(df, x="Date", y=['Daily coronavirus deaths UK', 'Daily hospital admissions with<br>coronavirus England', 'Daily positive tests UK', \
-                                'Daily hospital admissions plus<br>hospital diagnoses with coronavirus England' ], range_x=['2020-01-01',lastDate], \
+                                'Daily hospital admissions<br>plus hospital diagnoses<br>with coronavirus England' ], range_x=['2020-01-01',lastDate], \
              template = "simple_white", color_discrete_sequence =['red', 'gold', 'blue', 'green'] )
 
 fig1.update_layout(
@@ -843,7 +843,7 @@ fig1.update_layout(
 
 
 testsFig = px.bar(df, x="Date", y=['Daily tests UK'], range_x=['2020-01-01',lastDate], \
-             template = "simple_white", color_discrete_sequence =['cadetblue' ] )
+             template = "simple_white", color_discrete_sequence =['slateblue' ] )
 
 testsFig.update_layout(
     yaxis_title="",
