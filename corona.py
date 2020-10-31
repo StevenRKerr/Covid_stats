@@ -830,7 +830,7 @@ fig1.update_layout(
     legend_title="Variable:",
     legend=dict(
     yanchor="top",
-    y=1.6,
+    y=1.65,
     xanchor="left",
     x=0.02
 )
