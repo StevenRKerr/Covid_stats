@@ -80,7 +80,7 @@ def mergeFrames(df1, df2):
 
 
 # importHospAd imports the Hospital admissions data that records admissions
-# with coronavirus , puts it into a more useful format and saves it.
+# with Covid-19 , puts it into a more useful format and saves it.
 
 
 def importHospAd():
@@ -103,7 +103,7 @@ def importHospAd():
     # This takes the columns whose values are pandas timestamps, and makes the 
     # column labels the corresponding date.
     
-    df.columns = ['Date', 'Daily hospital admissions with<br>coronavirus England']
+    df.columns = ['Date', 'Daily hospital admissions with<br>Covid-19 England']
     
     # Make the row index equal to row number
     
@@ -117,7 +117,7 @@ def importHospAd():
 
 
 # importHospAd2 imports the Hospital admissions data that records admissions
-# plus diagnoses with coronavirus , puts it into a more useful format and 
+# plus diagnoses with Covid-19 , puts it into a more useful format and 
 # saves it.
 
 
@@ -133,7 +133,7 @@ def importHospAd2():
     # This takes the columns whose values are pandas timestamps, and makes the 
     # column labels the corresponding date.
     
-    df.columns = ['Date', 'Daily hospital admissions<br>plus hospital diagnoses<br>with coronavirus England']
+    df.columns = ['Date', 'Daily hospital admissions<br>plus hospital diagnoses<br>with Covid-19 England']
     
     # Make the row index equal to row number
     
@@ -217,19 +217,15 @@ def importMort():
 # importGDP imports the GDP data, puts it into a more useful format
 # and saves it.
 
-# Note that although GDP data is availble for download in csv format which
-# I generally prefer, there is a strange issue where the date format gets altered
-# when the file is read in with pd.read_csv. On the other hand, the excel file
-# does not have that issue.
 
-# Also even then there is an annoying issue with March 2017, which has 
-# 2017MAR in the date column rather than 2017 MAR, so tha has to be 
+# There is an annoying issue with March 2017, which has 
+# 2017MAR in the date column rather than 2017 MAR, so that has to be 
 # fixed manually.
 
 def importGDP():
     
     
-    df = pd.read_excel(r'Data/GDP Index.xls')
+    df = pd.read_csv(r'Data/GDP Index.csv')
     
     # Rename columns appropriately
     
@@ -246,10 +242,46 @@ def importGDP():
     # Make the row index equal to row number
     
     df.index = np.arange( len(df) )
+    
+    
+    # Start off with Dates from 2010 in the first column, and weekly deaths
+    # for 2010 in the second column.
+    
+    yearlyGDP = df[ df['Date'].dt.year == 2007 ]
+    
+    # Rename columns appropriately.
+    
+    yearlyGDP = yearlyGDP.rename(columns={"Monthly GDP index UK": "Monthly GDP index UK 2007"} )
+    
+
+    # Add columns for weekly deaths for years 2011-2019
+
+
+    for year in range(2008, 2020):
+        
+    
+        yearlyGDP['Monthly GDP index UK ' + str(year)] = df[  df['Date'].dt.year == year ]['Monthly GDP index UK'].values
+    
+    
+    
+    GDP2020 = df[  df['Date'].dt.year == 2020 ]['Monthly GDP index UK'].values
+
+
+    endGDP2020 = np.empty(12- len(GDP2020)  )
+
+    endGDP2020[:] = np.nan
+
+    GDP2020 = np.concatenate( [GDP2020, endGDP2020] )
+
+    yearlyGDP['Monthly GDP index UK 2020'] = GDP2020
+    
+    # Make all non-date entries floats.
+    
+    yearlyGDP.iloc[0:, 1:] = yearlyGDP.iloc[0:, 1:].astype(float)
    
     # Save the dataframe as a pickle object
     
-    Save(df, 'GDP')
+    Save(yearlyGDP, 'yearlyGDP')
     
     return
  
@@ -283,7 +315,7 @@ def importOWID():
     
     # Rename 'date' to 'Date', just for consistency
     
-    df.columns = ['Date', 'Daily positive tests UK', 'Daily coronavirus deaths UK', 'Daily tests UK', 'Positive test rate UK'  ]
+    df.columns = ['Date', 'Daily positive tests UK', 'Daily Covid-19 deaths UK', 'Daily tests UK', 'Positive test rate UK'  ]
     
   
     # Make the row index equal to row number
@@ -586,7 +618,7 @@ Mort = Open('Mort')
 
 # Government spending data is updated roughly monthly.
     
-importGovSpending()
+#importGovSpending()
 
 
 govSpending = Open('govSpending')
@@ -614,10 +646,10 @@ UC = Open('UC')
 # GDP data is updated monthly, approximately around the 10th of each month.
 # The file needs to be downloaded manually.
 
-# importGDP()
+#importGDP()
 
 
-GDP = Open('GDP')
+GDP = Open('yearlyGDP')
 
 
 # IandP data is never updated.
@@ -704,15 +736,15 @@ def createYearlyMort(Mort, OWID):
     
     
     
-    # Isolate coronavirus deaths in 2020
+    # Isolate Covid-19 deaths in 2020
     
-    OWIDDeaths2020 = OWID[ OWID.Date.dt.year ==2020 ][ 'Daily coronavirus deaths UK' ]
+    OWIDDeaths2020 = OWID[ OWID.Date.dt.year ==2020 ][ 'Daily Covid-19 deaths UK' ]
     
     # Make the row index equal to row number
     
     OWIDDeaths2020.index = np.arange( len(OWIDDeaths2020) )
     
-    # These are useful for finding weekly coronavirus deaths
+    # These are useful for finding weekly Covid-19 deaths
     
     lastWeekFloor = math.floor( len(OWIDDeaths2020)/7 ) 
     
@@ -743,9 +775,9 @@ def createYearlyMort(Mort, OWID):
     
     weeklyCoronaDeaths = np.concatenate( [weeklyCoronaDeaths, endOWID2020] )
     
-    # Add a column to yearlyMort that is mean deaths + coronavirus deaths
+    # Add a column to yearlyMort that is mean deaths + Covid-19 deaths
     
-    yearlyMort['Mean weekly deaths 2010-2019 England<br>and  Wales plus coronavirus deaths 2020'] = \
+    yearlyMort['Mean weekly deaths 2010-2019 England<br>and  Wales plus Covid-19 deaths 2020'] = \
                 weeklyCoronaDeaths + yearlyMort['Mean weekly deaths 2010-2019<br>England and Wales']
     
     # Save the dataframe as a pickle object
@@ -772,16 +804,16 @@ lastDate =  str(df.iloc[-1,0])[:10]
 
 # totalCoronaDeaths is what it says.
 
-totalCoronaDeaths = int( OWID['Daily coronavirus deaths UK'].sum() )
+totalCoronaDeaths = int( OWID['Daily Covid-19 deaths UK'].sum() )
 
 
 # Add a column to IandP and LCD that is constant and equal to total 
-# coronavirus deaths. This is useful for plotting purposes
+# Covid-19 deaths. This is useful for plotting purposes
 
 
-IandP.insert(1, 'Coronavirus deaths 2020 UK'  , totalCoronaDeaths  )
+IandP.insert(1, 'Covid-19 deaths 2020 UK'  , totalCoronaDeaths  )
 
-LCD.insert(1, 'Coronavirus deaths 2020 UK'  , totalCoronaDeaths  )
+LCD.insert(1, 'Covid-19 deaths 2020 UK'  , totalCoronaDeaths  )
 
 
 # This line is to make all the columns of IandP, LCD the same type, so they 
@@ -793,9 +825,9 @@ IandP['Yearly influenza and pneumonia deaths England and Wales'] = IandP['Yearly
 LCD.iloc[:, 1:] = LCD.iloc[:, 1:].astype(np.int)
 
 
-# Calculate total coronavirus excess deaths and total excess deaths this year.
+# Calculate total Covid-19 excess deaths and total excess deaths this year.
 
-totalNonCoronaED = (yearlyMort['Weekly deaths England<br>and Wales 2020'] - yearlyMort['Mean weekly deaths 2010-2019 England<br>and  Wales plus coronavirus deaths 2020']).sum()
+totalNonCoronaED = (yearlyMort['Weekly deaths England<br>and Wales 2020'] - yearlyMort['Mean weekly deaths 2010-2019 England<br>and  Wales plus Covid-19 deaths 2020']).sum()
 
 totalED = (yearlyMort['Weekly deaths England<br>and Wales 2020'] - yearlyMort['Mean weekly deaths 2010-2019<br>England and Wales']).sum()
 
@@ -821,8 +853,8 @@ with open('deaths.json', 'w') as file:
 # Create all the figures.
 
 
-fig1 = px.line(df, x="Date", y=['Daily coronavirus deaths UK', 'Daily hospital admissions with<br>coronavirus England', 'Daily positive tests UK', \
-                                'Daily hospital admissions<br>plus hospital diagnoses<br>with coronavirus England' ], range_x=['2020-01-01',lastDate], \
+fig1 = px.line(df, x="Date", y=['Daily Covid-19 deaths UK', 'Daily hospital admissions with<br>Covid-19 England', 'Daily positive tests UK', \
+                                'Daily hospital admissions<br>plus hospital diagnoses<br>with Covid-19 England' ], range_x=['2020-01-01',lastDate], \
              template = "simple_white", color_discrete_sequence =['red', 'gold', 'blue', 'green'] )
 
 fig1.update_layout(
@@ -898,10 +930,11 @@ UCFig.update_layout(
 
 
 
-GDPFig = px.line(GDP, x="Date", y=['Monthly GDP index UK'], range_x=['2020-01-01',lastDate], \
-             template = "simple_white", color_discrete_sequence =['darkslategray' ] )
+GDPFig = px.line(GDP, x="Date", y=['Monthly GDP index UK 2020', 'Monthly GDP index UK 2019', \
+              'Monthly GDP index UK 2018', 'Monthly GDP index UK 2017'], range_x=['2007-01-01','2007-12-01'], \
+             template = "simple_white")
 
-GDPFig.update_layout(
+GDPFig.update_layout( xaxis=dict(tickformat="%b"),
     yaxis_title="",
     legend_title="Variable:",
     legend=dict(
@@ -919,7 +952,7 @@ GDPFig.update_layout(
 
 
 
-IandPFig = px.line(IandP, x="Date", y=['Coronavirus deaths 2020 UK', 'Yearly influenza and pneumonia deaths England and Wales' ], \
+IandPFig = px.line(IandP, x="Date", y=['Covid-19 deaths 2020 UK', 'Yearly influenza and pneumonia deaths England and Wales' ], \
              template = "simple_white", color_discrete_sequence =['orange' ,'teal' ] )
 
 IandPFig.update_layout(
@@ -955,7 +988,7 @@ meanDeathsFig.update_layout(
 )
 
 
-meanDeathsFig.update_layout(xaxis=dict(tickformat="%d-%m"),
+meanDeathsFig.update_layout(xaxis=dict(tickformat="%b"),
             yaxis_title="Weekly deaths",
             legend_title="Variable:",
             legend=dict(
