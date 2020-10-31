@@ -53,6 +53,29 @@ def Open(filename):
 
     return pickle.load(file)    
 
+# The function mergeData does an outer merge of all the data sets, filling in
+# with missing value wherever appropriate.
+
+def mergeFrames(df1, df2):
+
+    df = pd.merge(df1, df2, how='outer')
+
+    # Sort by date
+
+    df= df.sort_values('Date')
+    
+    # Make sure everything that isn't the date is stored as a float
+    
+    df.iloc[:, 1:] = df.iloc[:, 1:].astype(float)
+    
+    # Make the row index equal to row number
+    
+    df.index = np.arange( len(df) )
+    
+    return df
+
+
+
 
 # importHospAd imports the Hospital admissions data, puts it into a more useful 
 # format and saves it.
@@ -321,7 +344,8 @@ def importIandP():
     return
     
     
-
+# importLCD imports leading cause of death data, puts it into a more 
+# useful format and saves it.
 
 
 
@@ -387,7 +411,8 @@ def importLCD():
    
 
 
-
+# importdeathByAge imports death by age data, puts it into a more 
+# useful format and saves it.
 
 
 
@@ -420,6 +445,74 @@ def importdeathByAge():
     Save(df, 'deathByAge')
     
     return
+
+
+# importGovSpending imports government spending data, puts it into a more 
+# useful format and saves it.
+
+
+def importGovSpending():
+    
+    # import CJRS and SEIS data
+    
+    CJRS = pd.read_excel(r'Data/CJRS.xls')
+
+    SEIS = pd.read_excel(r'Data/SEIS.xls')
+    
+    businessLoans = pd.read_excel(r'Data/Business loans.xls')
+    
+    VAT = pd.read_excel(r'Data/Vat deferral.xls')
+    
+    # Merge dataframes
+
+    df = pd.merge(CJRS, SEIS, how='outer')
+    
+    df = pd.merge(df, businessLoans, how = 'outer')
+    
+    df = pd.merge(df, VAT, how = 'outer')
+    
+    # Sort by date
+    
+    df = df.sort_values(by='Date')
+    
+    # Make the row index equal to row number
+    
+    df.index = np.arange( len(df) )
+    
+    
+    # Fill in the NaNs where possible
+    
+    for index in df.index:
+        
+        df.loc[index, 'Total value of claims made CJRS'] = df.iloc[ :(index+1) ,3].max()
+    
+        df.loc[index, 'Total value of claims made SEIS'] = df.iloc[ :(index+1) ,5].max()
+        
+        df.loc[index, 'Value of facilities approved CBILS'] = df.iloc[ :(index+1) ,6].max()
+        
+        df.loc[index, 'Value of facilities approved CBLILS'] = df.iloc[ :(index+1) ,8].max()
+        
+        df.loc[index, 'Value of facilities approved BBLS'] = df.iloc[ :(index+1) ,10].max()
+        
+        df.loc[index, 'Value of convertible loans approved FF'] = df.iloc[ :(index+1) ,14].max()
+        
+        df.loc[index, 'Total value of VAT deferred'] = df.iloc[ :(index+1) ,18].max()
+     
+    # Add a columns that has total value of CJRS and SEIS claims
+        
+    df['Total value of CJRS and SEIS claims'] = df['Total value of claims made CJRS'] + df['Total value of claims made SEIS']
+    
+    df['Total value of business loans'] = df['Value of facilities approved CBILS'] + df['Value of facilities approved CBLILS'] \
+        + df['Value of facilities approved BBLS'] + df['Value of convertible loans approved FF'] + df['Total value of VAT deferred']
+        
+    df.insert(22, 'Total NHS spending UK 2018-2019'  , 152900000000  )
+    
+     # Save the dataframe as a pickle object
+ 
+    Save(df, 'govSpending')
+    
+    return
+
 
 
 
@@ -458,6 +551,14 @@ HospAd = Open('HospAd')
 Mort = Open('Mort')
 
 
+# Government spending data is updated roughly monthly.
+    
+#importGovSpending()
+
+
+govSpending = Open('govSpending')
+
+
 # Deaths by age is updated weekly, on Tuesdays.
 # The file needs to be downloaded manually.
     
@@ -468,7 +569,7 @@ deathByAge = Open('deathByAge')
 
 
 
-# UC data is updated weekly? Maybe on Thursdays?
+# UC data is updated sporadically rsdays?
 # The file needs to be downloaded manually.
     
 # importUC()
@@ -507,26 +608,6 @@ LCD = Open('LCD')
 
 
 
-# The function mergeData does an outer merge of all the data sets, filling in
-# with missing value wherever appropriate.
-
-def mergeFrames(df1, df2):
-
-    df = pd.merge(df1, df2, how='outer')
-
-    # Sort by date
-
-    df= df.sort_values('Date')
-    
-    # Make sure everything that isn't the date is stored as a float
-    
-    df.iloc[:, 1:] = df.iloc[:, 1:].astype(float)
-    
-    # Make the row index equal to row number
-    
-    df.index = np.arange( len(df) )
-    
-    return df
 
 
 
@@ -687,6 +768,10 @@ deathDict = { "TCD": '{:,}'.format(totalCoronaDeaths),
 
 with open('deaths.json', 'w') as file:
     json.dump(deathDict, file)
+
+
+
+
 
 
 
@@ -873,6 +958,22 @@ LCDFig.update_layout(
 
 
 
+govSpendingFig = px.line(govSpending, x="Date", y=['Total value of CJRS and SEIS claims', \
+        'Total value of business loans', 'Total NHS spending UK 2018-2019'],template = "simple_white" )
+
+govSpendingFig.update_layout(
+    yaxis_title="",
+    legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=0.8,
+    xanchor="left",
+    x=0.02
+)
+)
+
+
+
 
 
 # Create HTML files
@@ -895,7 +996,7 @@ pio.write_html(LCDFig, file='HTML files/LCDFig.html', auto_open=True)
 
 pio.write_html(deathByAgeFig, file='HTML files/deathByAgeFig.html', auto_open=True)
 
-
+pio.write_html(govSpendingFig, file='HTML files/govSpendingFig.html', auto_open=True)
 
 
 
