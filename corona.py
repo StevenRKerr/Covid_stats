@@ -638,7 +638,7 @@ LCD = Open('LCD')
 # has been terminated.
 
 
-# importHospAd()
+#importHospAd()
 
 
 HospAd = Open('HospAd')
@@ -654,6 +654,8 @@ HospAd = Open('HospAd')
 # Create combined OWID, HospAd dataframe
 
 df = mergeFrames(OWID, HospAd )
+
+df = mergeFrames(df, HospAd2)
 
 
 
@@ -819,15 +821,16 @@ with open('deaths.json', 'w') as file:
 # Create all the figures.
 
 
-fig1 = px.bar(df, x="Date", y=['Daily coronavirus deaths UK', 'Daily hospital admissions with<br>coronavirus England', 'Daily positive tests UK'], range_x=['2020-01-01',lastDate], \
-             template = "simple_white", color_discrete_sequence =['red', 'gold', 'blue'] )
+fig1 = px.line(df, x="Date", y=['Daily coronavirus deaths UK', 'Daily hospital admissions with<br>coronavirus England', 'Daily positive tests UK', \
+                                'Daily hospital admissions plus<br>hospital diagnoses with coronavirus England' ], range_x=['2020-01-01',lastDate], \
+             template = "simple_white", color_discrete_sequence =['red', 'gold', 'blue', 'green'] )
 
 fig1.update_layout(
     yaxis_title="",
     legend_title="Variable:",
     legend=dict(
     yanchor="top",
-    y=0.99,
+    y=1.1,
     xanchor="left",
     x=0.02
 )
