@@ -124,7 +124,7 @@ def importHospAd():
 
 def importHospAd2():
     
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2020/10/COVID-19-daily-admissions-20201030.xlsx'
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2020/10/COVID-19-daily-admissions-20201031.xlsx'
 
     df = pd.read_excel (url)
 
@@ -610,7 +610,7 @@ HospAd2 = Open('HospAd2')
 # Mortality data is updated weekly, on Thursdays.
 # The file is downloaded automatically.
     
-#importMort()
+importMort()
 
 
 Mort = Open('Mort')
@@ -934,17 +934,16 @@ GDPFig = px.line(GDP, x="Date", y=['Monthly GDP index UK 2020', 'Monthly GDP ind
               'Monthly GDP index UK 2018', 'Monthly GDP index UK 2017'], range_x=['2007-01-01','2007-12-01'], \
              template = "simple_white")
 
-GDPFig.update_layout( xaxis=dict(tickformat="%b"),
+GDPFig.update_layout(xaxis=dict(tickformat="%b"),
     yaxis_title="",
     legend_title="Variable:",
     legend=dict(
     yanchor="top",
-    y=0.99,
+    y=0.5,
     xanchor="right",
     x=0.99
 )
 )
-
 
 
 
@@ -1038,6 +1037,7 @@ govSpendingFig = px.line(govSpending, x="Date", y=['Total value of CJRS and SEIS
         'Total value of approved business loans', 'Total NHS spending UK 2018-2019'],template = "simple_white" )
 
 govSpendingFig.update_layout(
+    yaxis_tickprefix = '£',
     yaxis_title="",
     legend_title="Variable:",
     legend=dict(
