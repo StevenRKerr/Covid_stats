@@ -26,7 +26,9 @@ import ssl
 
 import json
 
-from datetime import datetime
+from datetime import date
+
+import datetime
 
 # This handles ssl certificates of urls we are downloading data from.
 
@@ -123,6 +125,16 @@ def importHospAd():
 
 
 def importHospAd2():
+    
+    # Get yesterday's date, because it is used in the PHE url
+    
+    yesterday = date.today() - datetime.timedelta(1)
+    
+    dateStr = str(yesterday).replace("-", "")
+    
+    # Create url of hospital admissions data
+    
+#    url = ('https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/'  + str(yesterday.year) + "/" + str(yesterday.month) + '/' "COVID-19-daily-admissions-" + dateStr + '.xlsx')
     
     url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2020/10/COVID-19-daily-admissions-20201031.xlsx'
 
@@ -500,6 +512,10 @@ def importdeathByAge():
     
     df['Deaths'] = df['Male'] + df['Female']
     
+    #Reorder cos they are arse pieces
+    
+    df = df.iloc[::-1]
+    
     # Make the row index equal to row number
     
     df.index = np.arange( len(df) )
@@ -627,7 +643,7 @@ govSpending = Open('govSpending')
 # Deaths by age is updated weekly, on Tuesdays.
 # The file needs to be downloaded manually.
     
-# importdeathByAge()
+#importdeathByAge()
 
 
 deathByAge = Open('deathByAge') 
@@ -870,7 +886,7 @@ fig1.update_layout(
 )
 
 
-# fig1.add_trace( go.Scatter(x = Mort["Date"], y = Mort["Excess deaths"]/7, mode = 'lines', name = 'Excess deaths', line=dict(color="green")) ) 
+
 
 
 
