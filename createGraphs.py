@@ -223,7 +223,7 @@ fig1.update_layout(
     legend_title="Variable:",
     legend=dict(
     yanchor="top",
-    y=1.65,
+    y=1.45,
     xanchor="left",
     x=0.02
 )
@@ -421,9 +421,8 @@ bedBarCols = [ beds.columns[-2], beds.columns[-1] ]
 
 
 
-bedsFig = px.bar(beds, x='Date', y=bedBarCols, range_x=['2020-01-01',lastDate], template = "simple_white")
-
-
+bedsFig = px.bar(beds, x='Date', y=bedBarCols, range_x=['2020-01-01',lastDate], \
+  template = "simple_white", color_discrete_sequence =[ 'fuchsia', 'blue'] )
 
 
 Line0 = px.line(beds, x='Date', y=[bedLineCols[0]], range_x=['2020-01-01',lastDate], color_discrete_sequence = ['red'], template = "simple_white") 
@@ -434,7 +433,7 @@ Line1 = px.line(beds, x='Date', y=[bedLineCols[1]], range_x=['2020-01-01',lastDa
 
 bedsFig.add_trace(Line1.data[0])
 
-Line2 = px.line(beds, x='Date', y=[bedLineCols[2]], range_x=['2020-01-01',lastDate], color_discrete_sequence =[ 'orangered'], template = "simple_white") 
+Line2 = px.line(beds, x='Date', y=[bedLineCols[2]], range_x=['2020-01-01',lastDate], color_discrete_sequence =[ 'orange'], template = "simple_white") 
 
 bedsFig.add_trace(Line2.data[0])
 
@@ -442,12 +441,13 @@ Line3 = px.line(beds, x='Date', y=[bedLineCols[3]], range_x=['2020-01-01',lastDa
 
 bedsFig.add_trace(Line3.data[0])
 
-bedsFig.update_layout(xaxis=dict(tickformat="%b %d"),
+bedsFig.update_layout(
+    xaxis=dict(tickformat="%b %d"),
     yaxis_title="",
     legend_title="Variable:",
     legend=dict(
     yanchor="top",
-    y=0.1,
+    y=1.2,
     xanchor="left",
     x=0.02
 )
