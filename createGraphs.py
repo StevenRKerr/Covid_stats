@@ -16,20 +16,10 @@ import numpy as np
 
 import plotly.express as px
 
-import math
-
-import ssl
-
 import json
-
-from datetime import date
-
-import datetime
 
 import importData as iD
 
-
-import plotly.graph_objects as go
 
 
 
@@ -447,7 +437,7 @@ bedsFig.update_layout(
     legend_title="Variable:",
     legend=dict(
     yanchor="top",
-    y=1.2,
+    y=1.35,
     xanchor="left",
     x=0.02
 )

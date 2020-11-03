@@ -10,7 +10,6 @@ import pandas as pd
 
 import pickle
 
-import plotly.io as pio
 
 import numpy as np
 
@@ -20,11 +19,15 @@ import math
 
 import ssl
 
-import json
-
 from datetime import date
 
 import datetime
+
+import os
+
+import sys
+
+import shutil
 
 # This handles ssl certificates of urls we are downloading data from.
 
@@ -168,6 +171,12 @@ def importMort():
     # if you try with pandas dataframe
     
     array = np.genfromtxt('https://www.mortality.org/Public/STMF/Outputs/stmf.csv', delimiter = ',', dtype =str)
+    
+    # Importing mortalit.org data automatically creates a new folder for some
+    # reason. Delete it.
+    
+    shutil.rmtree('www.mortality.org')
+    
     
     # Now stick it into a dataframe
     
