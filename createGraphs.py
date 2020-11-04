@@ -23,10 +23,7 @@ import importData as iD
 
 
 
-
-
 # Import and format all the data
-
 
 
 # OWID data is updated daily
@@ -38,32 +35,36 @@ iD.importOWID()
 OWID = iD.Open('OWID')  
 
 
-# The HospAd2 data series is updated daily.
-# The link need to be updated manually.
+# The NewHosp data series is updated daily.
+# The file is downloaded automatically.
+
+iD.importNewHosp()
 
 
-iD.importHospAd2()
+newHospAd = iD.Open('newHospAd')
 
-
-HospAd2 = iD.Open('HospAd2')
+newBedsOccCovid = iD.Open('newBedsOccCovid')
 
 
 
 # Mortality data is updated weekly, on Thursdays.
 # The file is downloaded automatically.
     
-iD.importMort()
+# iD.importMort()
 
 
 Mort = iD.Open('Mort')
 
 
-# Beds needs to be updated on the first of each month.
 
-#iD.importBeds()
+# Total beds occupied data is updated at the start of each month
+    
+#iD.importNewBedsOcc()
 
 
-beds = iD.Open('beds')
+newBedsOcc = iD.Open('newbedsOcc')
+
+
 
 # Government spending data is updated roughly monthly.
     
@@ -115,40 +116,58 @@ IandP = iD.Open('IandP')
 
 LCD = iD.Open('LCD') 
 
-# HospAd never needs to be updated, because the data series of interest
-# has been terminated.
+# OldHosp is never updated, because the data series of interest
+# have been terminated or are redundant.
 
 
-#importHospAd()
+#importOldHosp()
 
 
-HospAd = iD.Open('HospAd')
+oldHospAd = iD.Open('oldHospAd')
+
+oldBedsOccCovid = iD.Open('oldBedsOccCovid')
 
 
+# oldBedsOcc never needs to be updated
+
+# iD.importOldBedsOcc()
 
 
-
-
-
-
-
-# Create combined OWID, HospAd, HospAd2 dataframe, and yearlyMort
-
-df = iD.mergeFrames(OWID, HospAd )
-
-df = iD.mergeFrames(df, HospAd2)
+oldBedsOcc = iD.Open('oldBedsOcc')
 
 
 
-    
+
+
+
+
+
+
+
+
+
+
+# Create combined OWID, oldHospAd andnewHospAd dataframe. Create yearlyMort,
+# and combine all beds data
+
+df = iD.mergeFrames(OWID, oldHospAd )
+
+df = iD.mergeFrames(df, newHospAd)
+
+
+
 iD.createYearlyMort(Mort, OWID)
 
 
 yearlyMort = iD.Open('yearlyMort') 
 
 
-# lastDate is the final data where there is data in the combined HospAd + OWID
-# data frame
+iD.combineBeds(oldBedsOcc, newBedsOcc, oldBedsOccCovid, newBedsOccCovid)
+
+beds = iD.Open('beds')
+
+
+# lastDate is the final data where there is data in the df data frame
 
 lastDate =  str(df.iloc[-1,0])[:10]
 
@@ -367,7 +386,6 @@ deathByAgeFig.update_layout(
 
 
 
-# Create a list of columns that I want to plot. It's everything except 'Date'
 
 LCDcols = list(LCD.columns)
 
@@ -447,8 +465,6 @@ bedsFig.update_layout(
 
 
 
-
-color_discrete_sequence =['orange' ,'teal' ]
 
 
 
