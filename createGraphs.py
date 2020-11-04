@@ -362,7 +362,7 @@ meanDeathsFig.update_layout(
 )
 
 
-meanDeathsFig.update_layout(xaxis=dict(tickformat="%b"),
+meanDeathsFig.update_layout(xaxis=dict(tickformat="%b %d"),
             yaxis_title="Weekly deaths",
             legend_title="Variable:",
             legend=dict(
