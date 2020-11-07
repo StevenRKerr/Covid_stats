@@ -50,7 +50,7 @@ newBedsOccCovid = iD.Open('newBedsOccCovid')
 # Mortality data is updated weekly, on Thursdays.
 # The file is downloaded automatically.
     
-# iD.importMort()
+#iD.importMort()
 
 
 Mort = iD.Open('Mort')

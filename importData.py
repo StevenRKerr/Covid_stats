@@ -85,7 +85,7 @@ def importOldHosp():
     
     url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2020/10/Covid-Publication-08-10-2020v3.xlsx"
     
-    df = pd.read_excel (url, sheet_name='Admissions Total')
+    df = pd.read_excel(url, sheet_name='Admissions Total')
     
     # Drop everything except rows 11 and 12, and all columns from 5 onwards.
     # Row 11 has the date
@@ -182,8 +182,9 @@ def importNewHosp():
     
     url = ('https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/'  + str(yesterday.year) + "/" + str(yesterday.month) + '/' "COVID-19-daily-admissions-" + dateStr + '.xlsx')
     
-    df = pd.read_excel (url)
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2020/11/COVID-19-daily-admissions-and-beds-20201106-1.xlsx'
     
+    df = pd.read_excel(url)    
     # Pick out relevant rows and columns
 
     admissions = df.iloc[11:13, 2:   ].T
