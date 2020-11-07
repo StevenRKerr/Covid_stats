@@ -182,7 +182,7 @@ def importNewHosp():
     
     url = ('https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/'  + str(yesterday.year) + "/" + str(yesterday.month) + '/' "COVID-19-daily-admissions-" + dateStr + '.xlsx')
     
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2020/11/COVID-19-daily-admissions-and-beds-20201106-1.xlsx'
+#    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2020/11/COVID-19-daily-admissions-and-beds-20201106-1.xlsx'
     
     df = pd.read_excel(url)    
     # Pick out relevant rows and columns for admissions
@@ -368,6 +368,7 @@ def importGDP():
     
     df = pd.read_csv(r'Data/GDP Index.csv')
     
+
     # Rename columns appropriately
     
     df.columns = ['Date', 'Monthly GDP index UK'] 
@@ -376,9 +377,17 @@ def importGDP():
     
     df = df.iloc[6:, :]
     
+     # Rename to remove fourth letters cos theyre fucking idiots
+    
+    df['Date'] = df['Date'].str.replace('June', 'Jun')
+    
+    df['Date'] = df['Date'].str.replace('July', 'Jul')
+    
+    df['Date'] = df['Date'].str.replace('Sept', 'Sep')
+    
     # Convert the Date entries to a proper timedate
     
-    df['Date'] = pd.to_datetime( df.Date.astype(str), format= '%Y %b')
+    df['Date'] = pd.to_datetime( df.Date.astype(str), format= '%b %Y')
        
     # Make the row index equal to row number
     

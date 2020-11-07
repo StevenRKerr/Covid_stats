@@ -120,7 +120,7 @@ LCD = iD.Open('LCD')
 # have been terminated or are redundant.
 
 
-iD.importOldHosp()
+#iD.importOldHosp()
 
 
 oldHospAd = iD.Open('oldHospAd')
@@ -234,7 +234,7 @@ fig1.update_layout(
     legend_title="Variable:",
     legend=dict(
     yanchor="top",
-    y=1.45,
+    y=1.4,
     xanchor="left",
     x=0.02
 )
