@@ -41,7 +41,7 @@ OWID = iD.Open('OWID')
 iD.importNewHosp()
 
 
-newHospAd = iD.Open('newHospAd')
+newHosp = iD.Open('newHosp')
 
 newBedsOccCovid = iD.Open('newBedsOccCovid')
 
@@ -120,7 +120,7 @@ LCD = iD.Open('LCD')
 # have been terminated or are redundant.
 
 
-#importOldHosp()
+iD.importOldHosp()
 
 
 oldHospAd = iD.Open('oldHospAd')
@@ -152,7 +152,7 @@ oldBedsOcc = iD.Open('oldBedsOcc')
 
 df = iD.mergeFrames(OWID, oldHospAd )
 
-df = iD.mergeFrames(df, newHospAd)
+df = iD.mergeFrames(df, newHosp)
 
 
 
@@ -223,9 +223,11 @@ with open('deaths.json', 'w') as file:
 # Create all the figures.
 
 
-fig1 = px.line(df, x="Date", y=['Daily Covid-19 deaths UK', 'Daily hospital admissions with<br>Covid-19 England', \
-                                'Daily hospital admissions<br>plus hospital diagnoses<br>with Covid-19 England' ], range_x=['2020-01-01',lastDate], \
-             template = "simple_white", color_discrete_sequence =['red', 'gold', 'blue'] )
+fig1 = px.line(df, x="Date", y=['Daily Covid-19 deaths UK', 'Daily hospital admissions with Covid-19 England', \
+                    'Daily hospital admissions plus hospital diagnoses with Covid-19 England' , \
+               'Mechanical ventilation beds occupied by patients with Covid-19 England'] , \
+               range_x=['2020-01-01',lastDate], \
+             template = "simple_white", color_discrete_sequence =['red', 'gold', 'blue', 'green'] )
 
 fig1.update_layout(
     yaxis_title="",

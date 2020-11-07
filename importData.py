@@ -97,7 +97,7 @@ def importOldHosp():
     # This takes the columns whose values are pandas timestamps, and makes the 
     # column labels the corresponding date.
     
-    df.columns = ['Date', 'Daily hospital admissions with<br>Covid-19 England']
+    df.columns = ['Date', 'Daily hospital admissions with Covid-19 England']
     
     # Make the row index equal to row number
     
@@ -185,7 +185,7 @@ def importNewHosp():
     url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2020/11/COVID-19-daily-admissions-and-beds-20201106-1.xlsx'
     
     df = pd.read_excel(url)    
-    # Pick out relevant rows and columns
+    # Pick out relevant rows and columns for admissions
 
     admissions = df.iloc[11:13, 2:   ].T
     
@@ -193,10 +193,9 @@ def importNewHosp():
     
     admissions = admissions.dropna(axis=0)
     
-    # This takes the columns whose values are pandas timestamps, and makes the 
-    # column labels the corresponding date.
+    # Rename columns appropriately
     
-    admissions.columns = ['Date', 'Daily hospital admissions<br>plus hospital diagnoses<br>with Covid-19 England']
+    admissions.columns = ['Date', 'Daily hospital admissions plus hospital diagnoses with Covid-19 England']
     
     # Make the row index equal to row number
     
@@ -204,7 +203,25 @@ def importNewHosp():
     
     # Save the dataframe as a pickle object
     
-    Save(admissions, 'newHospAd')
+    # Pick out relevant rows and columns for mechanical ventilator beds (MVB)
+
+    MVB = df.iloc[102:104, 2:   ].T
+    
+    # Rename columns appropriately
+    
+    MVB.columns = ['Date', 'Mechanical ventilation beds occupied by patients with Covid-19 England']
+    
+     # Make the row index equal to row number
+    
+    MVB.index = np.arange( len(MVB) )
+    
+    # Merge admissions and MVB
+    
+    newHosp = pd.merge(admissions, MVB, how = 'outer')
+    
+    # Save dataframe as a pickle object.
+    
+    Save(newHosp, 'newHosp')
     
     # Pick out beds occupid with covid patients data
     
