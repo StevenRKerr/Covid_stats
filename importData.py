@@ -5,6 +5,9 @@ Created on Sat Oct  3 11:22:19 2020
 @author: Steven
 """
 
+import io
+
+import requests
 
 import pandas as pd
 
@@ -967,6 +970,40 @@ def combineBeds(oldBedsOcc, newBedsOcc, oldBedsOccCovid, newBedsOccCovid):
 
 
 
+
+def importUnemployment():
+    
+    url = 'https://www.ons.gov.uk/generator?format=csv&uri=/employmentandlabourmarket/peoplenotinwork/unemployment/timeseries/mgsx/lms'
+    
+    r = requests.get(url)
+    
+    df = pd.read_csv(io.StringIO(r.text))
+    
+    # Unemployment by month starts in row 255
+    
+    df = df.iloc[255:, :]
+    
+    # Rename columns appropriately
+    
+    df.columns = ['Date', 'Unemployment rate (seasonally adjusted)']
+    
+    # Make unemployment a number between zero and one.
+    
+    df['Unemployment rate (seasonally adjusted)'] = df['Unemployment rate (seasonally adjusted)'].astype(float)/100
+    
+    # Turns date column into proper datetime objects
+ 
+    df['Date'] =   pd.to_datetime(df.Date.astype(str), format='%Y %b')
+    
+    # Make the row index equal to row number
+    
+    df.index = np.arange( len(df) )
+    
+    # Save the dataframe as a pickle object
+    
+    Save(df, 'Unemployment')
+    
+    return
 
 
 

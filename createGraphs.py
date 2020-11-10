@@ -20,7 +20,7 @@ import json
 
 import importData as iD
 
-
+import datetime
 
 
 # Import and format all the data
@@ -63,6 +63,14 @@ Mort = iD.Open('Mort')
 
 
 newBedsOcc = iD.Open('newbedsOcc')
+
+
+
+# Unempoyment data is updated roughly monthly
+
+iD.importUnemployment()
+
+Unemployment = iD.Open('Unemployment')
 
 
 
@@ -466,6 +474,27 @@ bedsFig.update_layout(
 
 
 
+unemploymentStart = datetime.datetime(2007, 1, 1)
+
+
+unemploymentEnd = Unemployment.iloc[-1,0]
+
+unemploymentFig = px.line(Unemployment, x="Date", y=['Unemployment rate (seasonally adjusted)'], \
+                          range_x=[unemploymentStart, unemploymentEnd ], \
+             template = "simple_white" )
+
+unemploymentFig.update_layout(
+    yaxis_title="",
+    legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="right",
+    x=0.99
+)
+)
+
+unemploymentFig.layout.yaxis.tickformat = ',.0000%'
 
 
 
@@ -496,7 +525,7 @@ pio.write_html(govSpendingFig, file='HTML files/govSpendingFig.html', auto_open=
 
 pio.write_html(bedsFig, file='HTML files/bedsFig.html', auto_open=True)
 
-
+pio.write_html(unemploymentFig, file='HTML files/unemploymentFig.html', auto_open=True)
 
 
 
