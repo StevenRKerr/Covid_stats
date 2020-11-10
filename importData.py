@@ -741,21 +741,21 @@ def importOldBedsOcc():
     
     #dfON is overnight beds
     
-    dfON = pd.read_excel(r'Data/Bed occupancy.xls', sheet_name = 'Open Overnight')
+    df = pd.read_excel(r'Data/Bed occupancy.xls', sheet_name = 'Open Overnight')
     
     # df is day only beds
     
-    df = pd.read_excel(r'Data/Bed occupancy.xls', sheet_name = 'Open Day Only')
+    #df = pd.read_excel(r'Data/Bed occupancy.xls', sheet_name = 'Open Day Only')
 
     # Pick out the data that is of interest
     
-    dfON = dfON.iloc[13:54, [1, 2, 4, 10 ]]
-    
     df = df.iloc[13:54, [1, 2, 4, 10 ]]
+    
+    #df = df.iloc[13:54, [1, 2, 4, 10 ]]
     
    # Add the overnight and day only entries together
     
-    df.iloc[:, 2:] = dfON.iloc[:, 2:] + df.iloc[:, 2:]
+   # df.iloc[:, 2:] = dfON.iloc[:, 2:] + df.iloc[:, 2:]
     
     # Rename columns more appropriately
     
@@ -770,8 +770,8 @@ def importOldBedsOcc():
     columns = ['Date']
         
     for year in  range(2010, 2021):   
-        columns.append( 'Quarterly mean NHS beds available England ' + str(year) )
-        columns.append(  'Quarterly mean NHS beds occupied England ' + str(year) )
+        columns.append( 'Quarterly mean overnight NHS beds available England ' + str(year) )
+        columns.append(  'Quarterly mean overnight NHS beds occupied England ' + str(year) )
         
      # beds is the dataframe we want   
         
