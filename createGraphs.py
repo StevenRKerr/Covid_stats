@@ -138,7 +138,7 @@ oldBedsOccCovid = iD.Open('oldBedsOccCovid')
 
 # oldBedsOcc never needs to be updated
 
-# iD.importOldBedsOcc()
+#iD.importOldBedsOcc()
 
 
 oldBedsOcc = iD.Open('oldBedsOcc')
