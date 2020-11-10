@@ -481,7 +481,7 @@ unemploymentEnd = Unemployment.iloc[-1,0]
 
 unemploymentFig = px.line(Unemployment, x="Date", y=['Unemployment rate (seasonally adjusted)'], \
                           range_x=[unemploymentStart, unemploymentEnd ], \
-             template = "simple_white" )
+             template = "simple_white", color_discrete_sequence =[ 'yellowgreen'] )
 
 unemploymentFig.update_layout(
     yaxis_title="",
@@ -494,7 +494,7 @@ unemploymentFig.update_layout(
 )
 )
 
-unemploymentFig.layout.yaxis.tickformat = ',.0000%'
+unemploymentFig.layout.yaxis.tickformat = ',.1%'
 
 
 
