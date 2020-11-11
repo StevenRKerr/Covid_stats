@@ -38,12 +38,14 @@ OWID = iD.Open('OWID')
 # The NewHosp data series is updated daily.
 # The file is downloaded automatically.
 
-iD.importNewHosp()
+iD.importDailyHosp()
 
 
-newHosp = iD.Open('newHosp')
+newHospAd = iD.Open('newHospAd')
 
-newBedsOccCovid = iD.Open('newBedsOccCovid')
+dailyBedsOccCovid = iD.Open('dailyBedsOccCovid')
+
+dailyMVbedsOccCovid = iD.Open('dailyMVbedsOccCovid')
 
 
 
@@ -56,19 +58,25 @@ iD.importMort()
 Mort = iD.Open('Mort')
 
 
+# importMonthlyHosp is updated around the 12th of each month
 
-# Total beds occupied data is updated at the start of each month
-    
-#iD.importNewBedsOcc()
+iD.importMonthlyHosp()
 
+oldHospAd = iD.Open('oldHospAd')
 
-newBedsOcc = iD.Open('newbedsOcc')
+monthlyBedsOcc = iD.Open('monthlyBedsOcc')
+
+monthlyBedsOccCovid = iD.Open('monthlyBedsOccCovid')
+
+monthlyMVbedsOcc = iD.Open('monthlyMVbedsOcc')
+
+monthlyMVbedsOccCovid = iD.Open('monthlyMVbedsOccCovid')
 
 
 
 # Unempoyment data is updated roughly monthly
 
-iD.importUnemployment()
+# iD.importUnemployment()
 
 Unemployment = iD.Open('Unemployment')
 
@@ -124,16 +132,6 @@ IandP = iD.Open('IandP')
 
 LCD = iD.Open('LCD') 
 
-# OldHosp is never updated, because the data series of interest
-# have been terminated or are redundant.
-
-
-#iD.importOldHosp()
-
-
-oldHospAd = iD.Open('oldHospAd')
-
-oldBedsOccCovid = iD.Open('oldBedsOccCovid')
 
 
 # oldBedsOcc never needs to be updated
@@ -160,7 +158,7 @@ oldBedsOcc = iD.Open('oldBedsOcc')
 
 df = iD.mergeFrames(OWID, oldHospAd )
 
-df = iD.mergeFrames(df, newHosp)
+df = iD.mergeFrames(df, newHospAd)
 
 
 
@@ -170,9 +168,46 @@ iD.createYearlyMort(Mort, OWID)
 yearlyMort = iD.Open('yearlyMort') 
 
 
-iD.combineBeds(oldBedsOcc, newBedsOcc, oldBedsOccCovid, newBedsOccCovid)
+# Stack the monthly and daily data on beds occupied covid
 
-beds = iD.Open('beds')
+bedsOccCovid = iD.stackData(monthlyBedsOccCovid, dailyBedsOccCovid)
+
+# Combine the beds occupied with beds occupied covid
+
+bedsOcc = pd.merge( bedsOccCovid, monthlyBedsOcc , how = 'outer' )
+
+# Add a non-covid beds occupied column
+
+bedsOcc['NHS beds occupied non-Covid-19 England 2020'] = bedsOcc['Total NHS beds occupied England 2020'] -  bedsOcc['NHS beds occupied Covid-19 England 2020']
+
+
+
+# Stack the months and daily data for MV beds occupied Covid
+
+MVbedsOccCovid = iD.stackData(monthlyMVbedsOccCovid, dailyMVbedsOccCovid)
+
+# Combine MV beds occupied with MV beds occupied covid
+
+MVbeds = pd.merge(monthlyMVbedsOcc, MVbedsOccCovid, how='outer'  )
+
+# Add an MV beds occupied non-covid column
+
+MVbeds['Mechanical ventilation beds occupied non-Covid-19 England'] =  MVbeds['Mechanical ventilation beds occupied England'] - MVbeds['Mechanical ventilation beds occupied Covid-19 England']
+
+
+
+
+# Create beds, which will combine hisotrical quarterly bed occupancy with bedsOcc
+
+beds = pd.merge(oldBedsOcc, bedsOcc, how='outer')
+
+    
+# Make all entries the same type
+    
+beds.iloc[:, 1:] = beds.iloc[:, 1:].astype(np.float)
+
+
+
 
 
 # lastDate is the final data where there is data in the df data frame
@@ -232,10 +267,9 @@ with open('deaths.json', 'w') as file:
 
 
 fig1 = px.line(df, x="Date", y=['Daily Covid-19 deaths UK', 'Daily hospital admissions with Covid-19 England', \
-                    'Daily hospital admissions plus hospital diagnoses with Covid-19 England' , \
-               'Mechanical ventilation beds occupied by patients with Covid-19 England'] , \
+                    'Daily hospital admissions plus hospital diagnoses with Covid-19 England'] , \
                range_x=['2020-01-01',lastDate], \
-             template = "simple_white", color_discrete_sequence =['red', 'gold', 'blue', 'green'] )
+             template = "simple_white", color_discrete_sequence =['red', 'gold', 'blue'] )
 
 fig1.update_layout(
     yaxis_title="",
@@ -284,6 +318,26 @@ testPosFig.update_layout(
 
 
 
+
+
+omniTestFig = px.bar(OWID,  x="Date",  y=['Daily positive tests UK', 'Daily negative tests UK'], \
+                     range_x=['2020-01-01',lastDate], template = "simple_white" )
+
+
+omniTestFig.update_layout(
+    yaxis_title="",
+    legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="left",
+    x=0.02
+)
+)    
+    
+    
+    
+    
 
 testPosRateFig = px.line(OWID, x="Date", y=['Positive test rate UK'], range_x=['2020-01-01',lastDate], \
              template = "simple_white", color_discrete_sequence =['indigo' ] )
@@ -433,9 +487,11 @@ govSpendingFig.update_layout(
 
 
 
+
+
 bedLineCols =   beds.columns[19:23]
 
-bedBarCols = [ beds.columns[-2], beds.columns[-1] ]
+bedBarCols = [ beds.columns[-3], beds.columns[-1] ]
 
 
 
@@ -499,6 +555,27 @@ unemploymentFig.layout.yaxis.tickformat = ',.1%'
 
 
 
+
+
+MVbedsFig = px.line(MVbeds,  x="Date",  y=['Mechanical ventilation beds occupied Covid-19 England',  \
+              'Mechanical ventilation beds occupied non-Covid-19 England'],                            
+                     range_x=['2020-04-02',lastDate], template = "simple_white" )
+
+
+MVbedsFig.update_layout(
+    yaxis_title="",
+    legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="right",
+    x=0.99
+)
+)    
+
+
+
+
 # Create HTML files
 
 pio.write_html(fig1, file='HTML files/fig1.html', auto_open=True)
@@ -527,5 +604,7 @@ pio.write_html(bedsFig, file='HTML files/bedsFig.html', auto_open=True)
 
 pio.write_html(unemploymentFig, file='HTML files/unemploymentFig.html', auto_open=True)
 
+pio.write_html(omniTestFig, file='HTML files/omniTestFig.html', auto_open=True)
 
+pio.write_html(MVbedsFig, file='HTML files/MVbedsFig.html', auto_open=True)
 
