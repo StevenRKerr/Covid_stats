@@ -72,7 +72,7 @@ Mort = iD.Open('Mort')
 
 # importMonthlyHosp is updated around the 12th of each month
 
-#iD.importMonthlyHosp()
+iD.importMonthlyHosp()
 
 oldHospAd = iD.Open('oldHospAd')
 
@@ -316,8 +316,12 @@ testsFig.update_layout(
 
 
 
-casesFig =  px.bar(casesOWID, x="Date", y=['Daily new Covid-19 cases UK', 'Daily tests UK'], \
+casesFig =  px.bar(cases, x="Date", y=['Daily new Covid-19 cases UK'], \
              template = "simple_white" )
+    
+tests = px.line(OWID, x='Date', y=['Daily tests UK'], color_discrete_sequence = ['orange'], template = "simple_white") 
+
+casesFig.add_trace(tests.data[0])
 
 casesFig.update_layout(
     yaxis_title="",

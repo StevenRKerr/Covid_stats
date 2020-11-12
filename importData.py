@@ -108,44 +108,37 @@ def stackData(old, new):
 
 def importMonthlyHosp():
     
-    # This tells the function whether to update the old monthly beds and MV beds
-    # occupied with covid data. There's unlikely to be a reason to set it to tryue
-    
-    oldUpdate = False
     
     
     # This url contains a link to hospital admissions data.
 
     
-    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2020/10/Covid-Publication-08-10-2020v3.xlsx"
+    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2020/11/Covid-Publication-12-11-2020_v4-CB.xlsx"
     
     
-    if oldUpdate == True:
+
     
+    oldHospAd = pd.read_excel(url, sheet_name='Admissions Total')
     
-        oldHospAd = pd.read_excel(url, sheet_name='Admissions Total')
-        
-        # Drop everything except rows 11 and 12, and all columns from 5 onwards.
-        # Row 11 has the date
-        # Row 12 has the number of hospital admissions
-        # The actual numbers start from column 5 onwards
-        
-        oldHospAd  = oldHospAd .iloc[11:13, 5:   ].T
-        
-        # This takes the columns whose values are pandas timestamps, and makes the 
-        # column labels the corresponding date.
-        
-        oldHospAd .columns = ['Date', 'Daily hospital admissions with Covid-19 England']
-        
-        # Make the row index equal to row number
-        
-        oldHospAd .index = np.arange( len(oldHospAd ) )
-        
-        # Save the dataframe as a pickle object
-        
-        Save(oldHospAd , 'oldHospAd')
+    # Drop everything except rows 11 and 12, and all columns from 5 onwards.
+    # Row 11 has the date
+    # Row 12 has the number of hospital admissions
+    # The actual numbers start from column 5 onwards
     
+    oldHospAd  = oldHospAd .iloc[11:13, 5:   ].T
     
+    # This takes the columns whose values are pandas timestamps, and makes the 
+    # column labels the corresponding date.
+    
+    oldHospAd .columns = ['Date', 'Daily hospital admissions with Covid-19 England']
+    
+    # Make the row index equal to row number
+    
+    oldHospAd .index = np.arange( len(oldHospAd ) )
+    
+    # Save the dataframe as a pickle object
+    
+    Save(oldHospAd , 'oldHospAd')
     
     
     
@@ -167,27 +160,23 @@ def importMonthlyHosp():
     
     
     
+    # Import and format the monthlyBedsOccCovid data
+    
+    monthlyBedsOccCovid = pd.read_excel(url, sheet_name='Total Beds Occupied Covid')
+    
+    monthlyBedsOccCovid = monthlyBedsOccCovid.iloc[[11,12], 5:].T
+    
+    monthlyBedsOccCovid.columns = ['Date', 'NHS beds occupied Covid-19 England 2020']
     
     
-    if oldUpdate == True:
+    # Make the row index equal to row number
     
-        # Import and format the monthlyBedsOccCovid data
-        
-        monthlyBedsOccCovid = pd.read_excel(url, sheet_name='Total Beds Occupied Covid')
-        
-        monthlyBedsOccCovid = monthlyBedsOccCovid.iloc[[11,12], 5:].T
-        
-        monthlyBedsOccCovid.columns = ['Date', 'NHS beds occupied Covid-19 England 2020']
-        
-        
-        # Make the row index equal to row number
-        
-        monthlyBedsOccCovid.index = np.arange( len(monthlyBedsOccCovid) )
-        
-        
-        # Save the dataframe as a pickle object
-        
-        Save(monthlyBedsOccCovid, 'monthlyBedsOccCovid')
+    monthlyBedsOccCovid.index = np.arange( len(monthlyBedsOccCovid) )
+    
+    
+    # Save the dataframe as a pickle object
+    
+    Save(monthlyBedsOccCovid, 'monthlyBedsOccCovid')
     
     
 
@@ -211,21 +200,19 @@ def importMonthlyHosp():
  
     
     
-    if oldUpdate == True:    
-        
-        monthlyMVbedsOccCovid = pd.read_excel (url, sheet_name='MV Beds Occupied Covid-19')
-        
-        monthlyMVbedsOccCovid = monthlyMVbedsOccCovid.iloc[[11,12], 5:].T
-        
-        monthlyMVbedsOccCovid.columns = ['Date', 'Mechanical ventilation beds occupied Covid-19 England']
-        
-         # Make the row index equal to row number
-        
-        monthlyMVbedsOccCovid.index = np.arange( len(monthlyMVbedsOccCovid) )
-        
-         # Save the dataframe as a pickle object
-        
-        Save(monthlyMVbedsOccCovid, 'monthlyMVbedsOccCovid')
+    monthlyMVbedsOccCovid = pd.read_excel (url, sheet_name='MV Beds Occupied Covid-19')
+    
+    monthlyMVbedsOccCovid = monthlyMVbedsOccCovid.iloc[[11,12], 5:].T
+    
+    monthlyMVbedsOccCovid.columns = ['Date', 'Mechanical ventilation beds occupied Covid-19 England']
+    
+     # Make the row index equal to row number
+    
+    monthlyMVbedsOccCovid.index = np.arange( len(monthlyMVbedsOccCovid) )
+    
+     # Save the dataframe as a pickle object
+    
+    Save(monthlyMVbedsOccCovid, 'monthlyMVbedsOccCovid')
     
     
     return
