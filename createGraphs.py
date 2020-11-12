@@ -26,6 +26,18 @@ import datetime
 # Import and format all the data
 
 
+
+# ONS data is updated daily
+# The file is downloaded automatically.
+
+iD.importONS()
+
+
+deaths = iD.Open('deaths') 
+
+cases = iD.Open('cases')
+
+
 # OWID data is updated daily
 # The file is downloaded automatically.
     
@@ -60,7 +72,7 @@ Mort = iD.Open('Mort')
 
 # importMonthlyHosp is updated around the 12th of each month
 
-iD.importMonthlyHosp()
+#iD.importMonthlyHosp()
 
 oldHospAd = iD.Open('oldHospAd')
 
@@ -147,18 +159,18 @@ oldBedsOcc = iD.Open('oldBedsOcc')
 
 
 
+# Combine deaths, oldHospAd and newHospAd
 
 
-
-
-
-
-# Create combined OWID, oldHospAd andnewHospAd dataframe. Create yearlyMort,
-# and combine all beds data
-
-df = iD.mergeFrames(OWID, oldHospAd )
+df = iD.mergeFrames(deaths, oldHospAd )
 
 df = iD.mergeFrames(df, newHospAd)
+
+
+# Combine cases with OWID
+
+
+casesOWID = iD.mergeFrames(cases, OWID)
 
 
 
@@ -302,10 +314,12 @@ testsFig.update_layout(
 
 
 
-testPosFig =  px.bar(OWID, x="Date", y=['Daily positive tests UK'], range_x=['2020-01-01',lastDate], \
-             template = "simple_white", color_discrete_sequence =['lightseagreen' ] )
 
-testPosFig.update_layout(
+
+casesFig =  px.bar(casesOWID, x="Date", y=['Daily new Covid-19 cases UK', 'Daily tests UK'], \
+             template = "simple_white" )
+
+casesFig.update_layout(
     yaxis_title="",
     legend_title="Variable:",
     legend=dict(
@@ -320,21 +334,6 @@ testPosFig.update_layout(
 
 
 
-omniTestFig = px.bar(OWID,  x="Date",  y=['Daily positive tests UK', 'Daily negative tests UK'], \
-                     range_x=['2020-01-01',lastDate], template = "simple_white" )
-
-
-omniTestFig.update_layout(
-    yaxis_title="",
-    legend_title="Variable:",
-    legend=dict(
-    yanchor="top",
-    y=0.99,
-    xanchor="left",
-    x=0.02
-)
-)    
-    
     
     
     
@@ -582,7 +581,7 @@ pio.write_html(fig1, file='HTML files/fig1.html', auto_open=True)
 
 pio.write_html(testsFig, file='HTML files/testsFig.html', auto_open=True)
 
-pio.write_html(testPosFig, file='HTML files/testPosFig.html', auto_open=True)
+pio.write_html(casesFig, file='HTML files/casesFig.html', auto_open=True)
 
 pio.write_html(testPosRateFig, file='HTML files/testPosRateFig.html', auto_open=True)
 
@@ -603,8 +602,6 @@ pio.write_html(govSpendingFig, file='HTML files/govSpendingFig.html', auto_open=
 pio.write_html(bedsFig, file='HTML files/bedsFig.html', auto_open=True)
 
 pio.write_html(unemploymentFig, file='HTML files/unemploymentFig.html', auto_open=True)
-
-pio.write_html(omniTestFig, file='HTML files/omniTestFig.html', auto_open=True)
 
 pio.write_html(MVbedsFig, file='HTML files/MVbedsFig.html', auto_open=True)
 

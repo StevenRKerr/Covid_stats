@@ -1053,6 +1053,48 @@ def importUnemployment():
 
 
 
+def importONS():
+    
+    url = 'https://api.coronavirus.data.gov.uk/v1/data?filters=areaType=overview&structure=%7B%22areaType%22:%22areaType%22,%22areaName%22:%22areaName%22,%22areaCode%22:%22areaCode%22,%22date%22:%22date%22,%22newDeaths28DaysByDeathDate%22:%22newDeaths28DaysByDeathDate%22,%22cumDeaths28DaysByDeathDate%22:%22cumDeaths28DaysByDeathDate%22%7D&format=csv'
+    
+    
+    deaths = pd.read_csv(url)
+
+    deaths = deaths.iloc[:, 3:5]
+
+    deaths.columns = ['Date', 'Daily Covid-19 deaths UK']
+    
+    
+  
+    
+    deaths['Date'] =  pd.to_datetime( deaths.Date, format = '%Y-%m-%d'  )
+    
+    # Save the dataframe as a pickle object
+    
+    Save(deaths, 'deaths')
+    
+
+
+    url = 'https://api.coronavirus.data.gov.uk/v1/data?filters=areaType=overview&structure=%7B%22areaType%22:%22areaType%22,%22areaName%22:%22areaName%22,%22areaCode%22:%22areaCode%22,%22date%22:%22date%22,%22newCasesBySpecimenDate%22:%22newCasesBySpecimenDate%22,%22cumCasesBySpecimenDate%22:%22cumCasesBySpecimenDate%22%7D&format=csv'
+
+    cases = pd.read_csv(url)
+
+    cases = pd.read_csv(url)
+
+    cases = cases.iloc[:, 3:5]
+
+    cases.columns = ['Date', 'Daily new Covid-19 cases UK']
+    
+    cases['Date'] =  pd.to_datetime( cases.Date, format = '%Y-%m-%d'  )
+
+    # Save the dataframe as a pickle object
+    
+    Save(cases, 'cases')
+
+    return
+
+
+
 
 
 
