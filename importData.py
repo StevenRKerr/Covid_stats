@@ -434,10 +434,13 @@ def importMort():
 
 def importGDP():
     
+    url = 'https://www.ons.gov.uk/generator?uri=/economy/grossdomesticproductgdp/bulletins/gdpmonthlyestimateuk/september2020/2f90704b&format=csv'
     
-    df = pd.read_csv(r'Data/GDP Index.csv')
     
-
+    r = requests.get(url)
+    
+    df = pd.read_csv(io.StringIO(r.text))
+  
     # Rename columns appropriately
     
     df.columns = ['Date', 'Monthly GDP index UK'] 

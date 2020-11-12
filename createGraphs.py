@@ -72,7 +72,7 @@ Mort = iD.Open('Mort')
 
 # importMonthlyHosp is updated around the 12th of each month
 
-iD.importMonthlyHosp()
+#iD.importMonthlyHosp()
 
 oldHospAd = iD.Open('oldHospAd')
 
@@ -124,7 +124,7 @@ UC = iD.Open('UC')
 # GDP data is updated monthly, approximately around the 10th of each month.
 # The file needs to be downloaded manually.
 
-#iD.importGDP()
+iD.importGDP()
 
 
 GDP = iD.Open('yearlyGDP')
