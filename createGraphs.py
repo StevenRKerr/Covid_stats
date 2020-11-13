@@ -229,7 +229,7 @@ lastDate =  str(df.iloc[-1,0])[:10]
 
 # totalCoronaDeaths is what it says.
 
-totalCoronaDeaths = int( OWID['Daily Covid-19 deaths UK'].sum() )
+totalCoronaDeaths = int( deaths['Daily Covid-19 deaths UK'].sum() )
 
 
 # Add a column to IandP and LCD that is constant and equal to total 
