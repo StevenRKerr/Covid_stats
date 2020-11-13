@@ -124,7 +124,7 @@ UC = iD.Open('UC')
 # GDP data is updated monthly, approximately around the 10th of each month.
 # The file needs to be downloaded manually.
 
-iD.importGDP()
+#iD.importGDP()
 
 
 GDP = iD.Open('yearlyGDP')
@@ -560,7 +560,8 @@ unemploymentFig.layout.yaxis.tickformat = ',.1%'
 
 
 
-MVbedsFig = px.line(MVbeds,  x="Date",  y=['Mechanical ventilation beds occupied Covid-19 England',  \
+MVbedsFig = px.line(MVbeds,  x="Date",  y=['Mechanical ventilation beds occupied England' , \
+                    'Mechanical ventilation beds occupied Covid-19 England',  \
               'Mechanical ventilation beds occupied non-Covid-19 England'],                            
                      range_x=['2020-04-02',lastDate], template = "simple_white" )
 
