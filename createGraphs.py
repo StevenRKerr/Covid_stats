@@ -582,7 +582,8 @@ MVbedsFig.update_layout(
 
 
 deathCompFig = px.line(deathComp,  x="Date",  y=['Weekly deaths within 28 days of a positive test' , \
-        'Weekly deaths with Covid-19 on death certificate',] , template = "simple_white" )
+        'Weekly deaths with Covid-19 on death certificate',] , color_discrete_sequence =[ 'lime', 'crimson'], \
+                       template = "simple_white" )
 
 
 deathCompFig.update_layout(
