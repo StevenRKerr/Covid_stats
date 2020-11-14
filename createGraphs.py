@@ -37,6 +37,8 @@ deaths = iD.Open('deaths')
 
 cases = iD.Open('cases')
 
+deathComp = iD.Open('deathComp')
+
 
 # OWID data is updated daily
 # The file is downloaded automatically.
@@ -174,7 +176,7 @@ casesOWID = iD.mergeFrames(cases, OWID)
 
 
 
-iD.createYearlyMort(Mort, OWID)
+iD.createYearlyMort(Mort, deaths)
 
 
 yearlyMort = iD.Open('yearlyMort') 
@@ -229,7 +231,7 @@ lastDate =  str(df.iloc[-1,0])[:10]
 
 # totalCoronaDeaths is what it says.
 
-totalCoronaDeaths = int( deaths['Daily Covid-19 deaths UK'].sum() )
+totalCoronaDeaths = int( deaths.loc[0, 'Cumulative deaths'] )
 
 
 # Add a column to IandP and LCD that is constant and equal to total 
@@ -579,6 +581,25 @@ MVbedsFig.update_layout(
 
 
 
+deathCompFig = px.line(deathComp,  x="Date",  y=['Weekly deaths within 28 days of a positive test' , \
+        'Weekly deaths with Covid-19 on death certificate',] , template = "simple_white" )
+
+
+deathCompFig.update_layout(
+    yaxis_title="",
+    legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="right",
+    x=0.99
+)
+)    
+
+
+
+
+
 
 # Create HTML files
 
@@ -609,4 +630,6 @@ pio.write_html(bedsFig, file='HTML files/bedsFig.html', auto_open=True)
 pio.write_html(unemploymentFig, file='HTML files/unemploymentFig.html', auto_open=True)
 
 pio.write_html(MVbedsFig, file='HTML files/MVbedsFig.html', auto_open=True)
+
+pio.write_html(deathCompFig, file='HTML files/deathCompFig.html', auto_open=True)
 
