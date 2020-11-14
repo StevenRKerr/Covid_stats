@@ -353,7 +353,7 @@ def importMort():
         # to the start of the numbered week. Convert that to a timedelta, and add onto
         # the timedate for the year
     
-        df.insert(0, 'Date', pd.to_datetime(df.Year.astype(str), format='%Y') + pd.to_timedelta(  (df.Week.astype(int)-1).mul(7).astype(str) + ' days') )
+        df.insert(0, 'Date', pd.to_datetime(df.Year.astype(str), format='%Y') + pd.to_timedelta(  (df.Week.astype(int)).mul(7).astype(str) + ' days') )
         
         # Keep only entries that have 'b' in the 'Sex' field. 'b' stands for 'both,
         # and it means that both male and female deaths are counted
@@ -904,7 +904,7 @@ def importOldBedsOcc():
 
 # createYearlyMort creates a dataframe of year by year mortality, and saves it.
 
-def createYearlyMort(Mort, OWID):
+def createYearlyMort(Mort, deaths):
     
     # Start off with Dates from 2015 in the first column, and weekly deaths
     # for 2015 in the second column.
@@ -949,50 +949,44 @@ def createYearlyMort(Mort, OWID):
     
     
     
-    # Isolate Covid-19 deaths in 2020
     
-    OWIDDeaths2020 = OWID[ OWID.Date.dt.year ==2020 ][ 'Daily Covid-19 deaths UK' ]
+    # Initialise a dataframe
     
-    # Make the row index equal to row number
+    deaths2020 = pd.DataFrame()
+     
+    # Make the first columns of deaths2020 equal to the dates of the year. 
     
-    OWIDDeaths2020.index = np.arange( len(OWIDDeaths2020) )
+    deaths2020['Date'] = pd.date_range(start = '2020-01-01', end = '2020-12-31', freq='D')
     
-    # These are useful for finding weekly Covid-19 deaths
+    # Merge deaths and deaths2020
     
-    lastWeekFloor = math.floor( len(OWIDDeaths2020)/7 ) 
+    deaths2020 = pd.merge(deaths2020, deaths, how='outer' )
     
-    lastWeekCeil = math.ceil( len(OWIDDeaths2020)/7 ) 
     
-    # Initialise weeklyCoronaDeaths
+  
+    # noWeeks is the number of weeks for which we have weekly deaths in 2020
     
-    weeklyCoronaDeaths = np.empty( lastWeekCeil )
+    noWeeks = 52 - yearlyMort['Weekly deaths UK 2020'].isna().sum()
     
+    
+    weeklyCoronaDeaths = np.empty(52)
+    
+    weeklyCoronaDeaths[:] = np.nan
+   
     # Calculate weeklyCoronaDeaths by summing in groups of 7
-    # Have to take care of the fact that number of days may not be divisible by
-    # 7
-    
-    for week in range(lastWeekFloor ):
+  
+    for week in range(noWeeks):    
         
-        weeklyCoronaDeaths[ week ] = OWIDDeaths2020.iloc[ 7*week : (7*week)+6 ].sum()
+        weeklyCoronaDeaths[ week ] = deaths2020.iloc[ 7*week : (7*week)+6, 1 ].sum()
         
-    if lastWeekCeil > lastWeekFloor:
         
-        weeklyCoronaDeaths[ lastWeekFloor ] = OWIDDeaths2020.iloc[ 7*lastWeekFloor:  ].sum()
        
-    # This fills out the rest of weeklyCoronaDeaths so it has 52 entries, one
-    # for each week. If the data for that week doesn't exist yet, it gets a NaN.
-       
-    endOWID2020 = np.empty(52- len(weeklyCoronaDeaths)  )
-
-    endOWID2020[:] = np.nan  
-    
-    weeklyCoronaDeaths = np.concatenate( [weeklyCoronaDeaths, endOWID2020] )
-    
     # Add a column to yearlyMort that is mean deaths + Covid-19 deaths
     
     yearlyMort['Mean weekly deaths 2015-2019<br>plus Covid-19 deaths UK 2020'] = \
-                weeklyCoronaDeaths + yearlyMort['Mean weekly deaths UK 2015-2019']
-    
+              weeklyCoronaDeaths + yearlyMort['Mean weekly deaths UK 2015-2019']
+                
+                
     # Save the dataframe as a pickle object
     
     Save(yearlyMort, 'yearlyMort')
@@ -1050,12 +1044,10 @@ def importONS():
     
     deaths = pd.read_csv(url)
 
-    deaths = deaths.iloc[:, 3:5]
+    deaths = deaths.iloc[:, 3:6]
 
-    deaths.columns = ['Date', 'Daily Covid-19 deaths UK']
+    deaths.columns = ['Date', 'Daily Covid-19 deaths UK', 'Cumulative deaths']
     
-    
-  
     
     deaths['Date'] =  pd.to_datetime( deaths.Date, format = '%Y-%m-%d'  )
     
@@ -1080,7 +1072,55 @@ def importONS():
     # Save the dataframe as a pickle object
     
     Save(cases, 'cases')
+    
+    
+    
+    
+    
+    url = 'https://api.coronavirus.data.gov.uk/v1/data?filters=areaName=United%2520Kingdom;areaType=overview&structure=%7B%22areaType%22:%22areaType%22,%22areaName%22:%22areaName%22,%22areaCode%22:%22areaCode%22,%22date%22:%22date%22,%22newOnsDeathsByRegistrationDate%22:%22newOnsDeathsByRegistrationDate%22,%22cumOnsDeathsByRegistrationDate%22:%22cumOnsDeathsByRegistrationDate%22%7D&format=csv'
+    
+    deathsCert = pd.read_csv(url)
+    
+    # Picks out relevant columns
+    
+    deathsCert = deathsCert.iloc[:, 3:5]
+    
+    # Rename columns appropriately
 
+    deathsCert.columns = ['Date', 'Weekly deaths with Covid-19 on death certificate']
+    
+    # Date column of deathsCert is not a datetime, so convert it
+    
+    deathsCert['Date'] = pd.to_datetime(  deathsCert.Date, format = '%Y-%m-%d'  )
+    
+   
+    # deathsComp will allow comparison of the two different ways of counting deaths
+    
+    deathComp = pd.merge(deathsCert, deaths[['Date', 'Cumulative deaths']] , how = 'outer')
+
+    deathComp['Weekly deaths within 28 days of a positive test'] = np.nan
+    
+    # Clculate first difference of cumulative deaths
+    
+    for index in range( len(deathComp)-1 ):
+        
+        deathComp.iloc[index, 3] = deathComp.iloc[index, 2] - deathComp.iloc[index + 1, 2]
+
+    
+
+    # Drop any entries with na in the 'Weekly deaths with Covid-19 on death certificate' column
+
+    deathComp = deathComp[deathComp['Weekly deaths with Covid-19 on death certificate'].notna()] 
+    
+    
+    
+    # Save the dataframe as a pickle object
+    
+    Save(deathComp, 'deathComp')
+    
+   
+    
+  
     return
 
 
