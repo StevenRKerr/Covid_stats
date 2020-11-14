@@ -1091,7 +1091,7 @@ def importONS():
     
     # Date column of deathsCert is not a datetime, so convert it
     
-    deathsCert['Date'] = pd.to_datetime(  deathsCert.Date, format = '%Y-%m-%d'  )
+    deathsCert['Date'] = pd.to_datetime(  deathsCert.Date, format = '%Y-%m-%d'  ) 
     
    
     # deathsComp will allow comparison of the two different ways of counting deaths
