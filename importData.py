@@ -16,8 +16,6 @@ import pickle
 import numpy as np
 
 
-import math
-
 import ssl
 
 from datetime import date
