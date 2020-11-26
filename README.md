@@ -19,3 +19,4 @@ The data all pertains to the UK, and consists of the following quantities:
 - Leading causes of death, 2001-2018
 - Government spending on economic stimulus packages in response to the coronavirus pandemic.
 - NHS bed occupancy and availability.
+- Unemployment
