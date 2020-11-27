@@ -8,8 +8,6 @@ Created on Mon Nov  2 12:08:14 2020
 
 import pandas as pd
 
-import pickle
-
 import plotly.io as pio
 
 import numpy as np
