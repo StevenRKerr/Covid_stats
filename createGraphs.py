@@ -571,8 +571,8 @@ MVbedsFig.update_layout(
     yaxis_title="",
     legend_title="Variable:",
     legend=dict(
-    yanchor="top",
-    y=0.99,
+    yanchor="middle",
+    y=0.5,
     xanchor="right",
     x=0.99
 )

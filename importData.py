@@ -111,7 +111,7 @@ def importMonthlyHosp():
     # This url contains a link to hospital admissions data.
 
     
-    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2020/11/Covid-Publication-12-11-2020_v4-CB.xlsx"
+    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2020/12/Covid-Publication-10-12-2020.xlsx"
     
     
 
