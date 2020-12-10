@@ -152,6 +152,11 @@ def importMonthlyHosp():
     
     monthlyBedsOcc.index = np.arange( len(monthlyBedsOcc) )
     
+    # For reasons unknown, the December 2020 data spuriously starts in March
+    # with zeroes. 
+    
+    monthlyBedsOcc = monthlyBedsOcc[ monthlyBedsOcc['Date'] >= pd.Timestamp(2020, 4, 2, 0)  ]
+    
     # Save the dataframe as a pickle object
     
     Save(monthlyBedsOcc, 'monthlyBedsOcc')

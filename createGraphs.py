@@ -73,7 +73,7 @@ Mort = iD.Open('Mort')
 
 # importMonthlyHosp is updated around the 12th of each month
 
-#iD.importMonthlyHosp()
+iD.importMonthlyHosp()
 
 oldHospAd = iD.Open('oldHospAd')
 
@@ -571,10 +571,10 @@ MVbedsFig.update_layout(
     yaxis_title="",
     legend_title="Variable:",
     legend=dict(
-    yanchor="middle",
-    y=0.5,
-    xanchor="right",
-    x=0.99
+    yanchor="top",
+    y=0.99,
+    xanchor="center",
+    x=0.5
 )
 )    
 
