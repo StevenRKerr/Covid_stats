@@ -1,4 +1,4 @@
-# Coronavirus_stats
+# Covid_stats
 
 This repo consists of a project that amalgamates coronavirus data from various sources and then creates interactive visualisations for them.
 
