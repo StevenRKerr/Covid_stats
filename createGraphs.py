@@ -73,7 +73,7 @@ Mort = iD.Open('Mort')
 
 # importMonthlyHosp is updated around the 12th of each month
 
-iD.importMonthlyHosp()
+#iD.importMonthlyHosp()
 
 oldHospAd = iD.Open('oldHospAd')
 
