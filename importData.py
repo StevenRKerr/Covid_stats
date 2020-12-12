@@ -437,7 +437,7 @@ def importMort():
 
 def importGDP():
     
-    url = 'https://www.ons.gov.uk/generator?uri=/economy/grossdomesticproductgdp/bulletins/gdpmonthlyestimateuk/september2020/2f90704b&format=csv'
+    url = 'https://www.ons.gov.uk/generator?uri=/economy/grossdomesticproductgdp/bulletins/gdpmonthlyestimateuk/october2020/aa230043&format=csv'
     
     
     r = requests.get(url)
@@ -708,23 +708,21 @@ def importLCD():
 
 def importdeathByAge():
     
-    df = pd.read_excel(r'Data/Deaths by age.xls')
+    df = pd.read_excel(r'Data/Deaths by age.xlsx')
     
     # Data starts in row 6
 
-    df = df.iloc[6:, :]
+    df = df.iloc[6:13, [0, 3]]
     
     # Label columns appropriately
     
-    df.columns = ['Age', 'Male', 'Female']
+    df.columns = ['Age', 'Deaths']
     
     # Everything is strings. Makes relevant entries integers
     
     df.iloc[:, 1:] = df.iloc[:, 1:].astype(int)
     
     # Make a new column that adds together male and female deaths
-    
-    df['Deaths'] = df['Male'] + df['Female']
     
     #Reorder cos they are arse pieces
     
