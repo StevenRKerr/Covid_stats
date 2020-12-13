@@ -106,7 +106,7 @@ govSpending = iD.Open('govSpending')
 # Deaths by age is updated weekly, on Tuesdays.
 # The file needs to be downloaded manually.
     
-iD.importdeathByAge()
+#iD.importdeathByAge()
 
 
 deathByAge = iD.Open('deathByAge') 
@@ -125,7 +125,7 @@ UC = iD.Open('UC')
 # GDP data is updated monthly, approximately around the 10th of each month.
 # The file needs to be downloaded manually.
 
-iD.importGDP()
+#iD.importGDP()
 
 
 GDP = iD.Open('yearlyGDP')
