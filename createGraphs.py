@@ -89,7 +89,7 @@ monthlyMVbedsOccCovid = iD.Open('monthlyMVbedsOccCovid')
 
 # Unempoyment data is updated roughly monthly
 
-# iD.importUnemployment()
+iD.importUnemployment()
 
 Unemployment = iD.Open('Unemployment')
 
