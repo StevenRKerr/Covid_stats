@@ -20,6 +20,7 @@ import importData as iD
 
 import datetime
 
+from datetime import date
 
 # Import and format all the data
 
@@ -89,9 +90,27 @@ monthlyMVbedsOccCovid = iD.Open('monthlyMVbedsOccCovid')
 
 # Unempoyment data is updated roughly monthly
 
-iD.importUnemployment()
+# iD.importUnemployment()
 
 Unemployment = iD.Open('Unemployment')
+
+# Redundancy data is updated roughly monthly
+
+#iD.importRed()
+
+redundancies =  iD.Open('Redundancies')
+
+# JSA data is updated roughly monthly
+
+#iD.importJSA()
+
+JSA =  iD.Open('JSA')
+
+# claimants data is updated roughly monthly
+
+#iD.importClaimants()
+
+claimants =  iD.Open('claimants')
 
 
 
@@ -361,8 +380,13 @@ testPosRateFig.layout.yaxis.tickformat = ',.0%'
 
 
 
-UCFig = px.line(UC, x="Date", y=['Weekly universal credit claims UK'], range_x=['2020-01-01',lastDate], \
-             template = "simple_white", color_discrete_sequence =['deeppink' ] )
+UCFig = px.line(UC, x="Date", y=['Weekly universal credit claims UK'], range_x=['2020-01-01', date.today()], \
+             template = "simple_white", color_discrete_sequence =['deeppink' ], range_y=[0, 600000] )
+    
+    
+Line0 = px.line(JSA, x='Date', y=['Number of JSA claimants'], range_x=['2020-01-01',date.today()], color_discrete_sequence = ['turquoise'], template = "simple_white") 
+
+UCFig.add_trace(Line0.data[0])
 
 UCFig.update_layout(
     yaxis_title="",
@@ -561,6 +585,8 @@ unemploymentFig.layout.yaxis.tickformat = ',.1%'
 
 
 
+
+
 MVbedsFig = px.line(MVbeds,  x="Date",  y=['Mechanical ventilation beds occupied England' , \
                     'Mechanical ventilation beds occupied Covid-19 England',  \
               'Mechanical ventilation beds occupied non-Covid-19 England'],                            
@@ -601,6 +627,45 @@ deathCompFig.update_layout(
 
 
 
+redEnd = redundancies.iloc[-1,0]
+
+redFig = px.line(redundancies, x="Date", y=['Redundancies in last 3 months'], range_x=['2007-01-01',redEnd], \
+             template = "simple_white", color_discrete_sequence =['red' ] )
+
+redFig.update_layout(
+    yaxis_title="",
+    legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="center",
+    x=0.5
+)
+)
+
+
+
+
+claimantsFig = px.line(claimants, x="Date", y=['Claimant count, seasonally adjusted'], \
+             template = "simple_white", color_discrete_sequence =['goldenrod' ] )
+
+claimantsFig.update_layout(
+    yaxis_title="",
+    legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="center",
+    x=0.5
+)
+)
+
+
+
+
+
+
+
 # Create HTML files
 
 pio.write_html(fig1, file='HTML files/fig1.html', auto_open=True)
@@ -632,4 +697,9 @@ pio.write_html(unemploymentFig, file='HTML files/unemploymentFig.html', auto_ope
 pio.write_html(MVbedsFig, file='HTML files/MVbedsFig.html', auto_open=True)
 
 pio.write_html(deathCompFig, file='HTML files/deathCompFig.html', auto_open=True)
+
+pio.write_html(redFig, file='HTML files/redFig.html', auto_open=True)
+
+pio.write_html(claimantsFig, file='HTML files/claimantsFig.html', auto_open=True)
+
 

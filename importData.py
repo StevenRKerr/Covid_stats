@@ -584,7 +584,7 @@ def importUC():
     # Turn the date column into a timedate object
     
     df['Date'] = pd.to_datetime( df.Date.astype(str), format= '%B %d, %Y')
-    
+
     
     # Make the row index equal to row number
     
@@ -1126,7 +1126,105 @@ def importONS():
 
 
 
+def importRed():
+    
+    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/december2020/934f3335&format=csv'
+
+    r = requests.get(url)
+    
+    redundancies = pd.read_csv(io.StringIO(r.text))
+
+    
+    # keep relevant rows
+
+    redundancies = redundancies.iloc[6:, :]
+    
+    #rename appropriately
+
+    redundancies.columns = ['Date', 'Redundancies in last 3 months']
+
+    # Convert date column to a datetime object
+
+    redundancies['Date'] = pd.to_datetime( redundancies['Date'].str[4:] )
+    
+    # Redundancies measured in 1000s.
+
+    redundancies['Redundancies in last 3 months'] = redundancies['Redundancies in last 3 months'].astype(float) *1000
+
+    # Make the row index equal to row number
+    
+    redundancies.index = np.arange( len(redundancies) )
+    
+    # Save the dataframe as a pickle object
+    
+    Save(redundancies, 'Redundancies')
+    
+    return
 
 
 
+
+def importJSA():
+    
+    JSA = pd.read_excel(r'Data/Claimants.xlsx')
+    
+    # Keep relevant rows and columns
+    
+    JSA = JSA.iloc[10:96, 1:3]
+    
+    # Rename columns appropriately
+    
+    JSA.columns = ['Date', 'Number of JSA claimants']
+    
+    # Convert date column to datetime object
+    
+    JSA['Date'] = pd.to_datetime( JSA.Date.astype(str), format= '%B %Y')
+    
+    # Make the row index equal to row number
+    
+    JSA.index = np.arange( len(JSA) )
+    
+    # Save the dataframe as a pickle object
+    
+    Save(JSA, 'JSA')
+    
+    return
+    
+
+def importClaimants():
+    
+    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/employmentintheuk/november2020/abd64da4&format=csv'
+
+    r = requests.get(url)
+    
+    claimants = pd.read_csv(io.StringIO(r.text))
+
+    # Keep relevant rows
+
+    claimants = claimants.iloc[6:, :]
+    
+    # Rename columns appropriately
+
+    claimants.columns = ['Date', 'Claimant count, seasonally adjusted']
+    
+    # Make Date column a datetime object
+    
+    claimants['Date'] = pd.to_datetime( claimants.Date.astype(str), format= '%B %Y')
+    
+    # Claimant count is measured in thousands
+    
+    claimants['Claimant count, seasonally adjusted'] = claimants['Claimant count, seasonally adjusted'].astype(float) *1000
+    
+    # Make the row index equal to row number
+    
+    claimants.index = np.arange( len(claimants) )
+    
+    # Save the dataframe as a pickle object
+    
+    Save(claimants, 'claimants')
+    
+    return
+    
+    
+    
 
