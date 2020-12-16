@@ -106,15 +106,9 @@ def stackData(old, new):
 
 def importMonthlyHosp():
     
-    
-    
     # This url contains a link to hospital admissions data.
 
-    
     url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2020/12/Covid-Publication-10-12-2020.xlsx"
-    
-    
-
     
     oldHospAd = pd.read_excel(url, sheet_name='Admissions Total')
     
