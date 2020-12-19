@@ -116,7 +116,7 @@ claimants =  iD.Open('claimants')
 
 # Government spending data is updated roughly monthly.
     
-#iD.importGovSpending()
+iD.importGovSpending()
 
 
 govSpending = iD.Open('govSpending')
