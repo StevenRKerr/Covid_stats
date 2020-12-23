@@ -15,7 +15,6 @@ import pickle
 
 import numpy as np
 
-
 import ssl
 
 from datetime import date
@@ -76,18 +75,26 @@ def mergeFrames(df1, df2):
 
 # Stacks data for different potentially overlapping time periods
 
-def stackData(old, new):
+def stackData(old, new, precedence):
     
     # endDate is where the old data will get cut off, and the new data will start
     
-    endDate = new['Date'].dropna().min()
+    if precedence == 'old':
+        
+        endDate = old['Date'].dropna().max()
     
-    # Cut off old at the date where new starts
+        new = new[  new['Date'] > endDate  ]
     
-    old = old[  old['Date'] < endDate ]
+    elif precedence == 'new':
+        
+        endDate = new['Date'].dropna().min()
     
-    # Stacks old and new vertically
-    
+        # Cut off old at the date where new starts
+        
+        old = old[  old['Date'] < endDate ]
+        
+        # Stacks old and new vertically
+        
     df = pd.concat( [ old, new ], axis=0)
     
     # Make the row index equal to row number
@@ -96,9 +103,6 @@ def stackData(old, new):
     
     return df
     
-
-
-
 
 
 # importMonthlyHosp imports monthly hospital data, puts it into a 
@@ -146,8 +150,17 @@ def importMonthlyHosp():
     
     monthlyBedsOcc.columns = monthlyBedsOcc.loc['Unnamed: 3',]
     
-    monthlyBedsOcc = monthlyBedsOcc.drop( ['Unnamed: 3','Unnamed: 4'], axis = 0 )
+    # Create a dataframe that is a hospital region lookup table
     
+    hospMeta = monthlyBedsOcc.iloc[0, 1:].T
+    
+    Save(hospMeta, 'hospMeta')
+    
+    
+
+    # Drop some more rows
+    
+    monthlyBedsOcc = monthlyBedsOcc.iloc[3:, ]
     
     monthlyBedsOcc = monthlyBedsOcc.rename(columns={"Code": "Date"})
     
@@ -159,8 +172,6 @@ def importMonthlyHosp():
     
     monthlyBedsOcc = monthlyBedsOcc.drop( drop, axis=0  )
     
-
-    
     # Make the row index equal to row number
     
     monthlyBedsOcc.index = np.arange( len(monthlyBedsOcc) )
@@ -168,9 +179,6 @@ def importMonthlyHosp():
     # Save the dataframe as a pickle object
     
     Save(monthlyBedsOcc, 'monthlyBedsOcc')
-    
-    
-    
     
     
     
@@ -186,11 +194,11 @@ def importMonthlyHosp():
     
     monthlyBedsOccCovid.columns = monthlyBedsOccCovid.loc['Unnamed: 3',]
     
-    monthlyBedsOccCovid = monthlyBedsOccCovid.drop( ['Unnamed: 3','Unnamed: 4'], axis = 0 )
+    monthlyBedsOccCovid = monthlyBedsOccCovid.iloc[3:, ]
     
     
     monthlyBedsOccCovid = monthlyBedsOccCovid.rename(columns={"Code": "Date"})
-
+    
     # Make the row index equal to row number
     
     monthlyBedsOccCovid.index = np.arange( len(monthlyBedsOccCovid) )
@@ -200,7 +208,6 @@ def importMonthlyHosp():
     Save(monthlyBedsOccCovid, 'monthlyBedsOccCovid')
     
     
-
 
     # Import data on mechanical ventilations beds
     
@@ -219,8 +226,7 @@ def importMonthlyHosp():
     Save(monthlyMVbedsOcc, 'monthlyMVbedsOcc')
         
  
-    
-    
+   
     monthlyMVbedsOccCovid = pd.read_excel (url, sheet_name='MV Beds Occupied Covid-19')
     
     monthlyMVbedsOccCovid = monthlyMVbedsOccCovid.iloc[[11,12], 5:].T
@@ -237,8 +243,6 @@ def importMonthlyHosp():
     
     
     return
-
-
 
 
 
@@ -319,7 +323,7 @@ def importDailyHosp():
     
     # Rename columns appropriately
     
-    dailyBedsOccCovid.columns = ['Date', 'NHS beds occupied Covid-19 England 2020']
+    dailyBedsOccCovid.columns = ['Date', 'Hospital beds occupied Covid-19 England']
     
      # Make the row index equal to row number
     
@@ -924,23 +928,20 @@ def importHistBedsOcc():
     
     bedsOpen = pd.read_excel(r'Data/Bed occupancy.xlsx', sheet_name = 'G&A_Beds_Open_crosstab').T
 
-    # Keep rows of interest
-    
-    bedsOpen = bedsOpen.drop('Unnamed: 1')
     
     # Make columns equal to hospital code
     
     bedsOpen.columns = bedsOpen.loc['Unnamed: 2', :]
     
-    # Drop hospital code row
+    # keep rows of interest
     
-    bedsOpen = bedsOpen.drop('Unnamed: 2')
+    bedsOpen = bedsOpen.iloc[3:, :]
     
     # Insert Date column
 
     bedsOpen.insert(loc=0, column='Date', value= bedsOpen.index  )
     
-    bedsOpen.iloc[0,0] = np.nan
+  
     
 
     # Make the row index equal to row number
@@ -956,23 +957,19 @@ def importHistBedsOcc():
     
     bedsOcc = pd.read_excel(r'Data/Bed occupancy.xlsx', sheet_name = 'G&A_Beds_Occupied_crosstab').T
 
-    # Keep rows of interest
-    
-    bedsOcc = bedsOcc.drop('Unnamed: 1')
     
     # Make columns equal to hospital code
     
     bedsOcc.columns = bedsOcc.loc['Unnamed: 2', :]
     
-    # Drop hospital code row
+    # keep rows of interest
     
-    bedsOcc = bedsOcc.drop('Unnamed: 2')
+    bedsOcc = bedsOcc.iloc[3:, :]
     
     # Insert Date column
 
     bedsOcc.insert(loc=0, column='Date', value= bedsOcc.index  )
     
-    bedsOcc.iloc[0,0] = np.nan
 
     # Make the row index equal to row number
     
