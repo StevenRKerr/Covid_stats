@@ -80,7 +80,7 @@ def stackData(old, new):
     
     # endDate is where the old data will get cut off, and the new data will start
     
-    endDate = new.iloc[0,0]
+    endDate = new['Date'].dropna().min()
     
     # Cut off old at the date where new starts
     
@@ -136,20 +136,34 @@ def importMonthlyHosp():
     
     # import and format the monthlyBedsOcc data
     
-    monthlyBedsOcc = pd.read_excel (url, sheet_name='Total Beds Occupied')
+    monthlyBedsOcc = pd.read_excel (url, sheet_name='Total Beds Occupied').T
+       
+    # Keep rows and columns of interest 
+   
+    monthlyBedsOcc = monthlyBedsOcc.iloc[2:, 11:]
     
-    monthlyBedsOcc = monthlyBedsOcc.iloc[[11,12], 5:].T
+    monthlyBedsOcc = monthlyBedsOcc.drop( np.arange(12,22), axis = 1 )
     
-    monthlyBedsOcc.columns = ['Date', 'Total NHS beds occupied England 2020']
+    monthlyBedsOcc.columns = monthlyBedsOcc.loc['Unnamed: 3',]
+    
+    monthlyBedsOcc = monthlyBedsOcc.drop( ['Unnamed: 3','Unnamed: 4'], axis = 0 )
+    
+    
+    monthlyBedsOcc = monthlyBedsOcc.rename(columns={"Code": "Date"})
+    
+    # For reasons unknown, the December 2020 data spuriously starts in March
+    # with zeroes. Drop any of that data
+    
+    drop = monthlyBedsOcc.index[  ~(monthlyBedsOcc['Date'] >= pd.Timestamp(2020, 4, 2, 0))
+                                & ~(monthlyBedsOcc['Date'].isna())  ]
+    
+    monthlyBedsOcc = monthlyBedsOcc.drop( drop, axis=0  )
+    
+
     
     # Make the row index equal to row number
     
     monthlyBedsOcc.index = np.arange( len(monthlyBedsOcc) )
-    
-    # For reasons unknown, the December 2020 data spuriously starts in March
-    # with zeroes. 
-    
-    monthlyBedsOcc = monthlyBedsOcc[ monthlyBedsOcc['Date'] >= pd.Timestamp(2020, 4, 2, 0)  ]
     
     # Save the dataframe as a pickle object
     
@@ -157,19 +171,29 @@ def importMonthlyHosp():
     
     
     
+    
+    
+    
     # Import and format the monthlyBedsOccCovid data
     
-    monthlyBedsOccCovid = pd.read_excel(url, sheet_name='Total Beds Occupied Covid')
+    monthlyBedsOccCovid = pd.read_excel(url, sheet_name='Total Beds Occupied Covid').T
     
-    monthlyBedsOccCovid = monthlyBedsOccCovid.iloc[[11,12], 5:].T
+    # Keep rows and columns of interest 
     
-    monthlyBedsOccCovid.columns = ['Date', 'NHS beds occupied Covid-19 England 2020']
+    monthlyBedsOccCovid = monthlyBedsOccCovid.iloc[2:, 11:]
+    
+    monthlyBedsOccCovid = monthlyBedsOccCovid.drop( np.arange(12,22), axis = 1 )
+    
+    monthlyBedsOccCovid.columns = monthlyBedsOccCovid.loc['Unnamed: 3',]
+    
+    monthlyBedsOccCovid = monthlyBedsOccCovid.drop( ['Unnamed: 3','Unnamed: 4'], axis = 0 )
     
     
+    monthlyBedsOccCovid = monthlyBedsOccCovid.rename(columns={"Code": "Date"})
+
     # Make the row index equal to row number
     
     monthlyBedsOccCovid.index = np.arange( len(monthlyBedsOccCovid) )
-    
     
     # Save the dataframe as a pickle object
     
@@ -805,15 +829,15 @@ def importGovSpending():
 
 
 
-def importOldBedsOcc():
+def importAvgBedsOcc():
     
     #dfON is overnight beds
     
-    df = pd.read_excel(r'Data/Bed occupancy.xls', sheet_name = 'Open Overnight')
+    df = pd.read_excel(r'Data/Avg bed occupancy.xls', sheet_name = 'Open Overnight')
     
     # df is day only beds
     
-    #df = pd.read_excel(r'Data/Bed occupancy.xls', sheet_name = 'Open Day Only')
+    #df = pd.read_excel(r'Data/Avg bed occupancy.xls', sheet_name = 'Open Day Only')
 
     # Pick out the data that is of interest
     
@@ -887,12 +911,78 @@ def importOldBedsOcc():
     
     # Save the dataframe as a pickle object
  
-    Save(beds, 'oldBedsOcc')
+    Save(beds, 'avgBedsOcc')
     
     return
 
 
 
+# Import historic daily bed occupied and available data, and format.
+
+
+def importHistBedsOcc():
+    
+    bedsOpen = pd.read_excel(r'Data/Bed occupancy.xlsx', sheet_name = 'G&A_Beds_Open_crosstab').T
+
+    # Keep rows of interest
+    
+    bedsOpen = bedsOpen.drop('Unnamed: 1')
+    
+    # Make columns equal to hospital code
+    
+    bedsOpen.columns = bedsOpen.loc['Unnamed: 2', :]
+    
+    # Drop hospital code row
+    
+    bedsOpen = bedsOpen.drop('Unnamed: 2')
+    
+    # Insert Date column
+
+    bedsOpen.insert(loc=0, column='Date', value= bedsOpen.index  )
+    
+    bedsOpen.iloc[0,0] = np.nan
+    
+
+    # Make the row index equal to row number
+    
+    bedsOpen.index = np.arange( len(bedsOpen) )
+    
+    # Save the dataframe as a pickle object
+ 
+    Save(bedsOpen, 'histBedsOpen')
+    
+    
+
+    
+    bedsOcc = pd.read_excel(r'Data/Bed occupancy.xlsx', sheet_name = 'G&A_Beds_Occupied_crosstab').T
+
+    # Keep rows of interest
+    
+    bedsOcc = bedsOcc.drop('Unnamed: 1')
+    
+    # Make columns equal to hospital code
+    
+    bedsOcc.columns = bedsOcc.loc['Unnamed: 2', :]
+    
+    # Drop hospital code row
+    
+    bedsOcc = bedsOcc.drop('Unnamed: 2')
+    
+    # Insert Date column
+
+    bedsOcc.insert(loc=0, column='Date', value= bedsOcc.index  )
+    
+    bedsOcc.iloc[0,0] = np.nan
+
+    # Make the row index equal to row number
+    
+    bedsOcc.index = np.arange( len(bedsOcc) )
+    
+    # Save the dataframe as a pickle object
+ 
+    Save(bedsOcc, 'histBedsOcc')
+    
+    return
 
 
 

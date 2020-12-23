@@ -166,12 +166,21 @@ LCD = iD.Open('LCD')
 
 
 
-# oldBedsOcc never needs to be updated
+# AvgBedsOcc never needs to be updated
 
-#iD.importOldBedsOcc()
+# iD.importAvgBedsOcc()
 
 
-oldBedsOcc = iD.Open('oldBedsOcc')
+avgBedsOcc = iD.Open('avgBedsOcc')
+
+
+#hisBedsOcc never needs to be updated
+
+#iD.importHistBedsOcc()
+
+histBedsOpen = iD.Open('histBedsOpen') 
+
+histBedsOcc = iD.Open('histBedsOcc') 
 
 
 
@@ -200,17 +209,40 @@ iD.createYearlyMort(Mort, deaths)
 yearlyMort = iD.Open('yearlyMort') 
 
 
+
+
+# NHShosp is a list of NHS hospital codes
+# privHosp is a list of private hospital codes
+
+
+NHShosp = list(histBedsOcc.columns) 
+
+privHosp = [hosp for hosp in list(monthlyBedsOcc.columns) if hosp not in NHShosp]
+
+NHShosp.remove('Date')
+
+
+
+
+
+
+bedsOcc = iD.stackData(histBedsOcc, monthlyBedsOcc)
+
+bedsOcc = bedsOcc.sort_values(by=['Date'])
+
+bedsOcc['Total NHS beds occupied England'] = bedsOcc[NHShosp].sum(axis=1)
+
+bedsOcc['Total non-NHS beds occupied England'] = bedsOcc[privHosp].sum(axis=1)
+
+bedsOcc['Total non-NHS beds occupied England'][bedsOcc['Total non-NHS beds occupied England'] == 0] = np.nan
+
+
 # Stack the monthly and daily data on beds occupied covid
 
 bedsOccCovid = iD.stackData(monthlyBedsOccCovid, dailyBedsOccCovid)
 
-# Combine the beds occupied with beds occupied covid
 
-bedsOcc = pd.merge( bedsOccCovid, monthlyBedsOcc , how = 'outer' )
 
-# Add a non-covid beds occupied column
-
-bedsOcc['NHS beds occupied non-Covid-19 England 2020'] = bedsOcc['Total NHS beds occupied England 2020'] -  bedsOcc['NHS beds occupied Covid-19 England 2020']
 
 
 
@@ -231,7 +263,7 @@ MVbeds['Mechanical ventilation beds occupied non-Covid-19 England'] =  MVbeds['M
 
 # Create beds, which will combine hisotrical quarterly bed occupancy with bedsOcc
 
-beds = pd.merge(oldBedsOcc, bedsOcc, how='outer')
+beds = pd.merge(avgBedsOcc, bedsOcc, how='outer')
 
     
 # Make all entries the same type
