@@ -248,6 +248,98 @@ def importMonthlyHosp():
 
 
 
+# importWeeklyHosp imports the dailt Hospital data, puts it into 
+# a more useful format and saves it.
+
+
+def importWeeklyHosp():
+    
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2020/12/Weekly-covid-admissions-and-beds-publication-201224.xlsx'
+    
+    # Import and format the weeklyGABedsOccCovid data
+    
+    weeklyGABedsOccCovid = pd.read_excel(url, sheet_name='Adult G&A Beds Occupied COVID').T
+
+    
+    # Keep rows and columns of interest 
+    
+    weeklyGABedsOccCovid= weeklyGABedsOccCovid.iloc[2:, 13:]
+    
+    weeklyGABedsOccCovid = weeklyGABedsOccCovid.drop( np.arange(14,23), axis = 1 )
+    
+    weeklyGABedsOccCovid.columns = weeklyGABedsOccCovid.loc['Unnamed: 2',]
+    
+    weeklyGABedsOccCovid = weeklyGABedsOccCovid.iloc[2:, ]
+    
+    
+    weeklyGABedsOccCovid= weeklyGABedsOccCovid.rename(columns={"Code": "Date"})
+    
+    # Make the row index equal to row number
+    
+    weeklyGABedsOccCovid.index = np.arange( len(weeklyGABedsOccCovid) )
+    
+    # Save the dataframe as a pickle object
+    
+    Save(weeklyGABedsOccCovid, 'weeklyGABedsOccCovid')
+    
+    
+    # Import and format the weeklyBedsOcc data
+    
+    weeklyGABedsOccNonCovid = pd.read_excel(url, sheet_name='Adult G&A Bed Occupied NonCOVID').T
+
+    
+    # Keep rows and columns of interest 
+    
+    weeklyGABedsOccNonCovid= weeklyGABedsOccNonCovid.iloc[2:, 13:]
+    
+    weeklyGABedsOccNonCovid = weeklyGABedsOccNonCovid.drop( np.arange(14,23), axis = 1 )
+    
+    weeklyGABedsOccNonCovid.columns = weeklyGABedsOccNonCovid.loc['Unnamed: 2',]
+    
+    weeklyGABedsOccNonCovid = weeklyGABedsOccNonCovid.iloc[2:, ]
+    
+    
+    weeklyGABedsOccNonCovid= weeklyGABedsOccNonCovid.rename(columns={"Code": "Date"})
+    
+    # Make the row index equal to row number
+    
+    weeklyGABedsOccNonCovid.index = np.arange( len(weeklyGABedsOccNonCovid) )
+    
+    # Save the dataframe as a pickle object
+    
+    Save(weeklyGABedsOccNonCovid, 'weeklyGABedsOccNonCovid')
+    
+    
+    
+   # Import and format the weeklyBedsOccCovid data
+    
+    weeklyBedsOccCovid = pd.read_excel(url, sheet_name='All beds COVID').T
+
+    # Keep rows and columns of interest 
+    
+    weeklyBedsOccCovid = weeklyBedsOccCovid.iloc[2:, 13:]
+    
+    weeklyBedsOccCovid = weeklyBedsOccCovid.drop( np.arange(14,23), axis = 1 )
+    
+    weeklyBedsOccCovid = weeklyBedsOccCovid.dropna(axis=1, how='all')
+    
+    weeklyBedsOccCovid.columns = weeklyBedsOccCovid.loc['Unnamed: 2',]
+    
+    weeklyBedsOccCovid = weeklyBedsOccCovid.iloc[2:, ]
+    
+    weeklyBedsOccCovid = weeklyBedsOccCovid.rename(columns={"Code": "Date"})
+    
+    # Make the row index equal to row number
+    
+    weeklyBedsOccCovid.index = np.arange( len(weeklyBedsOccCovid) )
+    
+    # Save the dataframe as a pickle object
+    
+    Save(weeklyBedsOccCovid, 'weeklyBedsOccCovid')
+    
+    return
+
+
 
 
 
@@ -734,29 +826,27 @@ def importdeathByAge():
     
     # Data starts in row 6
 
-    df = df.iloc[6:13, [0, 3]]
+    df = df.iloc[2:, [2,4, 6]]
     
+    df.columns = ['Date', 'Age group', 'Deaths']
+    
+    
+    df['Date'] = pd.to_datetime( df['Date'].map(lambda x: x[15:]), format = '%d-%b-%y')
     # Label columns appropriately
     
-    df.columns = ['Age', 'Deaths']
+    deathByAge = df.groupby(['Age group']).sum()
     
-    # Everything is strings. Makes relevant entries integers
+    deathByAge['Age group'] = deathByAge.index
     
-    df.iloc[:, 1:] = df.iloc[:, 1:].astype(int)
-    
-    # Make a new column that adds together male and female deaths
-    
-    #Reorder cos they are arse pieces
-    
-    df = df.iloc[::-1]
+    deathByAge['Age group'] = deathByAge['Age group'].replace(to_replace = '-', value =" to ", regex = True)
     
     # Make the row index equal to row number
     
-    df.index = np.arange( len(df) )
+    deathByAge.index = np.arange( len(deathByAge) )
     
      # Save the dataframe as a pickle object
  
-    Save(df, 'deathByAge')
+    Save(deathByAge, 'deathByAge')
     
     return
 
@@ -1274,7 +1364,7 @@ def importJSA():
 
 def importClaimants():
     
-    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/employmentintheuk/november2020/abd64da4&format=csv'
+    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/employmentintheuk/december2020/e5def0fc&format=csv'
 
     r = requests.get(url)
     

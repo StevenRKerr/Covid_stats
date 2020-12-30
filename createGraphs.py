@@ -49,17 +49,29 @@ iD.importOWID()
 OWID = iD.Open('OWID')  
 
 
-# The NewHosp data series is updated daily.
+# The DailyHosp is updated daily.
 # The file is downloaded automatically.
 
-#iD.importDailyHosp()
-
+iD.importDailyHosp()
 
 newHospAd = iD.Open('newHospAd')
 
 dailyBedsOccCovid = iD.Open('dailyBedsOccCovid')
 
 dailyMVbedsOccCovid = iD.Open('dailyMVbedsOccCovid')
+
+
+# The WeeklyHosp is updated daily.
+# The file is downloaded automatically.
+
+iD.importWeeklyHosp()
+
+weeklyGABedsOccCovid = iD.Open('weeklyGABedsOccCovid')
+
+weeklyGABedsOccNonCovid = iD.Open('weeklyGABedsOccNonCovid')
+
+weeklyBedsOccCovid = iD.Open('weeklyBedsOccCovid')
+
 
 
 
@@ -79,6 +91,8 @@ Mort = iD.Open('Mort')
 oldHospAd = iD.Open('oldHospAd')
 
 monthlyBedsOcc = iD.Open('monthlyBedsOcc')
+
+monthlyBedsOcc.name = 'monthlyBedsOcc'
 
 monthlyBedsOccCovid = iD.Open('monthlyBedsOccCovid')
 
@@ -221,9 +235,23 @@ hospMeta = iD.Open('hospMeta')
 
 # Stack historical and monthly bed occupancy data
 
-bedsOcc = iD.stackData(histBedsOcc, monthlyBedsOcc, 'new')
+
+weeklyBedsOcc = weeklyGABedsOccCovid
+
+weeklyBedsOcc.iloc[:, 1:] = weeklyGABedsOccCovid.iloc[:, 1:] + weeklyGABedsOccNonCovid.iloc[:, 1:]
+
+
+
+
+bedsOcc = iD.stackData(histBedsOcc, weeklyBedsOcc, 'new')
 
 bedsOcc.name = 'bedsOcc'
+
+
+
+bedsOccCovid = iD.stackData(monthlyBedsOccCovid, weeklyBedsOccCovid, 'old')
+
+bedsOccCovid.name = 'bedsOccCovid'
 
 
 
@@ -298,7 +326,7 @@ with open('deaths.json', 'w') as file:
 # according to area, NHS or private, and by year.
 
 
-def extract(df, area, hosp, year):
+def extract(df, area, hosp, bed, year):
     
     colMarker = hospMeta.copy()
 
@@ -306,29 +334,28 @@ def extract(df, area, hosp, year):
         
         colMarker = colMarker[NHShosp]
         
-        heading = 'NHS beds '
+        heading = 'NHS overnight '
     
     elif hosp == 'Non-NHS':
         
         colMarker = colMarker.drop( NHShosp, axis = 0   )
         
-        heading = 'Non-NHS beds '
+        heading = 'Non-NHS overnight '
         
     else:
         
-        heading = 'Hospital beds '
-    
-    
-    
-    if area == 'England':
-        pass
+        heading = 'Hospital overnight '
+      
+    if bed == 'G&A':
+        heading = heading + 'G&A beds '
     else:
-        colMarker = colMarker[colMarker == area ]
+        heading = heading + 'beds '
+      
         
       
-    if df.name == 'bedsOcc':
+    if df.name == 'bedsOcc' or df.name == 'monthlyBedsOcc':
         heading = heading + 'occupied '
-    elif df.name == 'monthlyBedsOccCovid':
+    elif df.name == 'bedsOccCovid' or df.name == 'monthlyBedsOccCovid':
         heading = heading + 'occupied Covid-19 '
     elif df.name ==  'histBedsOpen':
         heading = heading + 'available '
@@ -337,6 +364,7 @@ def extract(df, area, hosp, year):
          heading = heading + 'England'
     else: 
          heading = heading + area
+         colMarker = colMarker[colMarker == area ]
     
     heading = heading + ' ' + str(year)    
     
@@ -352,12 +380,9 @@ def extract(df, area, hosp, year):
     
     if df.name == 'bedsOcc':
         output[heading][ output[heading] == 0  ] = np.nan
+          
     
     return output
-  
-
-
-
 
 
 
@@ -534,7 +559,7 @@ meanDeathsFig.update_layout(xaxis=dict(tickformat="%b"),
 
 # Deaths by age group figure
 
-deathByAgeFig = px.bar(deathByAge, x="Age", y='Deaths' ,template = "simple_white")
+deathByAgeFig = px.bar(deathByAge, x="Age group", y='Deaths' ,template = "simple_white")
 
 deathByAgeFig.update_layout(
     yaxis_title="Deaths",
@@ -606,29 +631,30 @@ figNames = {'East of England': 'NHSBedsOccFigEoE',
             
 def createRegOccFig(reg):
    
-    frame = pd.merge(extract(bedsOcc, reg, 'NHS', 2020), extract(bedsOcc, reg, 'NHS', 2019), how='outer')
+    frame = pd.merge(extract(bedsOcc, reg, 'NHS', 'G&A', 2017), extract(bedsOcc, reg, 'NHS', 'G&A', 2018), how='outer')
                      
-    frame = pd.merge(frame, extract(bedsOcc, reg, 'NHS', 2018) )
+    frame = pd.merge(frame, extract(bedsOcc, reg, 'NHS', 'G&A', 2019) )
     
-    frame = pd.merge(frame,  extract(bedsOcc, reg, 'NHS', 2017) )
+    frame = pd.merge(frame,  extract(bedsOcc, reg, 'NHS', 'G&A', 2020) )
     
-    frame['Mean NHS beds occupied ' + reg + ' 2017-2019'] = frame.iloc[:, 2:].mean(axis=1)
+    frame['Mean NHS overnight G&A beds occupied ' + reg + ' 2017-2019'] = frame.iloc[:, 2:].mean(axis=1)
     
     
     fig = px.line(frame, x='Date', y=frame.columns[1:],  \
                     template = "simple_white", 
-                    color_discrete_sequence =[ 'gold', 'red', 'green', 'blue', 'fuchsia'])
+                    color_discrete_sequence =[ 'blue', 'green', 'red', 'gold', 'fuchsia'],
+                    range_x=['2020-01-01','2020-12-31'])
     
     
         
-    frame = extract(monthlyBedsOccCovid, reg, 'NHS', 2020) 
+    frame = extract(bedsOccCovid, reg, 'NHS', '', 2020) 
         
     bar0 = px.bar(frame, x='Date', y=[frame.columns[1]],     \
                     color_discrete_sequence = ['lightseagreen'], template = "simple_white") 
     
     fig.add_trace(bar0.data[0])
         
-        
+   
         
     fig.update_layout(
         xaxis=dict(tickformat="%b %d"),
@@ -651,18 +677,22 @@ for reg in regions:
     pio.write_html(createRegOccFig(reg), file='HTML files/Hospitals/' + figNames[reg] + '.html', auto_open=False) 
 
 
+reg = 'England'
+
+bob = extract(bedsOcc, 'England', 'NHS', 'G&A', 2019)
+
 
 
 
 # Beds available figure
 
-frame = pd.merge(extract(histBedsOpen, 'England', 'NHS', 2020), extract(histBedsOpen, 'England', 'NHS', 2019), how='outer')
+frame = pd.merge(extract(histBedsOpen, 'England', 'NHS', 'G&A', 2020), extract(histBedsOpen, 'England', 'NHS', 'G&A', 2019), how='outer')
                  
-frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 2018) )
+frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2018) )
 
-frame = pd.merge(frame,  extract(histBedsOpen, 'England', 'NHS', 2017) )
+frame = pd.merge(frame,  extract(histBedsOpen, 'England', 'NHS', 'G&A', 2017) )
 
-frame['Mean NHS beds available England 2017-2019'] = frame.iloc[:, 2:].mean(axis=1)
+frame['Mean NHS overnight beds G&A available England 2017-2019'] = frame.iloc[:, 2:].mean(axis=1)
 
 
 NHSBedsOpenFig = px.line(frame, x='Date', y=frame.columns[1:],  \
@@ -690,14 +720,14 @@ NHSBedsOpenFig.update_layout(
 
 # Private beds occupied figure
   
-frame = extract(bedsOcc, 'England', 'Non-NHS', 2020)
+frame = extract(monthlyBedsOcc, 'England', 'Non-NHS', '', 2020)
                  
 privBedsOccFig = px.line(frame, x='Date', y=frame.columns[1:],  \
                 template = "simple_white", 
                 color_discrete_sequence =['green'])
     
     
-frame = extract(monthlyBedsOccCovid, 'England', 'Non-NHS', 2020) 
+frame = extract(monthlyBedsOccCovid, 'England', 'Non-NHS', '', 2020) 
     
 bar0 = px.bar(frame, x='Date', y=[frame.columns[1]],     \
                 color_discrete_sequence = ['blue'], template = "simple_white") 
