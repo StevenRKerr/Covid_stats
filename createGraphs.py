@@ -52,7 +52,7 @@ OWID = iD.Open('OWID')
 # The NewHosp data series is updated daily.
 # The file is downloaded automatically.
 
-iD.importDailyHosp()
+#iD.importDailyHosp()
 
 
 newHospAd = iD.Open('newHospAd')
@@ -329,7 +329,7 @@ def extract(df, area, hosp, year):
     if df.name == 'bedsOcc':
         heading = heading + 'occupied '
     elif df.name == 'monthlyBedsOccCovid':
-        heading = heading + 'occupid Covid-19 '
+        heading = heading + 'occupied Covid-19 '
     elif df.name ==  'histBedsOpen':
         heading = heading + 'available '
      
@@ -648,7 +648,7 @@ def createRegOccFig(reg):
  
 for reg in regions:
  
-    pio.write_html(createRegOccFig(reg), file='HTML files/Hospitals/' + figNames[reg] + '.html', auto_open=True) 
+    pio.write_html(createRegOccFig(reg), file='HTML files/Hospitals/' + figNames[reg] + '.html', auto_open=False) 
 
 
 
@@ -840,13 +840,13 @@ pio.write_html(NHSBedsOpenFig, file='HTML files/Hospitals/NHSBedsOpenFig.html', 
 
 pio.write_html(fig1, file='HTML files/fig1.html', auto_open=True)
 
-pio.write_html(testsFig, file='HTML files/testsFig.html', auto_open=True)
+pio.write_html(testsFig, file='HTML files/testsFig.html', auto_open=False)
 
 pio.write_html(casesFig, file='HTML files/casesFig.html', auto_open=True)
 
 pio.write_html(testPosRateFig, file='HTML files/testPosRateFig.html', auto_open=True)
 
-pio.write_html(UCFig, file='HTML files/UCFig.html', auto_open=True)
+pio.write_html(UCFig, file='HTML files/UCFig.html', auto_open=False)
 
 pio.write_html(GDPFig, file='HTML files/GDPFig.html', auto_open=True)
 
@@ -854,7 +854,7 @@ pio.write_html(IandPFig, file='HTML files/IandPFig.html', auto_open=True)
 
 pio.write_html(meanDeathsFig, file='HTML files/meanDeathsFig.html', auto_open=True)
 
-pio.write_html(LCDFig, file='HTML files/LCDFig.html', auto_open=True)
+pio.write_html(LCDFig, file='HTML files/LCDFig.html', auto_open=False)
 
 pio.write_html(deathByAgeFig, file='HTML files/deathByAgeFig.html', auto_open=True)
 
