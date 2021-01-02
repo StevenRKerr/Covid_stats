@@ -322,7 +322,7 @@ jsonDict = { "TCD": '{:,}'.format(totalCoronaDeaths2020),
 # Save that dictinary in json format. This can then be passed to other
 # applications.
 
-with open('deaths.json', 'w') as file:
+with open('jsonDict.json', 'w') as file:
     json.dump(jsonDict, file)
 
 
