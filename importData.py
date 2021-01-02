@@ -646,7 +646,7 @@ def importOWID():
     
     # Select only those columns that are of interest
     
-    df = df[  ['date', 'new_cases', 'new_deaths', 'new_tests', 'positive_rate'] ]
+    df = df[  ['date', 'positive_rate'] ]
     
     # Convert date column to timedates
 
@@ -654,15 +654,11 @@ def importOWID():
     
     # Rename 'date' to 'Date', just for consistency
     
-    df.columns = ['Date', 'Daily positive tests UK', 'Daily Covid-19 deaths UK', 'Daily tests UK', 'Positive test rate UK'  ]
+    df.columns = ['Date', 'Positive test rate UK'  ]
     
     # Make the row index equal to row number
     
     df.index = np.arange( len(df) )
-    
-    # Add new negative test columns
-    
-    df['Daily negative tests UK'] = df['Daily tests UK'] - df['Daily positive tests UK']
     
     # Save the dataframe as a pickle object
     
@@ -1227,11 +1223,25 @@ def importONS():
     
     Save(deaths, 'deaths')
     
+    
+    
+    url = 'https://coronavirus.data.gov.uk/api/v1/data?filters=areaName=United%2520Kingdom;areaType=overview&structure=%7B%22areaType%22:%22areaType%22,%22areaName%22:%22areaName%22,%22areaCode%22:%22areaCode%22,%22date%22:%22date%22,%22newVirusTests%22:%22newVirusTests%22,%22cumVirusTests%22:%22cumVirusTests%22%7D&format=csv'
+    
+    tests = pd.read_csv(url)
+    
+    tests = tests.iloc[:, 3:6]
+    
+    tests.columns = ['Date', 'Daily tests UK', 'Cumulative tests UK' ]
 
+    tests['Date'] =  pd.to_datetime( tests.Date, format = '%Y-%m-%d'  )
+    
+    # Save the dataframe as a pickle object
+    
+    Save(tests, 'tests')
+    
 
+    
     url = 'https://api.coronavirus.data.gov.uk/v1/data?filters=areaType=overview&structure=%7B%22areaType%22:%22areaType%22,%22areaName%22:%22areaName%22,%22areaCode%22:%22areaCode%22,%22date%22:%22date%22,%22newCasesBySpecimenDate%22:%22newCasesBySpecimenDate%22,%22cumCasesBySpecimenDate%22:%22cumCasesBySpecimenDate%22%7D&format=csv'
-
-    cases = pd.read_csv(url)
 
     cases = pd.read_csv(url)
 

@@ -35,6 +35,8 @@ iD.importONS()
 
 deaths = iD.Open('deaths') 
 
+tests = iD.Open('tests')
+
 cases = iD.Open('cases')
 
 deathComp = iD.Open('deathComp')
@@ -308,17 +310,20 @@ totalNonCoronaED = (yearlyMort['Weekly deaths UK 2020'] - yearlyMort['Mean weekl
 
 totalED = (yearlyMort['Weekly deaths UK 2020'] - yearlyMort['Mean weekly deaths UK 2015-2019']).sum()
 
+totalTests = float(tests.loc[0, 'Cumulative tests UK'])
+
 # Create a dictionary with some death related variables of interest.
 
-deathDict = { "TCD": '{:,}'.format(totalCoronaDeaths2020), 
+jsonDict = { "TCD": '{:,}'.format(totalCoronaDeaths2020), 
         "TNCED": '{:,}'.format(round(totalNonCoronaED,2)),
-        "TED": '{:,}'.format(round(totalED,2))}
+        "TED": '{:,}'.format(round(totalED,2)),
+        "tests": totalTests}
 
 # Save that dictinary in json format. This can then be passed to other
 # applications.
 
 with open('deaths.json', 'w') as file:
-    json.dump(deathDict, file)
+    json.dump(jsonDict, file)
 
 
 
@@ -409,7 +414,7 @@ fig1.update_layout(
 
 # Tests figure
 
-testsFig = px.bar(OWID, x="Date", y=['Daily tests UK'], range_x=['2020-03-01',lastDate], \
+testsFig = px.bar(tests, x="Date", y=['Daily tests UK'], range_x=['2020-03-01',lastDate], \
              template = "simple_white", color_discrete_sequence =['magenta' ] )
 
 testsFig.update_layout(
@@ -430,7 +435,7 @@ testsFig.update_layout(
 casesFig =  px.bar(cases, x="Date", y=['Daily new Covid-19 cases UK'], \
              template = "simple_white" )
     
-tests = px.line(OWID, x='Date', y=['Daily tests UK'], color_discrete_sequence = ['orange'], template = "simple_white") 
+tests = px.line(tests, x='Date', y=['Daily tests UK'], color_discrete_sequence = ['orange'], template = "simple_white") 
 
 casesFig.add_trace(tests.data[0])
 
