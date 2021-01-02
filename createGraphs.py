@@ -317,7 +317,7 @@ totalTests = float(tests.loc[0, 'Cumulative tests UK'])
 jsonDict = { "TCD": '{:,}'.format(totalCoronaDeaths2020), 
         "TNCED": '{:,}'.format(round(totalNonCoronaED,2)),
         "TED": '{:,}'.format(round(totalED,2)),
-        "tests": format(round(totalED,0))}
+        "tests": format(round(totalTests,0))}
 
 # Save that dictinary in json format. This can then be passed to other
 # applications.
