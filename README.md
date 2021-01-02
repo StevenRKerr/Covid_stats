@@ -20,3 +20,6 @@ The data all pertains to the UK, and consists of the following quantities:
 - Government spending on economic stimulus packages in response to the coronavirus pandemic.
 - NHS bed occupancy and availability.
 - Unemployment
+- Redundancies
+- Claimaint count
+- NHS and independent hospital bed occupancy/availability, by region.
