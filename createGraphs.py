@@ -52,7 +52,7 @@ OWID = iD.Open('OWID')
 # The DailyHosp is updated daily.
 # The file is downloaded automatically.
 
-iD.importDailyHosp()
+#iD.importDailyHosp()
 
 newHospAd = iD.Open('newHospAd')
 
@@ -281,16 +281,16 @@ lastDate =  str(df.iloc[-1,0])[:10]
 
 # totalCoronaDeaths is what it says.
 
-totalCoronaDeaths = int( deaths.loc[0, 'Cumulative deaths'] )
+totalCoronaDeaths2020 = deaths['Daily Covid-19 deaths UK'][deaths['Date'].dt.year == 2020 ].sum()
 
 
 # Add a column to IandP and LCD that is constant and equal to total 
 # Covid-19 deaths. This is useful for plotting purposes
 
 
-IandP.insert(1, 'Covid-19 deaths 2020 UK'  , totalCoronaDeaths  )
+IandP.insert(1, 'Covid-19 deaths 2020 UK'  , totalCoronaDeaths2020  )
 
-LCD.insert(1, 'Covid-19 deaths 2020 UK'  , totalCoronaDeaths  )
+LCD.insert(1, 'Covid-19 deaths 2020 UK'  , totalCoronaDeaths2020  )
 
 
 # This line is to make all the columns of IandP, LCD the same type, so they 
@@ -310,7 +310,7 @@ totalED = (yearlyMort['Weekly deaths UK 2020'] - yearlyMort['Mean weekly deaths 
 
 # Create a dictionary with some death related variables of interest.
 
-deathDict = { "TCD": '{:,}'.format(totalCoronaDeaths), 
+deathDict = { "TCD": '{:,}'.format(totalCoronaDeaths2020), 
         "TNCED": '{:,}'.format(round(totalNonCoronaED,2)),
         "TED": '{:,}'.format(round(totalED,2))}
 
@@ -391,7 +391,7 @@ def extract(df, area, hosp, bed, year):
 
 fig1 = px.line(df, x="Date", y=['Daily Covid-19 deaths UK', 'Daily hospital admissions with Covid-19 England', \
                     'Daily hospital admissions plus hospital diagnoses with Covid-19 England'] , \
-               range_x=['2020-01-01',lastDate], \
+               range_x=['2020-03-01',lastDate], \
              template = "simple_white", color_discrete_sequence =['red', 'gold', 'blue'] )
 
 fig1.update_layout(
@@ -409,7 +409,7 @@ fig1.update_layout(
 
 # Tests figure
 
-testsFig = px.bar(OWID, x="Date", y=['Daily tests UK'], range_x=['2020-01-01',lastDate], \
+testsFig = px.bar(OWID, x="Date", y=['Daily tests UK'], range_x=['2020-03-01',lastDate], \
              template = "simple_white", color_discrete_sequence =['magenta' ] )
 
 testsFig.update_layout(
@@ -451,7 +451,7 @@ casesFig.update_layout(
 
 # Positive test rate figure 
 
-testPosRateFig = px.line(OWID, x="Date", y=['Positive test rate UK'], range_x=['2020-01-01',lastDate], \
+testPosRateFig = px.line(OWID, x="Date", y=['Positive test rate UK'], range_x=['2020-03-01',lastDate], \
              template = "simple_white", color_discrete_sequence =['indigo' ] )
 
 testPosRateFig.update_layout(
@@ -545,7 +545,7 @@ meanDeathsFig.update_layout(
 )
 
 
-meanDeathsFig.update_layout(xaxis=dict(tickformat="%b"),
+meanDeathsFig.update_layout(xaxis=dict(tickformat="%d %b"),
             yaxis_title="Weekly deaths",
             legend_title="Variable:",
             legend=dict(
@@ -637,7 +637,7 @@ def createRegOccFig(reg):
     
     frame = pd.merge(frame,  extract(bedsOcc, reg, 'NHS', 'G&A', 2020) )
     
-    frame['Mean NHS overnight G&A beds occupied ' + reg + ' 2017-2019'] = frame.iloc[:, 2:].mean(axis=1)
+    frame['Mean NHS overnight G&A beds occupied ' + reg + ' 2017-2019'] = frame.iloc[:, 1:4].mean(axis=1)
     
     
     fig = px.line(frame, x='Date', y=frame.columns[1:],  \
@@ -677,27 +677,25 @@ for reg in regions:
     pio.write_html(createRegOccFig(reg), file='HTML files/Hospitals/' + figNames[reg] + '.html', auto_open=False) 
 
 
-reg = 'England'
 
-bob = extract(bedsOcc, 'England', 'NHS', 'G&A', 2019)
 
 
 
 
 # Beds available figure
 
-frame = pd.merge(extract(histBedsOpen, 'England', 'NHS', 'G&A', 2020), extract(histBedsOpen, 'England', 'NHS', 'G&A', 2019), how='outer')
+frame = pd.merge(extract(histBedsOpen, 'England', 'NHS', 'G&A', 2017), extract(histBedsOpen, 'England', 'NHS', 'G&A', 2018), how='outer')
                  
-frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2018) )
+frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2019) )
 
-frame = pd.merge(frame,  extract(histBedsOpen, 'England', 'NHS', 'G&A', 2017) )
+frame = pd.merge(frame,  extract(histBedsOpen, 'England', 'NHS', 'G&A', 2020) )
 
-frame['Mean NHS overnight beds G&A available England 2017-2019'] = frame.iloc[:, 2:].mean(axis=1)
+frame['Mean NHS overnight beds G&A available England 2017-2019'] = frame.iloc[:, 1:4].mean(axis=1)
 
 
 NHSBedsOpenFig = px.line(frame, x='Date', y=frame.columns[1:],  \
                 template = "simple_white", 
-                color_discrete_sequence =[ 'gold', 'red', 'green', 'blue', 'fuchsia'])
+                color_discrete_sequence =[ 'blue', 'green', 'red', 'gold', 'fuchsia'])
 
 
     
@@ -899,6 +897,66 @@ pio.write_html(deathCompFig, file='HTML files/deathCompFig.html', auto_open=True
 pio.write_html(redFig, file='HTML files/redFig.html', auto_open=True)
 
 pio.write_html(claimantsFig, file='HTML files/claimantsFig.html', auto_open=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#reg = 'England'
+#
+#
+#frame = pd.merge(extract(bedsOcc, reg, 'NHS', 'G&A', 2020), extract(bedsOcc, reg, 'NHS', 'G&A', 2019), how='outer')
+#                     
+#frame = pd.merge(frame, extract(bedsOcc, reg, 'NHS', 'G&A', 2018) )
+#    
+#frame = pd.merge(frame,  extract(bedsOcc, reg, 'NHS', 'G&A', 2017) )
+#    
+#frame['Mean NHS overnight G&A beds occupied ' + reg + ' 2017-2019'] = frame.iloc[:, 1:4].mean(axis=1)
+    
+
+
+#start1 = pd.Timestamp(2020, 4, 1,0)
+#
+#start2 = pd.Timestamp(2020, 10, 1)
+#
+#end = pd.Timestamp(2020, 11, 12)
+
+
+#bob = frame[ (frame['Date'] >= start2) & (frame['Date'] <= end)  ]
+#bob.iloc[:,1].mean()
+
+
+
+
+
+#frame = pd.merge(extract(histBedsOpen, 'England', 'NHS', 'G&A', 2020), extract(histBedsOpen, 'England', 'NHS', 'G&A', 2019), how='outer')
+#                 
+#frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2018) )
+#
+#frame = pd.merge(frame,  extract(histBedsOpen, 'England', 'NHS', 'G&A', 2017) )
+#
+#frame['Mean NHS overnight beds G&A available England 2017-2019'] = frame.iloc[:, 2:].mean(axis=1)
+#
+#
+#bob = frame[ (frame['Date'] >= start2) & (frame['Date'] <= end)  ]
+#
+#
+#bob.iloc[:,1].mean()
+
 
 
 
