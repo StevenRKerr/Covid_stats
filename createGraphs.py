@@ -107,6 +107,7 @@ monthlyMVbedsOcc = iD.Open('monthlyMVbedsOcc')
 
 monthlyMVbedsOccCovid = iD.Open('monthlyMVbedsOccCovid')
 
+
 admissionsByAge = iD.Open('admissionsByAge')
 
 
@@ -864,7 +865,7 @@ claimantsFig.update_layout(
 
 
 
-admissionsByAgeFig = px.line(admissionsByAge, x='Date', y=frame.columns[1:],  \
+admissionsByAgeFig = px.line(admissionsByAge, x='Date', y=admissionsByAge.columns,  \
                     template = "simple_white", 
                     color_discrete_sequence =[ 'blue', 'green', 'red', 'gold', 'fuchsia'])
 
@@ -880,7 +881,7 @@ admissionsByAgeFig.update_layout(
 )
 )            
     
-pio.write_html(admissionsByAgeFig, file='HTML files/admissionsByAgeFig.html', auto_open=True)    
+  
 
 
 # Create HTML files
@@ -921,7 +922,7 @@ pio.write_html(redFig, file='HTML files/redFig.html', auto_open=True)
 
 pio.write_html(claimantsFig, file='HTML files/claimantsFig.html', auto_open=True)
 
-
+pio.write_html(admissionsByAgeFig, file='HTML files/admissionsByAgeFig.html', auto_open=True)  
 
 
 

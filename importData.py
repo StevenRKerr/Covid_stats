@@ -258,7 +258,7 @@ def importMonthlyHosp():
         
         admissions= admissions.iloc[5:, 11:13]
         
-        admissions.columns = ['Date', 'Admissions with Covid-19 England age ' + sheet]
+        admissions.columns = ['Date', 'Daily hospital admissions with Covid-19 England age ' + sheet]
         
         admissionsByAge = pd.merge(admissionsByAge, admissions, how = 'outer')
     
