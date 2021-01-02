@@ -107,6 +107,7 @@ monthlyMVbedsOcc = iD.Open('monthlyMVbedsOcc')
 
 monthlyMVbedsOccCovid = iD.Open('monthlyMVbedsOccCovid')
 
+admissionsByAge = iD.Open('admissionsByAge')
 
 
 # Unempoyment data is updated roughly monthly
@@ -863,8 +864,23 @@ claimantsFig.update_layout(
 
 
 
+admissionsByAgeFig = px.line(admissionsByAge, x='Date', y=frame.columns[1:],  \
+                    template = "simple_white", 
+                    color_discrete_sequence =[ 'blue', 'green', 'red', 'gold', 'fuchsia'])
 
-
+admissionsByAgeFig.update_layout(
+    yaxis_title="",
+    showlegend=True,
+    legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=1.35,
+    xanchor="left",
+    x=0.1
+)
+)            
+    
+pio.write_html(admissionsByAgeFig, file='HTML files/admissionsByAgeFig.html', auto_open=True)    
 
 
 # Create HTML files

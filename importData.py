@@ -31,7 +31,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 
 
-# Save saves Object as filename.pkl in the working directory
+# Save saves Object as filename.pkl in "Pickle files"
 
 def Save(Object, filename):
     
@@ -42,7 +42,7 @@ def Save(Object, filename):
     file.close()
     
 
-# Open opens filename.pkl from the working directory
+# Open opens filename.pkl from "Pickle files"
 
 def Open(filename):
 
@@ -242,6 +242,34 @@ def importMonthlyHosp():
     Save(monthlyMVbedsOccCovid, 'monthlyMVbedsOccCovid')
     
     
+    
+    
+    admissionsDict = { '0-5': 'Admissions 0-5',
+                 '6-17':   'Admissions 6-17',
+                 '18-64': 'Admissions 18-64',
+                 '65-84': 'Admissions 65-84',
+                 '85+': 'Admissions 85+'}
+    
+    admissionsByAge= pd.DataFrame(columns = ['Date'])
+    
+    for sheet in admissionsDict:
+    
+        admissions = pd.read_excel (url, sheet_name=admissionsDict[sheet] ).T
+        
+        admissions= admissions.iloc[5:, 11:13]
+        
+        admissions.columns = ['Date', 'Admissions with Covid-19 England age ' + sheet]
+        
+        admissionsByAge = pd.merge(admissionsByAge, admissions, how = 'outer')
+    
+    
+    admissionsByAge.index = np.arange( len(admissionsByAge) )
+    
+    # Save the dataframe as a pickle object
+    
+    Save(admissionsByAge, 'admissionsByAge')
+    
+    
     return
 
 
@@ -346,8 +374,6 @@ def importWeeklyHosp():
 # importDailyHosp imports the dailt Hospital data, puts it into 
 # a more useful format and saves it.
 
-
-
 def importDailyHosp():
     
     # Get yesterday's date, because it is used in the PHE url
@@ -359,11 +385,8 @@ def importDailyHosp():
     # Create url of hospital admissions data
     
     url = ('https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/'  + str(yesterday.year) + "/" + str(yesterday.month) + '/' "COVID-19-daily-admissions-and-beds-" + dateStr + '.xlsx')
-    
-#    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2020/11/COVID-19-daily-admissions-and-beds-20201106-1.xlsx'
-    
+       
     df = pd.read_excel(url)   
-    
     
     
     
@@ -444,7 +467,7 @@ def importMort():
     
     array = np.genfromtxt(url, delimiter = ',', dtype =str)
     
-    # Importing mortalit.org data automatically creates a new folder for some
+    # Importing mortality.org data automatically creates a new folder for some
     # reason. Delete it.
     
     shutil.rmtree('www.mortality.org')
@@ -695,7 +718,6 @@ def importUC():
     
     df['Date'] = pd.to_datetime( df.Date.astype(str), format= '%B %d, %Y')
 
-    
     # Make the row index equal to row number
     
     df.index = np.arange( len(df) )
@@ -729,7 +751,6 @@ def importIandP():
     
     # Convert years into timedates
     
-
     df['Date'] = pd.to_datetime( df.Date.astype(str), format= '%Y')
     
     # Make the row index equal to row number
@@ -746,7 +767,6 @@ def importIandP():
     
 # importLCD imports leading cause of death data, puts it into a more 
 # useful format and saves it.
-
 
 
 def importLCD():
@@ -813,7 +833,6 @@ def importLCD():
 
 # importdeathByAge imports death by age data, puts it into a more 
 # useful format and saves it.
-
 
 
 def importdeathByAge():
@@ -1160,11 +1179,6 @@ def createYearlyMort(Mort, deaths):
     Save(yearlyMort, 'yearlyMort')
     
     return 
-
-
-
-
-
 
 
 
