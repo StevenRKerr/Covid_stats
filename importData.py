@@ -1457,8 +1457,8 @@ def importPathways():
     
     pathways.index = np.arange( len(pathways) )
     
-    pathways = pathways.rename(columns={"TriageCount": "Daily number of telephone triages England", \
-                                        "Total": "Daily number of completed online Covid-19 assessments England"})
+    pathways = pathways.rename(columns={"TriageCount": "Daily potential Covid-19 telephone triages England", \
+                                        "Total": "Daily potential Covid-19 online Covid-19 assessments England"})
 
     # Save the dataframe as a pickle object
     
