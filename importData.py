@@ -1421,5 +1421,48 @@ def importClaimants():
     return
     
     
+
+def importPathways():
     
+    url = 'https://files.digital.nhs.uk/CA/8D4110/NHS%20Pathways%20Covid-19%20data%202020-12-30.csv'
+
+
+    calls = pd.read_csv(url)
+
+    calls = calls[[ 'Call Date', 'TriageCount']]
+    
+    calls['Call Date'] = pd.to_datetime( calls['Call Date'], format = '%d/%m/%Y'   )
+
+    calls = calls.groupby(['Call Date']).sum()
+
+
+    url = 'https://files.digital.nhs.uk/48/AEC166/111%20Online%20Covid-19%20data_2020-12-30.csv'
+    
+
+    online = pd.read_csv(url)
+
+    online = online[[ 'journeydate', 'Total']]
+    
+    online['journeydate'] = pd.to_datetime( online['journeydate'], format = '%d/%m/%Y'   )
+
+    online = online.groupby(['journeydate']).sum()
+
+
+    pathways = pd.concat( [calls, online], axis=1)
+    
+    
+    pathways['Date'] = pathways.index
+
+    # Make the row index equal to row number
+    
+    pathways.index = np.arange( len(pathways) )
+    
+    pathways = pathways.rename(columns={"TriageCount": "Daily number of telephone triages England", \
+                                        "Total": "Daily number of completed online Covid-19 assessments England"})
+
+    # Save the dataframe as a pickle object
+    
+    Save(pathways, 'pathways')
+
+    return
 

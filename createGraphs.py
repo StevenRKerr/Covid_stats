@@ -64,6 +64,13 @@ dailyBedsOccCovid = iD.Open('dailyBedsOccCovid')
 
 dailyMVbedsOccCovid = iD.Open('dailyMVbedsOccCovid')
 
+# NHS pathways data should be updated daily
+
+iD.importPathways()
+
+pathways = iD.Open('pathways')
+
+
 
 # The WeeklyHosp is updated daily.
 # The file is downloaded automatically.
@@ -866,7 +873,7 @@ claimantsFig.update_layout(
 )
 )
 
-
+# Admissiong by age figure
 
 admissionsByAgeFig = px.line(admissionsByAge, x='Date', y=admissionsByAge.columns,  \
                     template = "simple_white", 
@@ -885,6 +892,31 @@ admissionsByAgeFig.update_layout(
 )            
     
   
+
+# NHS pathways figure
+
+
+pathwaysFig = px.line(pathways, x="Date", y=['Daily number of telephone triages England', \
+                                       'Daily number of completed online Covid-19 assessments England'], \
+             template = "simple_white", color_discrete_sequence =['red', 'blue'] )
+
+pathwaysFig.update_layout(
+    yaxis_title="",
+    legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=1,
+    xanchor="center",
+    x=0.5
+)
+    
+)
+
+
+
+
+
+
 
 
 # Create HTML files
@@ -927,6 +959,7 @@ pio.write_html(claimantsFig, file='HTML files/claimantsFig.html', auto_open=True
 
 pio.write_html(admissionsByAgeFig, file='HTML files/admissionsByAgeFig.html', auto_open=True)  
 
+pio.write_html(pathwaysFig, file='HTML files/pathwaysFig.html', auto_open=True)  
 
 
 
@@ -942,47 +975,46 @@ pio.write_html(admissionsByAgeFig, file='HTML files/admissionsByAgeFig.html', au
 
 
 
+reg = 'England'
 
-#reg = 'England'
-#
-#
-#frame = pd.merge(extract(bedsOcc, reg, 'NHS', 'G&A', 2020), extract(bedsOcc, reg, 'NHS', 'G&A', 2019), how='outer')
-#                     
-#frame = pd.merge(frame, extract(bedsOcc, reg, 'NHS', 'G&A', 2018) )
-#    
-#frame = pd.merge(frame,  extract(bedsOcc, reg, 'NHS', 'G&A', 2017) )
-#    
-#frame['Mean NHS overnight G&A beds occupied ' + reg + ' 2017-2019'] = frame.iloc[:, 1:4].mean(axis=1)
+
+frame = pd.merge(extract(bedsOcc, reg, 'NHS', 'G&A', 2020), extract(bedsOcc, reg, 'NHS', 'G&A', 2019), how='outer')
+                     
+frame = pd.merge(frame, extract(bedsOcc, reg, 'NHS', 'G&A', 2018) )
+    
+frame = pd.merge(frame,  extract(bedsOcc, reg, 'NHS', 'G&A', 2017) )
+    
+frame['Mean NHS overnight G&A beds occupied ' + reg + ' 2017-2019'] = frame.iloc[:, 1:4].mean(axis=1)
     
 
 
-#start1 = pd.Timestamp(2020, 4, 1,0)
-#
-#start2 = pd.Timestamp(2020, 10, 1)
-#
-#end = pd.Timestamp(2020, 11, 12)
+start1 = pd.Timestamp(2020, 4, 1,0)
+
+start2 = pd.Timestamp(2020, 10, 1)
+
+end = pd.Timestamp(2020, 11, 12)
 
 
-#bob = frame[ (frame['Date'] >= start2) & (frame['Date'] <= end)  ]
-#bob.iloc[:,1].mean()
+bob = frame[ (frame['Date'] >= start1) & (frame['Date'] <= end)  ]
+(bob.iloc[:,2]- bob.iloc[:,1]).mean()
 
 
 
 
 
-#frame = pd.merge(extract(histBedsOpen, 'England', 'NHS', 'G&A', 2020), extract(histBedsOpen, 'England', 'NHS', 'G&A', 2019), how='outer')
-#                 
-#frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2018) )
-#
-#frame = pd.merge(frame,  extract(histBedsOpen, 'England', 'NHS', 'G&A', 2017) )
-#
-#frame['Mean NHS overnight beds G&A available England 2017-2019'] = frame.iloc[:, 2:].mean(axis=1)
-#
-#
-#bob = frame[ (frame['Date'] >= start2) & (frame['Date'] <= end)  ]
-#
-#
-#bob.iloc[:,1].mean()
+frame = pd.merge(extract(histBedsOpen, 'England', 'NHS', 'G&A', 2020), extract(histBedsOpen, 'England', 'NHS', 'G&A', 2019), how='outer')
+                 
+frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2018) )
+
+frame = pd.merge(frame,  extract(histBedsOpen, 'England', 'NHS', 'G&A', 2017) )
+
+frame['Mean NHS overnight beds G&A available England 2017-2019'] = frame.iloc[:, 2:].mean(axis=1)
+
+
+bob = frame[ (frame['Date'] >= start2) & (frame['Date'] <= end)  ]
+
+
+bob.iloc[:,1].mean()
 
 
 
