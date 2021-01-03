@@ -68,7 +68,7 @@ dailyMVbedsOccCovid = iD.Open('dailyMVbedsOccCovid')
 # The WeeklyHosp is updated daily.
 # The file is downloaded automatically.
 
-iD.importWeeklyHosp()
+#iD.importWeeklyHosp()
 
 weeklyGABedsOccCovid = iD.Open('weeklyGABedsOccCovid')
 
@@ -316,12 +316,15 @@ totalED = (yearlyMort['Weekly deaths UK 2020'] - yearlyMort['Mean weekly deaths 
 
 totalTests = float(tests.loc[0, 'Cumulative tests UK'])
 
+totalCases = float(cases['Daily new Covid-19 cases UK'].sum())
+
 # Create a dictionary with some death related variables of interest.
 
 jsonDict = { "TCD": '{:,}'.format(totalCoronaDeaths2020), 
         "TNCED": '{:,}'.format(round(totalNonCoronaED,2)),
         "TED": '{:,}'.format(round(totalED,2)),
-        "tests": '{:,}'.format(math.trunc(totalTests))}
+        "tests": '{:,}'.format(math.trunc(totalTests)),
+        "cases": '{:,}'.format(math.trunc(totalCases))}
 
 # Save that dictinary in json format. This can then be passed to other
 # applications.
