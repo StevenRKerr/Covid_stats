@@ -324,7 +324,7 @@ jsonDict = { "TCD": '{:,}'.format(totalCoronaDeaths2020),
         "TNCED": '{:,}'.format(round(totalNonCoronaED,2)),
         "TED": '{:,}'.format(round(totalED,2)),
         "tests": '{:,}'.format(math.trunc(totalTests)),
-        "totalcases": '{:,}'.format(math.trunc(totalCases))}
+        "newpos": '{:,}'.format(math.trunc(totalCases))}
 
 # Save that dictinary in json format. This can then be passed to other
 # applications.
