@@ -84,6 +84,11 @@ weeklyGABedsOccNonCovid = iD.Open('weeklyGABedsOccNonCovid')
 weeklyBedsOccCovid = iD.Open('weeklyBedsOccCovid')
 
 
+# Flu and Covid surveilance is updated weekly
+
+iD.importSurveilance()
+
+ICU = iD.Open('ICU')
 
 
 # Mortality data is updated weekly, on Thursdays.
@@ -922,7 +927,23 @@ pathwaysFig.update_layout(
 
 
 
+# Surveilane figure
 
+surveilanceFig = px.line(ICU, x="Date", y=ICU.columns[1:], template = "simple_white" )
+
+surveilanceFig.update_layout(
+    yaxis_title="",
+    legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=1,
+    xanchor="left",
+    x=0.02
+)
+    
+)
+
+ 
 
 
 
@@ -967,6 +988,8 @@ pio.write_html(claimantsFig, file='HTML files/claimantsFig.html', auto_open=True
 pio.write_html(admissionsByAgeFig, file='HTML files/admissionsByAgeFig.html', auto_open=True)  
 
 pio.write_html(pathwaysFig, file='HTML files/pathwaysFig.html', auto_open=True)  
+
+pio.write_html(surveilanceFig, file='HTML files/surveilanceFig.html', auto_open=True) 
 
 
 
