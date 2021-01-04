@@ -296,6 +296,7 @@ lastDate =  str(df.iloc[-1,0])[:10]
 
 totalCoronaDeaths2020 = deaths['Daily Covid-19 deaths UK'][deaths['Date'].dt.year == 2020 ].sum()
 
+totalCoronaDeaths2021 = deaths['Daily Covid-19 deaths UK'][deaths['Date'].dt.year == 2021 ]
 
 # Add a column to IandP and LCD that is constant and equal to total 
 # Covid-19 deaths. This is useful for plotting purposes
@@ -304,6 +305,11 @@ totalCoronaDeaths2020 = deaths['Daily Covid-19 deaths UK'][deaths['Date'].dt.yea
 IandP.insert(1, 'Covid-19 deaths 2020 UK'  , totalCoronaDeaths2020  )
 
 LCD.insert(1, 'Covid-19 deaths 2020 UK'  , totalCoronaDeaths2020  )
+
+#IandP.insert(1, 'Covid-19 deaths 2021 UK'  , totalCoronaDeaths2021  )
+
+#LCD.insert(1, 'Covid-19 deaths 2021 UK'  , totalCoronaDeaths2021  )
+
 
 
 # This line is to make all the columns of IandP, LCD the same type, so they 
@@ -654,7 +660,7 @@ def createRegOccFig(reg):
                      
     frame = pd.merge(frame, extract(bedsOcc, reg, 'NHS', 'G&A', 2019) )
     
-    frame = pd.merge(frame,  extract(bedsOcc, reg, 'NHS', 'G&A', 2020) )
+    frame = pd.merge(frame,  extract(bedsOcc, reg, 'NHS', 'G&A', 2020), how = 'outer' )
     
     frame['Mean NHS overnight G&A beds occupied ' + reg + ' 2017-2019'] = frame.iloc[:, 1:4].mean(axis=1)
     
@@ -700,21 +706,21 @@ for reg in regions:
 
 
 
-
 # Beds available figure
 
-frame = pd.merge(extract(histBedsOpen, 'England', 'NHS', 'G&A', 2017), extract(histBedsOpen, 'England', 'NHS', 'G&A', 2018), how='outer')
+frame = pd.merge(extract(histBedsOpen, 'England', 'NHS', 'G&A', 2017), extract(histBedsOpen, 'England', 'NHS', 'G&A', 2018))
                  
 frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2019) )
 
-frame = pd.merge(frame,  extract(histBedsOpen, 'England', 'NHS', 'G&A', 2020) )
+frame = pd.merge(extract(histBedsOpen, 'England', 'NHS', 'G&A', 2020),   frame, how = 'outer' )
 
 frame['Mean NHS overnight beds G&A available England 2017-2019'] = frame.iloc[:, 1:4].mean(axis=1)
 
 
 NHSBedsOpenFig = px.line(frame, x='Date', y=frame.columns[1:],  \
                 template = "simple_white", 
-                color_discrete_sequence =[ 'blue', 'green', 'red', 'gold', 'fuchsia'])
+                color_discrete_sequence =[ 'blue', 'green', 'red', 'gold', 'fuchsia'], \
+                range_x=['2020-01-01','2020-12-31'])
 
 
     
