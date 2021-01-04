@@ -1458,7 +1458,7 @@ def importPathways():
     pathways.index = np.arange( len(pathways) )
     
     pathways = pathways.rename(columns={"TriageCount": "Daily potential Covid-19 telephone triages England", \
-                                        "Total": "Daily potential Covid-19 online Covid-19 assessments England"})
+                                        "Total": "Daily potential Covid-19 online assessments England"})
 
     # Save the dataframe as a pickle object
     
@@ -1469,7 +1469,40 @@ def importPathways():
 
 
 
+def importSurveilance():
+    
+   url = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/948530/Weekly_Influenza_and_COVID19_report_data_w52data.xlsx'
+    
+   ICU = pd.read_excel(url, sheet_name = 'Figure 42. SARIWatch-ICUPHEC')
+   
+   ICU.iloc[7,1] = 'Date'
+   
+   ICU.columns = ICU.iloc[7, :]
+   
+   ICU = ICU.iloc[8:34, 1:]
+    
+   ICU['Date'] =  pd.Timestamp(2020, 1, 1) + pd.to_timedelta(  (ICU.Date.astype(int)).mul(7).astype(str) + ' days')
 
+   Save(ICU, 'ICU') 
+   
+   return
+  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
 
 
