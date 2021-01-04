@@ -214,7 +214,9 @@ histBedsOpen.name = 'histBedsOpen'
 histBedsOcc = iD.Open('histBedsOcc') 
 
 
-
+# retail is never updated
+#
+# retail = pd.read_csv('Data/Retail.csv')
 
 
 
@@ -917,7 +919,6 @@ pathwaysFig.update_layout(
 )
     
 )
-
 
 
 
