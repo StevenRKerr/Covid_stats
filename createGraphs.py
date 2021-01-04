@@ -660,17 +660,18 @@ def createRegOccFig(reg):
    
     frame = pd.merge(extract(bedsOcc, reg, 'NHS', 'G&A', 2017), extract(bedsOcc, reg, 'NHS', 'G&A', 2018), how='outer')
                      
-    frame = pd.merge(frame, extract(bedsOcc, reg, 'NHS', 'G&A', 2019) )
+    frame = pd.merge(frame, extract(bedsOcc, reg, 'NHS', 'G&A', 2019), how='outer' )
     
-    frame = pd.merge(frame,  extract(bedsOcc, reg, 'NHS', 'G&A', 2020), how = 'outer' )
+    frame = pd.merge(frame,  extract(bedsOcc, reg, 'NHS', 'G&A', 2020), how='outer' )
     
     frame['Mean NHS overnight G&A beds occupied ' + reg + ' 2017-2019'] = frame.iloc[:, 1:4].mean(axis=1)
     
     
-    fig = px.line(frame, x='Date', y=frame.columns[1:],  \
+    
+    
+    fig = px.line(frame, x='Date', y=frame.columns[[4,3,2,1,5]],  \
                     template = "simple_white", 
-                    color_discrete_sequence =[ 'blue', 'green', 'red', 'gold', 'fuchsia'],
-                    range_x=['2020-01-01','2020-12-31'])
+                    color_discrete_sequence =[ 'gold', 'red', 'green', 'blue', 'fuchsia'])
     
     
         
@@ -710,19 +711,18 @@ for reg in regions:
 
 # Beds available figure
 
-frame = pd.merge(extract(histBedsOpen, 'England', 'NHS', 'G&A', 2017), extract(histBedsOpen, 'England', 'NHS', 'G&A', 2018))
+frame = pd.merge(extract(histBedsOpen, 'England', 'NHS', 'G&A', 2020), extract(histBedsOpen, 'England', 'NHS', 'G&A', 2019), how = 'outer')
                  
-frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2019) )
+frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2018) )
 
-frame = pd.merge(extract(histBedsOpen, 'England', 'NHS', 'G&A', 2020),   frame, how = 'outer' )
+frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2017)  )
 
 frame['Mean NHS overnight beds G&A available England 2017-2019'] = frame.iloc[:, 1:4].mean(axis=1)
 
 
 NHSBedsOpenFig = px.line(frame, x='Date', y=frame.columns[1:],  \
                 template = "simple_white", 
-                color_discrete_sequence =[ 'blue', 'green', 'red', 'gold', 'fuchsia'], \
-                range_x=['2020-01-01','2020-12-31'])
+                color_discrete_sequence =[ 'gold', 'red', 'green', 'blue', 'fuchsia'])
 
 
     
