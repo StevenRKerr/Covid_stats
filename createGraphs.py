@@ -86,7 +86,7 @@ weeklyBedsOccCovid = iD.Open('weeklyBedsOccCovid')
 
 # Flu and Covid surveilance is updated weekly
 
-iD.importSurveilance()
+#iD.importSurveilance()
 
 ICU = iD.Open('ICU')
 
@@ -909,8 +909,8 @@ admissionsByAgeFig.update_layout(
 # NHS pathways figure
 
 
-pathwaysFig = px.line(pathways, x="Date", y=['Daily potential Covid-19 telephone triages England', \
-                                       'Daily potential Covid-19 online Covid-19 assessments England'], \
+pathwaysFig = px.line(pathways, x="Date", y=['Daily potential Covid-19 telephone triages England',
+       'Daily potential Covid-19 online assessments England'], \
              template = "simple_white", color_discrete_sequence =['red', 'blue'] )
 
 pathwaysFig.update_layout(
