@@ -675,7 +675,7 @@ def createRegOccFig(reg):
     
     frame = pd.merge(frame,  extract(bedsOcc, reg, 'NHS', 'G&A', 2017), how='outer' )
     
-    frame['Mean NHS overnight G&A beds occupied ' + reg + ' 2017-2019'] = frame.iloc[:, 1:4].mean(axis=1)
+    frame['Mean NHS overnight G&A beds occupied ' + reg + ' 2017-2019'] = frame.iloc[:, 3:6].mean(axis=1)
     
     frame = frame.sort_values('Date')
     
@@ -702,7 +702,7 @@ def createRegOccFig(reg):
         legend_title="Variable:",
         legend=dict(
         yanchor="top",
-        y=1.35,
+        y=1.4,
         xanchor="left",
         x=0.1
     )
