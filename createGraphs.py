@@ -702,7 +702,7 @@ def createRegOccFig(reg):
         legend_title="Variable:",
         legend=dict(
         yanchor="top",
-        y=1.4,
+        y=1.45,
         xanchor="left",
         x=0.1
     )
