@@ -75,7 +75,7 @@ pathways = iD.Open('pathways')
 # The WeeklyHosp is updated daily.
 # The file is downloaded automatically.
 
-iD.importWeeklyHosp()
+#iD.importWeeklyHosp()
 
 weeklyGABedsOccCovid = iD.Open('weeklyGABedsOccCovid')
 
@@ -686,13 +686,23 @@ def createRegOccFig(reg):
     
     
         
-    frame = extract(bedsOccCovid, reg, 'NHS', '', 2020) 
+    frame = extract(bedsOccCovid, reg, 'NHS', '', 2021) 
         
     bar0 = px.bar(frame, x='Date', y=[frame.columns[1]],     \
-                    color_discrete_sequence = ['lightseagreen'], template = "simple_white") 
+                    color_discrete_sequence = ['purple'], template = "simple_white") 
     
     fig.add_trace(bar0.data[0])
+            
         
+        
+    frame = extract(bedsOccCovid, reg, 'NHS', '', 2020) 
+        
+    bar1 = px.bar(frame, x='Date', y=[frame.columns[1]],     \
+                    color_discrete_sequence = ['lightseagreen'], template = "simple_white") 
+    
+    fig.add_trace(bar1.data[0])
+    
+    
    
         
     fig.update_layout(
@@ -702,7 +712,7 @@ def createRegOccFig(reg):
         legend_title="Variable:",
         legend=dict(
         yanchor="top",
-        y=1.45,
+        y=1.5,
         xanchor="left",
         x=0.1
     )
