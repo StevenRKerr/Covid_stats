@@ -660,23 +660,29 @@ figNames = {'East of England': 'NHSBedsOccFigEoE',
             'England': 'NHSBedsOccFigE',
             }
             
-            
+ 
+reg = 'England'
+          
 def createRegOccFig(reg):
-   
-    frame = pd.merge(extract(bedsOcc, reg, 'NHS', 'G&A', 2017), extract(bedsOcc, reg, 'NHS', 'G&A', 2018), how='outer')
-                     
-    frame = pd.merge(frame, extract(bedsOcc, reg, 'NHS', 'G&A', 2019), how='outer' )
     
-    frame = pd.merge(frame,  extract(bedsOcc, reg, 'NHS', 'G&A', 2020), how='outer' )
+    
+    
+    frame = pd.merge(extract(bedsOcc, reg, 'NHS', 'G&A', 2021), extract(bedsOcc, reg, 'NHS', 'G&A', 2020), how='outer')
+        
+    frame = pd.merge(frame, extract(bedsOcc, reg, 'NHS', 'G&A', 2019), how='outer' )
+             
+    frame = pd.merge(frame, extract(bedsOcc, reg, 'NHS', 'G&A', 2018), how='outer' )
+    
+    frame = pd.merge(frame,  extract(bedsOcc, reg, 'NHS', 'G&A', 2017), how='outer' )
     
     frame['Mean NHS overnight G&A beds occupied ' + reg + ' 2017-2019'] = frame.iloc[:, 1:4].mean(axis=1)
     
+    frame = frame.sort_values('Date')
     
     
-    
-    fig = px.line(frame, x='Date', y=frame.columns[[4,3,2,1,5]],  \
+    fig = px.line(frame, x='Date', y=frame.columns[1:],  \
                     template = "simple_white", 
-                    color_discrete_sequence =[ 'gold', 'red', 'green', 'blue', 'fuchsia'])
+                    color_discrete_sequence =[ 'orange', 'gold', 'red', 'green', 'blue', 'fuchsia'])
     
     
         
