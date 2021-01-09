@@ -618,7 +618,7 @@ LCDFig.update_layout(
     legend_title="Variable:",
     legend=dict(
     yanchor="top",
-    y=1.05,
+    y=1.25,
     xanchor="right",
     x=0.99
 )
