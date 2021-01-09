@@ -1424,7 +1424,9 @@ def importClaimants():
 
 def importPathways():
     
-    url = 'https://files.digital.nhs.uk/CA/8D4110/NHS%20Pathways%20Covid-19%20data%202020-12-30.csv'
+    
+    
+    url = 'https://files.digital.nhs.uk/0F/6A1EA9/NHS%20Pathways%20Covid-19%20data%202021-01-07.csv'
 
 
     calls = pd.read_csv(url)
@@ -1436,7 +1438,7 @@ def importPathways():
     calls = calls.groupby(['Call Date']).sum()
 
 
-    url = 'https://files.digital.nhs.uk/48/AEC166/111%20Online%20Covid-19%20data_2020-12-30.csv'
+    url = 'https://files.digital.nhs.uk/BC/C99E8E/111%20Online%20Covid-19%20data_2021-01-07.csv'
     
 
     online = pd.read_csv(url)

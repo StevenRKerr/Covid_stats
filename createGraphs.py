@@ -303,7 +303,7 @@ lastDate =  str(df.iloc[-1,0])[:10]
 
 totalCoronaDeaths2020 = deaths['Daily Covid-19 deaths UK'][deaths['Date'].dt.year == 2020 ].sum()
 
-totalCoronaDeaths2021 = deaths['Daily Covid-19 deaths UK'][deaths['Date'].dt.year == 2021 ]
+totalCoronaDeaths2021 = deaths['Daily Covid-19 deaths UK'][deaths['Date'].dt.year == 2021 ].sum()
 
 # Add a column to IandP and LCD that is constant and equal to total 
 # Covid-19 deaths. This is useful for plotting purposes
@@ -311,7 +311,11 @@ totalCoronaDeaths2021 = deaths['Daily Covid-19 deaths UK'][deaths['Date'].dt.yea
 
 IandP.insert(1, 'Covid-19 deaths 2020 UK'  , totalCoronaDeaths2020  )
 
+IandP.insert(1, 'Covid-19 deaths 2021 UK'  , totalCoronaDeaths2021  )
+
 LCD.insert(1, 'Covid-19 deaths 2020 UK'  , totalCoronaDeaths2020  )
+
+LCD.insert(1, 'Covid-19 deaths 2021 UK'  , totalCoronaDeaths2021  )
 
 #IandP.insert(1, 'Covid-19 deaths 2021 UK'  , totalCoronaDeaths2021  )
 
@@ -545,8 +549,9 @@ GDPFig.update_layout(xaxis=dict(tickformat="%b"),
 
 # Influenza and Pneumonia figure
 
-IandPFig = px.line(IandP, x="Date", y=['Covid-19 deaths 2020 UK', 'Yearly influenza and pneumonia deaths England and Wales' ], \
-             template = "simple_white", color_discrete_sequence =['orange' ,'teal' ] )
+IandPFig = px.line(IandP, x="Date", y=['Covid-19 deaths 2020 UK', 'Covid-19 deaths 2021 UK',\
+        'Yearly influenza and pneumonia deaths England and Wales' ], \
+             template = "simple_white", color_discrete_sequence =['orange' ,'teal', 'green' ] )
 
 IandPFig.update_layout(
     yaxis_title="",
@@ -979,15 +984,15 @@ pio.write_html(testPosRateFig, file='HTML files/testPosRateFig.html', auto_open=
 
 pio.write_html(UCFig, file='HTML files/UCFig.html', auto_open=False)
 
-pio.write_html(GDPFig, file='HTML files/GDPFig.html', auto_open=True)
+pio.write_html(GDPFig, file='HTML files/GDPFig.html', auto_open=False)
 
-pio.write_html(IandPFig, file='HTML files/IandPFig.html', auto_open=True)
+pio.write_html(IandPFig, file='HTML files/IandPFig.html', auto_open=False)
 
 pio.write_html(meanDeathsFig, file='HTML files/meanDeathsFig.html', auto_open=True)
 
 pio.write_html(LCDFig, file='HTML files/LCDFig.html', auto_open=False)
 
-pio.write_html(deathByAgeFig, file='HTML files/deathByAgeFig.html', auto_open=True)
+pio.write_html(deathByAgeFig, file='HTML files/deathByAgeFig.html', auto_open=False)
 
 pio.write_html(govSpendingFig, file='HTML files/govSpendingFig.html', auto_open=True)
 
@@ -995,7 +1000,7 @@ pio.write_html(unemploymentFig, file='HTML files/unemploymentFig.html', auto_ope
 
 pio.write_html(MVbedsFig, file='HTML files/MVbedsFig.html', auto_open=True)
 
-pio.write_html(deathCompFig, file='HTML files/deathCompFig.html', auto_open=True)
+pio.write_html(deathCompFig, file='HTML files/deathCompFig.html', auto_open=False)
 
 pio.write_html(redFig, file='HTML files/redFig.html', auto_open=True)
 
