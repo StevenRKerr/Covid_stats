@@ -981,7 +981,7 @@ depressionFig.update_layout(
     legend_traceorder= 'reversed',
     legend=dict(
     yanchor="top",
-    y=1.1,
+    y=1.15,
     xanchor="left",
     x=0.02
 )
