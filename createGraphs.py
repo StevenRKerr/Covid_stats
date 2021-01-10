@@ -966,6 +966,35 @@ surveilanceFig.update_layout(
 
  
 
+# Create depression figure.
+# This only needs to be done once - the figure is not dynamic
+
+#depression = pd.read_excel(r'Data/Depression.xlsx')
+
+#depression['Time period'] = 'Prevalence of moderate to severe depression symptoms ' \
+#                                + depression['Time period'] + ' Britain'
+
+
+#depressionFig = px.bar(depression, x="Group", y=['Estimate (%)'], barmode = 'group', \
+#                   color = 'Time period',   template = "simple_white" )
+
+#depressionFig.update_layout(
+#    yaxis_title="",
+#    legend_title="Variable:",
+#    legend=dict(
+#    yanchor="top",
+#    y=1.1,
+#    xanchor="left",
+#    x=0.02
+#)
+    
+#)
+
+#depressionFig.layout.yaxis.ticksuffix = '%'
+
+#pio.write_html(depressionFig, file='HTML files/depressionFig.html', auto_open=True) 
+
+
 
 
 # Create HTML files
@@ -990,7 +1019,7 @@ pio.write_html(IandPFig, file='HTML files/IandPFig.html', auto_open=False)
 
 pio.write_html(meanDeathsFig, file='HTML files/meanDeathsFig.html', auto_open=True)
 
-pio.write_html(LCDFig, file='HTML files/LCDFig.html', auto_open=False)
+pio.write_html(LCDFig, file='HTML files/LCDFig.html', auto_open=True)
 
 pio.write_html(deathByAgeFig, file='HTML files/deathByAgeFig.html', auto_open=False)
 
