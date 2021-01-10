@@ -1492,4 +1492,35 @@ def importSurveilance():
     
 
      
-  
+def importDepression():
+    
+    
+    depression = pd.read_excel(r'Data/Depression.xlsx', sheet_name = 'Table 1')
+
+    rows = [9,10,11,20,21,24,25,28,29 ]
+    
+    columns = [0,6,15,24]
+
+    depression = depression.iloc[rows, columns]    
+    
+    depression.columns = ['Group', 'November 2020', 'June 2020', 'July 2019 to March 2020' ]
+    
+    depression =  pd.melt( depression, depression.columns[0], depression.columns[1:]  )
+    
+    depression = depression.rename({'variable': 'Time period', 'value': 'Prevalence'}, axis=1)
+    
+    depression['Time period'] = 'Prevalence of moderate to severe depression symptoms ' \
+         + depression['Time period'] + ' Britain'
+         
+    depression['Prevalence'] = depression['Prevalence'].astype(float) 
+    
+    Save(depression, 'depression') 
+    
+    return
+    
+    
+    
+    
+    
+    
+    
