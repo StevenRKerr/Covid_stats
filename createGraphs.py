@@ -969,28 +969,29 @@ surveilanceFig.update_layout(
  #Create depression figure.
  #This only needs to be done once - the figure is not dynamic
 
-depression = iD.Open('depression')
+#depression = iD.Open('depression')
 
-depressionFig = px.bar(depression, x="Prevalence", y='Group', \
-                   color = 'Time period',   template = "simple_white", 
-                   barmode = 'group', orientation = 'h' )
 
-depressionFig.update_layout(
-   yaxis_title="",
-    legend_title="Variable:",
-    legend_traceorder= 'reversed',
-    legend=dict(
-    yanchor="top",
-    y=1.2,
-    xanchor="left",
-    x=0.02
-)
+#depressionFig = px.bar(depression, x="Prevalence", y='Group', \
+#                   color = 'Time period',   template = "simple_white", 
+#                   barmode = 'group', orientation = 'h' )
+
+#depressionFig.update_layout(
+#   yaxis_title="",
+#    legend_title="Variable:",
+#    legend_traceorder= 'reversed',
+#    legend=dict(
+#    yanchor="top",
+#    y=1.2,
+#    xanchor="left",
+#    x=0.02
+#)
     
-)
+#)
 
-depressionFig.layout.xaxis.ticksuffix = '%'
+#depressionFig.layout.xaxis.ticksuffix = '%'
 
-pio.write_html(depressionFig, file='HTML files/depressionFig.html', auto_open=True) 
+#pio.write_html(depressionFig, file='HTML files/depressionFig.html', auto_open=True) 
 
 
 
