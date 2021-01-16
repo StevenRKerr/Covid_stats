@@ -112,7 +112,7 @@ def importMonthlyHosp():
     
     # This url contains a link to hospital admissions data.
 
-    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2020/12/Covid-Publication-10-12-2020.xlsx"
+    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/01/Covid-Publication-14-01-2021.xlsx"
     
     oldHospAd = pd.read_excel(url, sheet_name='Admissions Total')
     
@@ -282,7 +282,7 @@ def importMonthlyHosp():
 
 def importWeeklyHosp():
     
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/01/Weekly-covid-admissions-and-beds-publication-210107.xlsx'
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/01/Weekly-covid-admissions-and-beds-publication-210114.xlsx'
     
     # Import and format the weeklyGABedsOccCovid data
     
@@ -384,7 +384,7 @@ def importDailyHosp():
     
     # Create url of hospital admissions data
     
-    url = ('https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/'  + str(yesterday.year) + "/" + str(yesterday.month) + '/' "COVID-19-daily-admissions-and-beds-" + dateStr + '.xlsx')
+    url = ('https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/'  + str(yesterday.year) + "/" + str('{:02}'.format(yesterday.month)) + '/' "COVID-19-daily-admissions-and-beds-" + dateStr + '.xlsx')
        
     df = pd.read_excel(url)   
     
@@ -1426,7 +1426,7 @@ def importPathways():
     
     
     
-    url = 'https://files.digital.nhs.uk/0F/6A1EA9/NHS%20Pathways%20Covid-19%20data%202021-01-07.csv'
+    url = 'https://files.digital.nhs.uk/68/D13ADD/NHS%20Pathways%20Covid-19%20data%202021-01-14.csv'
 
 
     calls = pd.read_csv(url)
@@ -1438,7 +1438,7 @@ def importPathways():
     calls = calls.groupby(['Call Date']).sum()
 
 
-    url = 'https://files.digital.nhs.uk/BC/C99E8E/111%20Online%20Covid-19%20data_2021-01-07.csv'
+    url = 'https://files.digital.nhs.uk/CC/246080/111%20Online%20Covid-19%20data_2021-01-14.csv'
     
 
     online = pd.read_csv(url)
