@@ -574,7 +574,7 @@ def importMort():
 
 def importGDP():
     
-    url = 'https://www.ons.gov.uk/generator?uri=/economy/grossdomesticproductgdp/bulletins/gdpmonthlyestimateuk/october2020/aa230043&format=csv'
+    url = 'https://www.ons.gov.uk/generator?uri=/economy/grossdomesticproductgdp/bulletins/gdpmonthlyestimateuk/november2020/7e8704cf&format=csv'
     
     
     r = requests.get(url)
@@ -599,7 +599,7 @@ def importGDP():
     
     # Convert the Date entries to a proper timedate
     
-    df['Date'] = pd.to_datetime( df.Date.astype(str), format= '%b %Y')
+    df['Date'] = pd.to_datetime( df.Date.astype(str), format= '%b %y')
        
     # Make the row index equal to row number
     

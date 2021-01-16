@@ -102,7 +102,7 @@ Mort = iD.Open('Mort')
 
 # importMonthlyHosp is updated around the 12th of each month
 
-iD.importMonthlyHosp()
+#iD.importMonthlyHosp()
 
 oldHospAd = iD.Open('oldHospAd')
 
@@ -771,19 +771,27 @@ NHSBedsOpenFig.update_layout(
 
 # Private beds occupied figure
   
-frame = extract(monthlyBedsOcc, 'England', 'Non-NHS', '', 2020)
+frame = pd.merge(extract(monthlyBedsOcc, 'England', 'Non-NHS', '', 2020),
+                 extract(monthlyBedsOcc, 'England', 'Non-NHS', '', 2021), how='outer')
+
                  
 privBedsOccFig = px.line(frame, x='Date', y=frame.columns[1:],  \
                 template = "simple_white", 
-                color_discrete_sequence =['green'])
+                color_discrete_sequence =['green', 'gold'])
     
     
-frame = extract(monthlyBedsOccCovid, 'England', 'Non-NHS', '', 2020) 
+frame = pd.merge( extract(monthlyBedsOccCovid, 'England', 'Non-NHS', '', 2020),
+                 extract(monthlyBedsOccCovid, 'England', 'Non-NHS', '', 2021), how='outer')
     
 bar0 = px.bar(frame, x='Date', y=[frame.columns[1]],     \
                 color_discrete_sequence = ['blue'], template = "simple_white") 
 
 privBedsOccFig.add_trace(bar0.data[0])
+
+bar1 = px.bar(frame, x='Date', y=[frame.columns[2]],     \
+                color_discrete_sequence = ['fuchsia'], template = "simple_white") 
+
+privBedsOccFig.add_trace(bar1.data[0])
 
     
 privBedsOccFig.update_layout(
@@ -948,7 +956,7 @@ pathwaysFig.update_layout(
 
 
 
-# Surveilane figure
+# Surveilacne figure
 
 surveilanceFig = px.line(ICU, x="Date", y=ICU.columns[1:], template = "simple_white" )
 
