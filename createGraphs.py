@@ -179,7 +179,7 @@ UC = iD.Open('UC')
 # GDP data is updated monthly, approximately around the 10th of each month.
 # The file needs to be downloaded manually.
 
-#iD.importGDP()
+iD.importGDP()
 
 
 GDP = iD.Open('yearlyGDP')
