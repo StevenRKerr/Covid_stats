@@ -743,7 +743,7 @@ frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2018) )
 
 frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2017)  )
 
-frame['Mean NHS overnight beds G&A available England 2017-2019'] = frame.iloc[:, 1:4].mean(axis=1)
+frame['Mean NHS overnight beds G&A available England 2017-2019'] = frame.iloc[:, 2:].mean(axis=1)
 
 
 NHSBedsOpenFig = px.line(frame, x='Date', y=frame.columns[1:],  \
