@@ -282,7 +282,7 @@ def importMonthlyHosp():
 
 def importWeeklyHosp():
     
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/01/Weekly-covid-admissions-and-beds-publication-210114.xlsx'
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/01/Weekly-covid-admissions-and-beds-publication-210121.xlsx'
     
     # Import and format the weeklyGABedsOccCovid data
     
@@ -1426,7 +1426,7 @@ def importPathways():
     
     
     
-    url = 'https://files.digital.nhs.uk/68/D13ADD/NHS%20Pathways%20Covid-19%20data%202021-01-14.csv'
+    url = 'https://files.digital.nhs.uk/E0/27538C/NHS%20Pathways%20Covid-19%20data%202021-01-21.csv'
 
 
     calls = pd.read_csv(url)
@@ -1438,7 +1438,7 @@ def importPathways():
     calls = calls.groupby(['Call Date']).sum()
 
 
-    url = 'https://files.digital.nhs.uk/CC/246080/111%20Online%20Covid-19%20data_2021-01-14.csv'
+    url = 'https://files.digital.nhs.uk/51/5E2425/111%20Online%20Covid-19%20data_2021-01-21.csv'
     
 
     online = pd.read_csv(url)
@@ -1473,17 +1473,24 @@ def importPathways():
 
 def importSurveilance():
     
-   url = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/948530/Weekly_Influenza_and_COVID19_report_data_w52data.xlsx'
+   url = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/954730/Weekly_Influenza_and_COVID19_report_data_W3_V2.xlsx'
     
    ICU = pd.read_excel(url, sheet_name = 'Figure 42. SARIWatch-ICUPHEC')
+   
+   
+   start =  ICU.index[ ICU['Unnamed: 2'].str[:12] == '(a) COVID-19' ] [0] + 2
+   
+   end = ICU.index[ ICU['Unnamed: 2'].str[:13] == '(b) Influenza' ] [0] - 2
    
    ICU.iloc[7,1] = 'Date'
    
    ICU.columns = ICU.iloc[7, :]
    
-   ICU = ICU.iloc[8:34, 1:]
+   ICU = ICU.iloc[start:end, 1:]
     
-   ICU['Date'] =  pd.Timestamp(2020, 1, 1) + pd.to_timedelta(  (ICU.Date.astype(int)).mul(7).astype(str) + ' days')
+   ICU.loc[:34,  'Date'] =  pd.Timestamp(2020, 1, 1) + pd.to_timedelta(  (ICU.loc[:34,  'Date'].astype(int)).mul(7).astype(str) + ' days') 
+   
+   ICU.loc[35:, 'Date'] =  pd.Timestamp(2021, 1, 1) + pd.to_timedelta(  (ICU.loc[35:, 'Date'].astype(int)).mul(7).astype(str) + ' days')
 
    Save(ICU, 'ICU') 
    
