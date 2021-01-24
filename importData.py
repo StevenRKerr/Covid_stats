@@ -487,24 +487,19 @@ def importMort():
     
     def formatMort(df):
     
-        # Index the dataframe by timedates.
-        # To conver a year and a week into a timedate object, first convert just the
-        # year to a timedate. Then calculate how many days pass from the start of the year
-        # to the start of the numbered week. Convert that to a timedelta, and add onto
-        # the timedate for the year
-    
         df.insert(0, 'Date', pd.to_datetime(df.Year.astype(str), format='%Y') + pd.to_timedelta(  (df.Week.astype(int)).mul(7).astype(str) + ' days') )
-        
+    
         # Keep only entries that have 'b' in the 'Sex' field. 'b' stands for 'both,
         # and it means that both male and female deaths are counted
     
-        df = df.loc[ df['Sex'] == 'b'][ ['Date', 'DTotal'] ]
+        df = df[ df['Sex'] == 'b' ][ ['Date', 'DTotal'] ]
         
         # Right now everything is strings. Coerce to integers.
         
         df.iloc[:, 1] = df.iloc[:, 1].astype(int)
         
         return df
+    
     
     dfEW = formatMort(dfEW)
     
@@ -1093,12 +1088,13 @@ def importHistBedsOcc():
 
 def createYearlyMort(Mort, deaths):
     
+    Mort = Open('Mort')
+    
     # Start off with Dates from 2015 in the first column, and weekly deaths
     # for 2015 in the second column.
     
     yearlyMort = Mort[ Mort['Date'].dt.year == 2015 ][['Date', 'Weekly deaths UK']]
     
-    # Annoyingly, 2015 has only 51 weeks. 
     
     # Rename columns appropriately.
     
@@ -1108,12 +1104,13 @@ def createYearlyMort(Mort, deaths):
     
     yearlyMort.index = np.arange( len(yearlyMort.index) )
 
-    # Add columns for weekly deaths for years 2011-2019
+    # Add columns for weekly deaths for years 2016-2019
+
 
 
     for year in range(2016, 2020):
-        
-        yearlyMort['Weekly deaths UK ' + str(year)] = Mort[  Mort['Date'].dt.year == year ]['Weekly deaths UK'].values
+                    
+        yearlyMort['Weekly deaths UK ' + str(year)] = Mort[  Mort['Date'].dt.year == year ]['Weekly deaths UK'].values[-52:]
     
     # Add column for weekly deaths in 2020
     # This isn't so easy because 2020 isn't finished yet, so need to create
