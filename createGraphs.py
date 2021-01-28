@@ -228,6 +228,8 @@ histBedsOcc = iD.Open('histBedsOcc')
 
 # Combine deaths, oldHospAd and newHospAd
 
+df = pd.merge(deaths, oldHospAd)
+
 df = iD.mergeFrames(deaths, oldHospAd )
 
 df = iD.mergeFrames(df, newHospAd)
@@ -301,9 +303,9 @@ lastDate =  str(df.iloc[-1,0])[:10]
 
 # totalCoronaDeaths is what it says.
 
-totalCoronaDeaths2020 = deaths['Daily Covid-19 deaths UK'][deaths['Date'].dt.year == 2020 ].sum()
+totalCoronaDeaths2020 = deaths['Daily reported Covid-19 deaths UK'][deaths['Date'].dt.year == 2020 ].sum()
 
-totalCoronaDeaths2021 = deaths['Daily Covid-19 deaths UK'][deaths['Date'].dt.year == 2021 ].sum()
+totalCoronaDeaths2021 = deaths['Daily reported Covid-19 deaths UK'][deaths['Date'].dt.year == 2021 ].sum()
 
 # Add a column to IandP and LCD that is constant and equal to total 
 # Covid-19 deaths. This is useful for plotting purposes
@@ -425,7 +427,7 @@ def extract(df, area, hosp, bed, year):
 # Deaths and hospital admissions figure
 
 
-fig1 = px.line(df, x="Date", y=['Daily Covid-19 deaths UK', 'Daily hospital admissions with Covid-19 England', \
+fig1 = px.line(df, x="Date", y=['Daily reported Covid-19 deaths UK', 'Daily hospital admissions with Covid-19 England', \
                     'Daily hospital admissions plus hospital diagnoses with Covid-19 England'] , \
                range_x=['2020-03-01',lastDate], \
              template = "simple_white", color_discrete_sequence =['red', 'gold', 'blue'] )
@@ -614,7 +616,6 @@ LCDcols.remove('Date')
 LCDFig = px.line(LCD, x="Date", y= LCDcols, template = "simple_white" ) 
 
 LCDFig.update_layout(
-    yaxis_title="Yearly deaths UK",
     legend_title="Variable:",
     legend=dict(
     yanchor="top",
