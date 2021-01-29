@@ -282,7 +282,7 @@ def importMonthlyHosp():
 
 def importWeeklyHosp():
     
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/01/Weekly-covid-admissions-and-beds-publication-210121.xlsx'
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/01/Weekly-covid-admissions-and-beds-publication-210128.xlsx'
     
     # Import and format the weeklyGABedsOccCovid data
     
@@ -1218,14 +1218,14 @@ def importUnemployment():
 
 def importONS():
     
-    url = 'https://coronavirus.data.gov.uk/api/v1/data?filters=areaType=overview&structure=%7B%22areaType%22:%22areaType%22,%22areaName%22:%22areaName%22,%22areaCode%22:%22areaCode%22,%22date%22:%22date%22,%22newDeaths28DaysByPublishDate%22:%22newDeaths28DaysByPublishDate%22,%22cumDeaths28DaysByPublishDate%22:%22cumDeaths28DaysByPublishDate%22%7D&format=csv'
+    url = 'https://coronavirus.data.gov.uk/api/v1/data?filters=areaType=overview&structure=%7B%22areaType%22:%22areaType%22,%22areaName%22:%22areaName%22,%22areaCode%22:%22areaCode%22,%22date%22:%22date%22,%22newDeaths28DaysByDeathDate%22:%22newDeaths28DaysByDeathDate%22,%22cumDeaths28DaysByDeathDate%22:%22cumDeaths28DaysByDeathDate%22%7D&format=csv'
     
     
     deaths = pd.read_csv(url)
     
     deaths = deaths.iloc[:, 3:6]
     
-    deaths.columns = ['Date', 'Daily reported Covid-19 deaths UK', 'Cumulative deaths']
+    deaths.columns = ['Date', 'Daily Covid-19 deaths UK', 'Cumulative deaths']
     
     deaths['Date'] =  pd.to_datetime( deaths.Date, format = '%Y-%m-%d'  )
     
