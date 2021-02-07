@@ -1384,7 +1384,7 @@ def importJSA():
 
 def importClaimants():
     
-    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/employmentintheuk/december2020/e5def0fc&format=csv'
+    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/employmentintheuk/january2021/f572c64c&format=csv'
 
     r = requests.get(url)
     
@@ -1422,7 +1422,7 @@ def importPathways():
     
     
     
-    url = 'https://files.digital.nhs.uk/E0/27538C/NHS%20Pathways%20Covid-19%20data%202021-01-21.csv'
+    url = 'https://files.digital.nhs.uk/6B/1D4C04/NHS%20Pathways%20Covid-19%20data%202021-02-04.csv'
 
 
     calls = pd.read_csv(url)
@@ -1434,7 +1434,7 @@ def importPathways():
     calls = calls.groupby(['Call Date']).sum()
 
 
-    url = 'https://files.digital.nhs.uk/51/5E2425/111%20Online%20Covid-19%20data_2021-01-21.csv'
+    url = 'https://files.digital.nhs.uk/48/15BA59/111%20Online%20Covid-19%20data%202021-02-04.csv'
     
 
     online = pd.read_csv(url)
@@ -1469,7 +1469,7 @@ def importPathways():
 
 def importSurveilance():
     
-   url = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/954730/Weekly_Influenza_and_COVID19_report_data_W3_V2.xlsx'
+   url = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/958477/Weekly_Influenza_and_COVID19_report_data_W5.xlsx'
     
    ICU = pd.read_excel(url, sheet_name = 'Figure 42. SARIWatch-ICUPHEC')
    
