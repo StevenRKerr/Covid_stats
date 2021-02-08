@@ -86,7 +86,7 @@ weeklyBedsOccCovid = iD.Open('weeklyBedsOccCovid')
 
 # Flu and Covid surveilance is updated weekly
 
-iD.importSurveilance()
+#iD.importSurveilance()
 
 ICU = iD.Open('ICU')
 
@@ -143,7 +143,7 @@ JSA =  iD.Open('JSA')
 
 # claimants data is updated roughly monthly
 
-iD.importClaimants()
+#iD.importClaimants()
 
 claimants =  iD.Open('claimants')
 
