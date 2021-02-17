@@ -654,10 +654,10 @@ def importOWID():
     
     url = "https://covid.ourworldindata.org/data/owid-covid-data.csv"
     
-    # Read in from above url
+    r = requests.get(url)
     
-    df = pd.read_csv(url)
-    
+    df = pd.read_csv(io.StringIO(r.text))
+        
     # Select all records from the UK
     
     df = df.loc[ df['location'] == 'United Kingdom']

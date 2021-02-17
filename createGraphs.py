@@ -56,7 +56,7 @@ OWID = iD.Open('OWID')
 # The DailyHosp is updated daily.
 # The file is downloaded automatically.
 
-#iD.importDailyHosp()
+iD.importDailyHosp()
 
 newHospAd = iD.Open('newHospAd')
 
