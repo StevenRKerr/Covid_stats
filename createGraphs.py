@@ -27,8 +27,6 @@ import math
 # Import and format all the data
 
 
-
-
 # ONS data is updated daily
 # The file is downloaded automatically.
 
