@@ -112,7 +112,7 @@ def importMonthlyHosp():
     
     # This url contains a link to hospital admissions data.
 
-    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/01/Covid-Publication-14-01-2021.xlsx"
+    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/02/Covid-Publication-11-02-2021.xlsx"
     
     oldHospAd = pd.read_excel(url, sheet_name='Admissions Total')
     
@@ -282,7 +282,7 @@ def importMonthlyHosp():
 
 def importWeeklyHosp():
     
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/02/Weekly-covid-admissions-and-beds-publication-210211.xlsx'
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/02/Weekly-covid-admissions-and-beds-publication-210218.xlsx'
     
     # Import and format the weeklyGABedsOccCovid data
     
