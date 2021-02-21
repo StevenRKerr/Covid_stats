@@ -735,7 +735,7 @@ deathCompFig.update_layout(
     legend_title="Variable:",
     legend=dict(
     yanchor="top",
-    y=0.99,
+    y=1.1,
     xanchor="right",
     x=0.99
 )
