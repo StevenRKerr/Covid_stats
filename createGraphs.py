@@ -72,7 +72,7 @@ pathways = iD.Open('pathways')
 
 # The WeeklyHosp is updated daily.
 # The file is downloaded automatically.
-iD.importWeeklyHosp()
+#iD.importWeeklyHosp()
 
 weeklyGABedsOccCovid = iD.Open('weeklyGABedsOccCovid')
 
@@ -99,7 +99,7 @@ Mort = iD.Open('Mort')
 
 # importMonthlyHosp is updated around the 12th of each month
 
-iD.importMonthlyHosp()
+#iD.importMonthlyHosp()
 
 oldHospAd = iD.Open('oldHospAd')
 
@@ -1045,61 +1045,6 @@ pio.write_html(admissionsByAgeFig, file='HTML files/admissionsByAgeFig.html', au
 pio.write_html(pathwaysFig, file='HTML files/pathwaysFig.html', auto_open=True)  
 
 pio.write_html(surveilanceFig, file='HTML files/surveilanceFig.html', auto_open=True) 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#reg = 'England'
-
-
-#frame = pd.merge(extract(bedsOcc, reg, 'NHS', 'G&A', 2020), extract(bedsOcc, reg, 'NHS', 'G&A', 2019), how='outer')
-#                     
-#frame = pd.merge(frame, extract(bedsOcc, reg, 'NHS', 'G&A', 2018) )
-#    
-#frame = pd.merge(frame,  extract(bedsOcc, reg, 'NHS', 'G&A', 2017) )
-#    
-#frame['Mean NHS overnight G&A beds occupied ' + reg + ' 2017-2019'] = frame.iloc[:, 1:4].mean(axis=1)
-    
-
-
-#start1 = pd.Timestamp(2020, 4, 1,0)
-#
-#start2 = pd.Timestamp(2020, 10, 1)
-#
-#end = pd.Timestamp(2020, 11, 12)
-
-
-#bob = frame[ (frame['Date'] >= start1) & (frame['Date'] <= end)  ]
-#(bob.iloc[:,2]- bob.iloc[:,1]).mean()
-
-
-
-
-
-#frame = pd.merge(extract(histBedsOpen, 'England', 'NHS', 'G&A', 2020), extract(histBedsOpen, 'England', 'NHS', 'G&A', 2019), how='outer')
-#                 
-#frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2018) )
-#
-#frame = pd.merge(frame,  extract(histBedsOpen, 'England', 'NHS', 'G&A', 2017) )
-#
-#frame['Mean NHS overnight beds G&A available England 2017-2019'] = frame.iloc[:, 2:].mean(axis=1)
-
-
-#bob = frame[ (frame['Date'] >= start2) & (frame['Date'] <= end)  ]
-
-
-#bob.iloc[:,1].mean()
 
 
 
