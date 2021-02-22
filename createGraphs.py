@@ -57,7 +57,7 @@ pathways = iD.Open('pathways')
 
 # The WeeklyHosp is updated daily.
 # The file is downloaded automatically.
-#iD.importWeeklyHosp()
+iD.importWeeklyHosp()
 weeklyGABedsOccCovid = iD.Open('weeklyGABedsOccCovid')
 
 weeklyGABedsOccNonCovid = iD.Open('weeklyGABedsOccNonCovid')
@@ -66,9 +66,11 @@ weeklyBedsOccCovid = iD.Open('weeklyBedsOccCovid')
 
 weeklyBedsOpen = iD.Open('weeklyBedsOpen')
 
+criticalBeds = iD.Open('criticalBeds')
+
 
 # Flu and Covid surveilance is updated weekly
-#iD.importSurveilance()
+iD.importSurveilance()
 ICU = iD.Open('ICU')
 
 
@@ -98,11 +100,11 @@ admissionsByAge = iD.Open('admissionsByAge')
 
 
 # Unempoyment data is updated roughly monthly
-# iD.importUnemployment()
+iD.importUnemployment()
 Unemployment = iD.Open('Unemployment')
 
 # Redundancy data is updated roughly monthly
-#iD.importRed()
+iD.importRed()
 redundancies =  iD.Open('Redundancies')
 
 # JSA data is updated roughly monthly
@@ -119,7 +121,7 @@ govSpending = iD.Open('govSpending')
 
 # Deaths by age is updated weekly, on Tuesdays.
 # The file needs to be downloaded manually.
-    #iD.importdeathByAge()
+#iD.importdeathByAge()
 deathByAge = iD.Open('deathByAge') 
 
 # UC data is updated sporadically.
@@ -829,6 +831,40 @@ surveilanceFig.update_layout(
 )
 
  
+# Vaccine fig
+
+# Deaths and hospital admissions figure
+vaccineFig = px.line(OWID, x="Date", y=['Individuals vaccinated', 'Individuals fully vaccinated'], \
+             template = "simple_white", color_discrete_sequence =['gold', 'green'], \
+                range_x=['2021-01-01', str(date.today())  ]   )
+
+vaccineFig.update_layout(
+    yaxis_title="",
+    legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="left",
+    x=0.02
+)
+)
+
+# Deaths and hospital admissions figure
+criticalFig = px.line(criticalBeds, x="Date", y=criticalBeds.columns, \
+             template = "simple_white", color_discrete_sequence =['cornflowerblue', 'goldenrod'] )                                                 
+
+criticalFig.update_layout(
+    yaxis_title="",
+    legend_title="Variable:",
+    legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="left",
+    x=0.02
+)
+)
+
+
 
 #Create depression figure.
 #This only needs to be done once - the figure is not dynamic
@@ -904,8 +940,8 @@ pio.write_html(pathwaysFig, file='HTML files/pathwaysFig.html', auto_open=True)
 
 pio.write_html(surveilanceFig, file='HTML files/surveilanceFig.html', auto_open=True) 
 
+pio.write_html(vaccineFig, file='HTML files/vaccineFig.html', auto_open=True) 
 
-
-
+pio.write_html(criticalFig, file='HTML files/criticalFig.html', auto_open=True) 
 
 

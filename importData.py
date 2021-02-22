@@ -16,6 +16,9 @@ import ssl
 from datetime import date
 import datetime
 import shutil
+import os
+
+os.chdir('C:/Users/Steven/Desktop/Git/Covid_stats' )
 
 # This handles ssl certificates of urls we are downloading data from.
 
@@ -314,6 +317,25 @@ def importWeeklyHosp():
     # Save the dataframe as a pickle object
     Save(weeklyBedsOpen, 'weeklyBedsOpen')
     
+    
+    
+    criticalBeds = weeklyBedsOpen = pd.read_excel(url, sheet_name='Adult critical care').T
+    
+    criticalBeds = criticalBeds.iloc[5:, 12:15]
+    
+    
+    criticalBeds2 = criticalBeds[ criticalBeds[13] == 'CC Adult Open'  ][ [12,14]]
+    
+    criticalBeds2.columns = ['Date', 'Adult critical care beds open']
+    
+    criticalBeds2['Adult critical care beds occupied'] = criticalBeds[ criticalBeds[13] == 'CC Adult Occ'  ][14].values
+    
+    # Make the row index equal to row number
+    criticalBeds2.index = np.arange( len(criticalBeds2) ) 
+    
+    # Save the dataframe as a pickle object
+    Save(criticalBeds2, 'criticalBeds')
+    
     return
 
 # importDailyHosp imports the dailt Hospital data, puts it into 
@@ -475,7 +497,7 @@ def importMort():
 
 def importGDP():
     
-    url = 'https://www.ons.gov.uk/generator?uri=/economy/grossdomesticproductgdp/bulletins/gdpmonthlyestimateuk/november2020/7e8704cf&format=csv'
+    url = 'https://www.ons.gov.uk/generator?uri=/economy/grossdomesticproductgdp/bulletins/gdpmonthlyestimateuk/december2020/1d1392cb&format=csv'
     
     r = requests.get(url)
     
@@ -549,13 +571,13 @@ def importOWID():
     df = df.loc[ df['location'] == 'United Kingdom']
     
     # Select only those columns that are of interest
-    df = df[  ['date', 'positive_rate'] ]
+    df = df[  ['date', 'positive_rate', 'people_vaccinated', 'people_fully_vaccinated' ] ]
     
     # Convert date column to timedates
     df['date'] = pd.to_datetime( df.date.astype(str), format= '%Y-%m-%d')
     
     # Rename 'date' to 'Date', just for consistency
-    df.columns = ['Date', 'Positive test rate UK'  ]
+    df.columns = ['Date', 'Positive test rate UK', 'Individuals vaccinated', 'Individuals fully vaccinated'  ]
     
     # Make the row index equal to row number
     df.index = np.arange( len(df) )
@@ -1125,7 +1147,7 @@ def importONS():
 
 def importRed():
     
-    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/december2020/934f3335&format=csv'
+    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/january2021/0636c13e&format=csv'
 
     r = requests.get(url)
     
@@ -1134,15 +1156,42 @@ def importRed():
     # keep relevant rows
     redundancies = redundancies.iloc[6:, :]
     
+    redundancies.columns = ['date', 'Redundancies in last 3 months']
+    
+    redundancies.insert(0, 'Date', pd.to_datetime(redundancies.date.str[:4], format='%Y')  \
+    + pd.to_timedelta(  ( (redundancies.date.str[6].astype(int)-1) * 13 + redundancies.date.str[-2:].astype('int')).astype(str) + ' W') )
+    
+    redundancies = redundancies.drop('date', axis = 1 )
+       
     #rename appropriately
-    redundancies.columns = ['Date', 'Redundancies in last 3 months']
+    #redundancies.columns = ['Date', 'Redundancies in last 3 months']
 
     # Convert date column to a datetime object
-    redundancies['Date'] = pd.to_datetime( redundancies['Date'].str[4:] )
+    #redundancies['Date'] = pd.to_datetime( redundancies['Date'].str[4:] )
     
     # Redundancies measured in 1000s.
     redundancies['Redundancies in last 3 months'] = redundancies['Redundancies in last 3 months'].astype(float) *1000
 
+    url2 = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/december2020/934f3335&format=csv'
+    
+    r = requests.get(url2)
+    
+    redundancies2 = pd.read_csv(io.StringIO(r.text))
+    
+    # keep relevant rows
+    redundancies2 = redundancies2.iloc[6:, :]
+    
+    #rename appropriately
+    redundancies2.columns = ['Date', 'Redundancies in last 3 months']
+
+    # Convert date column to a datetime object
+    redundancies2['Date'] = pd.to_datetime( redundancies2['Date'].str[4:] )
+    
+    # Redundancies measured in 1000s.
+    redundancies2['Redundancies in last 3 months'] = redundancies2['Redundancies in last 3 months'].astype(float) *1000
+
+    redundancies = pd.merge(redundancies, redundancies2, how = 'outer')
+    
     # Make the row index equal to row number
     redundancies.index = np.arange( len(redundancies) )
     
@@ -1208,7 +1257,7 @@ def importClaimants():
 
 def importPathways():
     
-    url = 'https://files.digital.nhs.uk/6B/1D4C04/NHS%20Pathways%20Covid-19%20data%202021-02-04.csv'
+    url = 'https://files.digital.nhs.uk/64/1650AF/NHS%20Pathways%20Covid-19%20data%202021-02-21.csv'
 
     calls = pd.read_csv(url)
 
@@ -1219,7 +1268,7 @@ def importPathways():
     calls = calls.groupby(['Call Date']).sum()
 
 
-    url = 'https://files.digital.nhs.uk/48/15BA59/111%20Online%20Covid-19%20data%202021-02-04.csv'
+    url = 'https://files.digital.nhs.uk/60/FAAD15/111%20Online%20Covid-19%20data_2021-02-21.csv'
     
     online = pd.read_csv(url)
 
@@ -1250,9 +1299,9 @@ def importPathways():
 
 def importSurveilance():
     
-   url = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/958477/Weekly_Influenza_and_COVID19_report_data_W5.xlsx'
+   url = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/962517/Weekly_Influenza_and_COVID19_report_data_w7.xlsx'
     
-   ICU = pd.read_excel(url, sheet_name = 'Figure 42. SARIWatch-ICUPHEC')
+   ICU = pd.read_excel(url, sheet_name = 'Figure 43. SARIWatch-ICUPHEC')
    
    start =  ICU.index[ ICU['Unnamed: 2'].str[:12] == '(a) COVID-19' ] [0] + 2
    
