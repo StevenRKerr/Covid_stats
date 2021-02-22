@@ -748,7 +748,7 @@ deathCompFig.update_layout(
 # Redundancies figure
 redEnd = redundancies.iloc[-1,0]
 
-redFig = px.line(redundancies, x="Date", y=['Redundancies in last 3 months'], range_x=['2007-01-01',redEnd], \
+redFig = px.line(redundancies, x="Date", y=['Redundancies in last 3 months'], range_x=['2007-01-01',str(date.today())], \
              template = "simple_white", color_discrete_sequence =['red' ] )
 
 redFig.update_layout(

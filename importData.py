@@ -1190,7 +1190,11 @@ def importRed():
     # Redundancies measured in 1000s.
     redundancies2['Redundancies in last 3 months'] = redundancies2['Redundancies in last 3 months'].astype(float) *1000
 
-    redundancies = pd.merge(redundancies, redundancies2, how = 'outer')
+
+
+    redundancies = stackData(redundancies2, redundancies, 'new' )
+
+    #redundancies = pd.merge(redundancies, redundancies2, how = 'outer')
     
     # Make the row index equal to row number
     redundancies.index = np.arange( len(redundancies) )
