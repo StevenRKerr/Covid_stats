@@ -57,7 +57,7 @@ pathways = iD.Open('pathways')
 
 # The WeeklyHosp is updated daily.
 # The file is downloaded automatically.
-iD.importWeeklyHosp()
+#iD.importWeeklyHosp()
 weeklyGABedsOccCovid = iD.Open('weeklyGABedsOccCovid')
 
 weeklyGABedsOccNonCovid = iD.Open('weeklyGABedsOccNonCovid')
@@ -70,7 +70,7 @@ criticalBeds = iD.Open('criticalBeds')
 
 
 # Flu and Covid surveilance is updated weekly
-iD.importSurveilance()
+#iD.importSurveilance()
 ICU = iD.Open('ICU')
 
 
@@ -100,11 +100,11 @@ admissionsByAge = iD.Open('admissionsByAge')
 
 
 # Unempoyment data is updated roughly monthly
-iD.importUnemployment()
+#iD.importUnemployment()
 Unemployment = iD.Open('Unemployment')
 
 # Redundancy data is updated roughly monthly
-iD.importRed()
+#iD.importRed()
 redundancies =  iD.Open('Redundancies')
 
 # JSA data is updated roughly monthly
@@ -131,7 +131,7 @@ UC = iD.Open('UC')
 
 # GDP data is updated monthly, approximately around the 10th of each month.
 # The file needs to be downloaded manually.
-iD.importGDP()
+#iD.importGDP()
 
 GDP = iD.Open('yearlyGDP')
 
