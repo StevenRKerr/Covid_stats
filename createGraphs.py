@@ -70,7 +70,7 @@ criticalBeds = iD.Open('criticalBeds')
 
 
 # Flu and Covid surveilance is updated weekly
-#iD.importSurveilance()
+iD.importSurveilance()
 ICU = iD.Open('ICU')
 
 

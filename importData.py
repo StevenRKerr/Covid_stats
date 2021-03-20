@@ -95,7 +95,7 @@ def stackData(old, new, precedence):
 def importMonthlyHosp():
     
     # This url contains a link to hospital admissions data.
-    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/02/Covid-Publication-11-02-2021.xlsx"
+    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/03/Covid-Publication-11-03-2021.xlsx"
     
     oldHospAd = pd.read_excel(url, sheet_name='Admissions Total')
     
@@ -229,7 +229,7 @@ def importMonthlyHosp():
 
 def importWeeklyHosp():
     
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/03/Weekly-covid-admissions-and-beds-publication-210304.xlsx'
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/03/Weekly-covid-admissions-and-beds-publication-210318.xlsx'
     # Import and format the weeklyGABedsOccCovid data
     
     weeklyGABedsOccCovid = pd.read_excel(url, sheet_name='Adult G&A Beds Occupied COVID').T
@@ -497,7 +497,7 @@ def importMort():
 
 def importGDP():
     
-    url = 'https://www.ons.gov.uk/generator?uri=/economy/grossdomesticproductgdp/bulletins/gdpmonthlyestimateuk/december2020/1d1392cb&format=csv'
+    url = 'https://www.ons.gov.uk/generator?uri=/economy/grossdomesticproductgdp/bulletins/gdpmonthlyestimateuk/january2021/f2593830&format=csv'
     
     r = requests.get(url)
     
@@ -1047,12 +1047,15 @@ def importUnemployment():
     
     # Unemployment by month starts in row 255
     df = df.iloc[255:, :]
-    
+
     # Rename columns appropriately
     df.columns = ['Date', 'Unemployment rate (seasonally adjusted)']
     
     # Make unemployment a number between zero and one.
     df['Unemployment rate (seasonally adjusted)'] = df['Unemployment rate (seasonally adjusted)'].astype(float)/100
+    
+    # For reasons unknown, some of them are in the wrong format.
+    df = df[ df['Date'].str.len() == 8 ]
     
     # Turns date column into proper datetime objects
     df['Date'] =   pd.to_datetime(df.Date.astype(str), format='%Y %b')
@@ -1147,21 +1150,21 @@ def importONS():
 
 def importRed():
     
-    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/january2021/0636c13e&format=csv'
+#    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/january2021/0636c13e&format=csv'
 
-    r = requests.get(url)
+#    r = requests.get(url)
     
-    redundancies = pd.read_csv(io.StringIO(r.text))
+#    redundancies = pd.read_csv(io.StringIO(r.text))
 
     # keep relevant rows
-    redundancies = redundancies.iloc[6:, :]
+#    redundancies = redundancies.iloc[6:, :]
     
-    redundancies.columns = ['date', 'Redundancies in last 3 months']
+#    redundancies.columns = ['date', 'Redundancies in last 3 months']
     
-    redundancies.insert(0, 'Date', pd.to_datetime(redundancies.date.str[:4], format='%Y')  \
-    + pd.to_timedelta(  ( (redundancies.date.str[6].astype(int)-1) * 13 + redundancies.date.str[-2:].astype('int')).astype(str) + ' W') )
+#    redundancies.insert(0, 'Date', pd.to_datetime(redundancies.date.str[:4], format='%Y')  \
+#    + pd.to_timedelta(  ( (redundancies.date.str[6].astype(int)-1) * 13 + redundancies.date.str[-2:].astype('int')).astype(str) + ' W') )
     
-    redundancies = redundancies.drop('date', axis = 1 )
+#    redundancies = redundancies.drop('date', axis = 1 )
        
     #rename appropriately
     #redundancies.columns = ['Date', 'Redundancies in last 3 months']
@@ -1170,9 +1173,9 @@ def importRed():
     #redundancies['Date'] = pd.to_datetime( redundancies['Date'].str[4:] )
     
     # Redundancies measured in 1000s.
-    redundancies['Redundancies in last 3 months'] = redundancies['Redundancies in last 3 months'].astype(float) *1000
+#    redundancies['Redundancies in last 3 months'] = redundancies['Redundancies in last 3 months'].astype(float) *1000
 
-    url2 = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/december2020/934f3335&format=csv'
+    url2 = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/february2021/c40f15b3&format=csv'
     
     r = requests.get(url2)
     
@@ -1192,15 +1195,15 @@ def importRed():
 
 
 
-    redundancies = stackData(redundancies2, redundancies, 'new' )
+#    redundancies = stackData(redundancies2, redundancies, 'new' )
 
     #redundancies = pd.merge(redundancies, redundancies2, how = 'outer')
     
     # Make the row index equal to row number
-    redundancies.index = np.arange( len(redundancies) )
+    redundancies2.index = np.arange( len(redundancies2) )
     
     # Save the dataframe as a pickle object
-    Save(redundancies, 'Redundancies')
+    Save(redundancies2, 'Redundancies')
     
     return
 
@@ -1231,7 +1234,7 @@ def importJSA():
 
 def importClaimants():
     
-    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/employmentintheuk/january2021/f572c64c&format=csv'
+    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/employmentintheuk/february2021/a2f89d21&format=csv'
 
     r = requests.get(url)
     
@@ -1303,7 +1306,7 @@ def importPathways():
 
 def importSurveilance():
     
-   url = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/962517/Weekly_Influenza_and_COVID19_report_data_w7.xlsx'
+   url = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/970785/Weekly_Influenza_and_COVID19_report_data_w11.xlsx'
     
    ICU = pd.read_excel(url, sheet_name = 'Figure 43. SARIWatch-ICUPHEC')
    
