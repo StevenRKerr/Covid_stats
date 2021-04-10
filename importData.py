@@ -1133,6 +1133,8 @@ def importONS():
 
     deathComp['Weekly deaths within 28 days of a positive test'] = np.nan
     
+    deathComp = deathComp.sort_values(by = ['Date'], ascending = False)
+    
     # Calculate first difference of cumulative deaths
     for index in range( len(deathComp)-1 ):
         
