@@ -1126,10 +1126,10 @@ def importONS():
     deathsCert.columns = ['Date', 'Weekly deaths with Covid-19 on death certificate']
     
     # Date column of deathsCert is not a datetime, so convert it
-    deathsCert['Date'] = pd.to_datetime(  deathsCert.Date, format = '%Y-%m-%d'  ) 
+    deathsCert['Date'] = pd.to_datetime(  deathsCert.Date, format = '%Y-%m-%d') 
     
     # deathsComp will allow comparison of the two different ways of counting deaths
-    deathComp = pd.merge(deathsCert, deaths[['Date', 'Cumulative deaths']] , how = 'outer')
+    deathComp = pd.merge(deathsCert, deaths[['Date', 'Cumulative deaths']] , how = 'left')
 
     deathComp['Weekly deaths within 28 days of a positive test'] = np.nan
     
