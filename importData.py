@@ -229,7 +229,7 @@ def importMonthlyHosp():
 
 def importWeeklyHosp():
     
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/03/Weekly-covid-admissions-and-beds-publication-210325-1.xlsx'
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/04/Weekly-covid-admissions-and-beds-publication-210408.xlsx'
     # Import and format the weeklyGABedsOccCovid data
     
     weeklyGABedsOccCovid = pd.read_excel(url, sheet_name='Adult G&A Beds Occupied COVID').T
@@ -1175,7 +1175,7 @@ def importRed():
     # Redundancies measured in 1000s.
 #    redundancies['Redundancies in last 3 months'] = redundancies['Redundancies in last 3 months'].astype(float) *1000
 
-    url2 = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/february2021/c40f15b3&format=csv'
+    url2 = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/march2021/03076fad&format=csv'
     
     r = requests.get(url2)
     
@@ -1188,7 +1188,7 @@ def importRed():
     redundancies2.columns = ['Date', 'Redundancies in last 3 months']
 
     # Convert date column to a datetime object
-    redundancies2['Date'] = pd.to_datetime( redundancies2['Date'].str[4:] )
+    redundancies2['Date'] = pd.to_datetime( redundancies2['Date'].str[-8:] )
     
     # Redundancies measured in 1000s.
     redundancies2['Redundancies in last 3 months'] = redundancies2['Redundancies in last 3 months'].astype(float) *1000
@@ -1234,7 +1234,7 @@ def importJSA():
 
 def importClaimants():
     
-    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/employmentintheuk/february2021/a2f89d21&format=csv'
+    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/employmentintheuk/march2021/80f7b8c8&format=csv'
 
     r = requests.get(url)
     
@@ -1264,7 +1264,7 @@ def importClaimants():
 
 def importPathways():
     
-    url = 'https://files.digital.nhs.uk/64/1650AF/NHS%20Pathways%20Covid-19%20data%202021-02-21.csv'
+    url = 'https://files.digital.nhs.uk/F1/BD5A7B/NHS%20Pathways%20Covid-19%20data%202021-04-08.csv'
 
     calls = pd.read_csv(url)
 
@@ -1275,7 +1275,7 @@ def importPathways():
     calls = calls.groupby(['Call Date']).sum()
 
 
-    url = 'https://files.digital.nhs.uk/60/FAAD15/111%20Online%20Covid-19%20data_2021-02-21.csv'
+    url = 'https://files.digital.nhs.uk/4A/05BE06/111%20Online%20Covid-19%20data_2021-04-08.csv'
     
     online = pd.read_csv(url)
 
@@ -1306,7 +1306,7 @@ def importPathways():
 
 def importSurveilance():
     
-   url = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/970785/Weekly_Influenza_and_COVID19_report_data_w11.xlsx'
+   url = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/976983/Weekly_Influenza_and_COVID19_report_data_w14.xlsx'
     
    ICU = pd.read_excel(url, sheet_name = 'Figure 43. SARIWatch-ICUPHEC')
    
