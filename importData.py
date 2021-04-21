@@ -350,7 +350,9 @@ def importDailyHosp():
     
     # Create url of hospital admissions data
     url = ('https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/'  + str(yesterday.year) + "/" + str('{:02}'.format(yesterday.month)) + '/' "COVID-19-daily-admissions-and-beds-" + dateStr + '.xlsx')
-       
+     
+#    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/04/COVID-19-daily-admissions-and-beds-20210420-1.xlsx'
+    
     df = pd.read_excel(url)   
     
     # Pick out relevant rows and columns for admissions
@@ -624,7 +626,6 @@ def importUC():
 
 # importIandP imports influenza + pneumonia mortality data, puts it into a more 
 # useful format and saves it.
-
 
 def importIandP():
     
@@ -938,7 +939,6 @@ def importHistBedsOcc():
 
 
 
-
 # createYearlyMort creates a dataframe of year by year mortality, and saves it.
 
 def createYearlyMort(Mort, deaths):
@@ -997,9 +997,7 @@ def createYearlyMort(Mort, deaths):
     for week in range(52):    
         
         weeklyCoronaDeaths2020[ week ] = deaths2020.iloc[ 7*week : (7*week)+6, 1 ].sum()
-        
-    
-        
+               
     # Initialise a dataframe
     deaths2021 = pd.DataFrame()
      
@@ -1195,8 +1193,6 @@ def importRed():
     # Redundancies measured in 1000s.
     redundancies2['Redundancies in last 3 months'] = redundancies2['Redundancies in last 3 months'].astype(float) *1000
 
-
-
 #    redundancies = stackData(redundancies2, redundancies, 'new' )
 
     #redundancies = pd.merge(redundancies, redundancies2, how = 'outer')
@@ -1208,7 +1204,6 @@ def importRed():
     Save(redundancies2, 'Redundancies')
     
     return
-
 
 
 
