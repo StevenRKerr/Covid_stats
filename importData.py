@@ -64,7 +64,6 @@ def mergeFrames(df1, df2):
     return df
 
 
-
 # Stacks data for different potentially overlapping time periods
 def stackData(old, new, precedence):
     
@@ -78,7 +77,11 @@ def stackData(old, new, precedence):
         endDate = new['Date'].dropna().min()
      # Cut off old at the date where new starts
         old = old[  old['Date'] < endDate ]
-        
+     
+    # Get rid of duplicates    
+    old = old.loc[:,~old.columns.duplicated()]   
+    new = new.loc[:,~new.columns.duplicated()]  
+     
     # Stacks old and new vertically
     df = pd.concat( [ old, new ], axis=0)
     
@@ -95,7 +98,7 @@ def stackData(old, new, precedence):
 def importMonthlyHosp():
     
     # This url contains a link to hospital admissions data.
-    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/03/Covid-Publication-11-03-2021.xlsx"
+    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/04/Covid-Publication-15-04-2021.xlsx"
     
     oldHospAd = pd.read_excel(url, sheet_name='Admissions Total')
     
@@ -117,13 +120,13 @@ def importMonthlyHosp():
     
     # import and format the monthlyBedsOcc data
     monthlyBedsOcc = pd.read_excel (url, sheet_name='Total Beds Occupied').T
-       
+
     # Keep rows and columns of interest 
-    monthlyBedsOcc = monthlyBedsOcc.iloc[2:, 11:]
+    monthlyBedsOcc = monthlyBedsOcc.iloc[1:, 11:]
     
     monthlyBedsOcc = monthlyBedsOcc.drop( np.arange(12,22), axis = 1 )
     
-    monthlyBedsOcc.columns = monthlyBedsOcc.loc['Unnamed: 3',]
+    monthlyBedsOcc.columns = monthlyBedsOcc.loc['Unnamed: 2',]
     
     # Create a dataframe that is a hospital region lookup table
     hospMeta = monthlyBedsOcc.iloc[0, 1:].T
@@ -137,7 +140,7 @@ def importMonthlyHosp():
     
     # For reasons unknown, the December 2020 data spuriously starts in March
     # with zeroes. Drop any of that data
-    drop = monthlyBedsOcc.index[  ~(monthlyBedsOcc['Date'] >= pd.Timestamp(2020, 4, 2, 0))
+    drop = monthlyBedsOcc.index[  ~(monthlyBedsOcc['Date'] >= pd.Timestamp(2020, 4, 2, 0)) \
                                 & ~(monthlyBedsOcc['Date'].isna())  ]
     
     monthlyBedsOcc = monthlyBedsOcc.drop( drop, axis=0  )
@@ -156,9 +159,9 @@ def importMonthlyHosp():
     
     monthlyBedsOccCovid = monthlyBedsOccCovid.drop( np.arange(12,22), axis = 1 )
     
-    monthlyBedsOccCovid.columns = monthlyBedsOccCovid.loc['Unnamed: 3',]
+    monthlyBedsOccCovid.columns = monthlyBedsOccCovid.loc['Unnamed: 2',]
     
-    monthlyBedsOccCovid = monthlyBedsOccCovid.iloc[3:, ]
+    monthlyBedsOccCovid = monthlyBedsOccCovid.iloc[2:, ]
     
     
     monthlyBedsOccCovid = monthlyBedsOccCovid.rename(columns={"Code": "Date"})
@@ -229,7 +232,7 @@ def importMonthlyHosp():
 
 def importWeeklyHosp():
     
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/04/Weekly-covid-admissions-and-beds-publication-210408.xlsx'
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/04/Weekly-covid-admissions-and-beds-publication-210422.xlsx'
     # Import and format the weeklyGABedsOccCovid data
     
     weeklyGABedsOccCovid = pd.read_excel(url, sheet_name='Adult G&A Beds Occupied COVID').T
@@ -499,7 +502,7 @@ def importMort():
 
 def importGDP():
     
-    url = 'https://www.ons.gov.uk/generator?uri=/economy/grossdomesticproductgdp/bulletins/gdpmonthlyestimateuk/january2021/f2593830&format=csv'
+    url = 'https://www.ons.gov.uk/generator?uri=/economy/grossdomesticproductgdp/bulletins/gdpmonthlyestimateuk/february2021/7efda03f&format=csv'
     
     r = requests.get(url)
     
@@ -1175,7 +1178,7 @@ def importRed():
     # Redundancies measured in 1000s.
 #    redundancies['Redundancies in last 3 months'] = redundancies['Redundancies in last 3 months'].astype(float) *1000
 
-    url2 = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/march2021/03076fad&format=csv'
+    url2 = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/april2021/5d9bf662&format=csv'
     
     r = requests.get(url2)
     
@@ -1231,7 +1234,7 @@ def importJSA():
 
 def importClaimants():
     
-    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/employmentintheuk/march2021/80f7b8c8&format=csv'
+    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/employmentintheuk/april2021/1a9b53b0&format=csv'
 
     r = requests.get(url)
     
@@ -1261,7 +1264,7 @@ def importClaimants():
 
 def importPathways():
     
-    url = 'https://files.digital.nhs.uk/F1/BD5A7B/NHS%20Pathways%20Covid-19%20data%202021-04-08.csv'
+    url = 'https://files.digital.nhs.uk/3D/089292/NHS%20Pathways%20Covid-19%20data%202021-04-22.csv'
 
     calls = pd.read_csv(url)
 
@@ -1272,7 +1275,7 @@ def importPathways():
     calls = calls.groupby(['Call Date']).sum()
 
 
-    url = 'https://files.digital.nhs.uk/4A/05BE06/111%20Online%20Covid-19%20data_2021-04-08.csv'
+    url = 'https://files.digital.nhs.uk/3C/453F69/111%20Online%20Covid-19%20data_2021-04-22.csv'
     
     online = pd.read_csv(url)
 
@@ -1303,7 +1306,7 @@ def importPathways():
 
 def importSurveilance():
     
-   url = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/976983/Weekly_Influenza_and_COVID19_report_data_w14.xlsx'
+   url = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/979626/Weekly_Influenza_and_COVID19_report_data_w16.xlsx'
     
    ICU = pd.read_excel(url, sheet_name = 'Figure 43. SARIWatch-ICUPHEC')
    
