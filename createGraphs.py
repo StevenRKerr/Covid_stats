@@ -81,7 +81,7 @@ iD.importMort()
 Mort = iD.Open('Mort')
 
 # importMonthlyHosp is updated around the 12th of each month
-iD.importMonthlyHosp()
+#iD.importMonthlyHosp()
 oldHospAd = iD.Open('oldHospAd')
 
 monthlyBedsOcc = iD.Open('monthlyBedsOcc')
@@ -100,11 +100,11 @@ admissionsByAge = iD.Open('admissionsByAge')
 
 
 # Unempoyment data is updated roughly monthly
-iD.importUnemployment()
+#iD.importUnemployment()
 Unemployment = iD.Open('Unemployment')
 
 # Redundancy data is updated roughly monthly
-iD.importRed()
+#iD.importRed()
 redundancies =  iD.Open('Redundancies')
 
 # JSA data is updated roughly monthly
@@ -112,7 +112,7 @@ redundancies =  iD.Open('Redundancies')
 JSA =  iD.Open('JSA')
 
 # claimants data is updated roughly monthly
-iD.importClaimants()
+#iD.importClaimants()
 claimants =  iD.Open('claimants')
 
 # Government spending data is updated roughly monthly.
@@ -131,7 +131,7 @@ UC = iD.Open('UC')
 
 # GDP data is updated monthly, approximately around the 10th of each month.
 # The file needs to be downloaded manually.
-iD.importGDP()
+#iD.importGDP()
 
 GDP = iD.Open('yearlyGDP')
 
@@ -280,9 +280,6 @@ with open('jsonDict.json', 'w') as file:
 
 # Extract queries bedsOcc, monthlybedsOccCovid, and histBedsOpen
 # according to area, NHS or private, and by year.
-
-
-
 
 def extract(df, area, hosp, bed, year):
     
