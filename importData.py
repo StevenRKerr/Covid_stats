@@ -354,7 +354,7 @@ def importDailyHosp():
     # Create url of hospital admissions data
     url = ('https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/'  + str(yesterday.year) + "/" + str('{:02}'.format(yesterday.month)) + '/' "COVID-19-daily-admissions-and-beds-" + dateStr + '.xlsx')
      
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/05/COVID-19-daily-admissions-and-beds-20210504.xlsx'
+#    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/05/COVID-19-daily-admissions-and-beds-20210504.xlsx'
     
     df = pd.read_excel(url)   
     
