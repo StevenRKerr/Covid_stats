@@ -64,6 +64,8 @@ def mergeFrames(df1, df2):
     return df
 
 
+
+
 # Stacks data for different potentially overlapping time periods
 def stackData(old, new, precedence):
     
@@ -98,25 +100,26 @@ def stackData(old, new, precedence):
 def importMonthlyHosp():
     
     # This url contains a link to hospital admissions data.
-    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/04/Covid-Publication-15-04-2021.xlsx"
+    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/05/Covid-Publication-13-05-2021.xlsx"
     
-    oldHospAd = pd.read_excel(url, sheet_name='Admissions Total')
+    newHospAd = pd.read_excel(url, sheet_name='Admissions Total')
     
-    # Drop everything except rows 11 and 12, and all columns from 5 onwards.
-    # Row 11 has the date
-    # Row 12 has the number of hospital admissions
-    # The actual numbers start from column 5 onwards
-    oldHospAd  = oldHospAd .iloc[11:13, 5:   ].T
+    #Drop everything except rows 11 and 12, and all columns from 5 onwards.
+    #Row 11 has the date
+    #Row 12 has the number of hospital admissions
+    #The actual numbers start from column 5 onwards
+    newHospAd  = newHospAd .iloc[11:13, 5:   ].T
     
-    # This takes the columns whose values are pandas timestamps, and makes the 
-    # column labels the corresponding date.
-    oldHospAd .columns = ['Date', 'Daily hospital admissions with Covid-19 England']
+    #This takes the columns whose values are pandas timestamps, and makes the 
+    #column labels the corresponding date.
+    newHospAd .columns = ['Date', 'Daily hospital admissions with Covid-19 England']
+
+    #Make the row index equal to row number
+    newHospAd .index = np.arange( len(newHospAd ) )
+
+    #Save the dataframe as a pickle object
+    Save(newHospAd , 'newHospAd')
     
-    # Make the row index equal to row number
-    oldHospAd .index = np.arange( len(oldHospAd ) )
-    
-    # Save the dataframe as a pickle object
-    Save(oldHospAd , 'oldHospAd')
     
     # import and format the monthlyBedsOcc data
     monthlyBedsOcc = pd.read_excel (url, sheet_name='Total Beds Occupied').T
@@ -173,50 +176,132 @@ def importMonthlyHosp():
     Save(monthlyBedsOccCovid, 'monthlyBedsOccCovid')
     
     # Import data on mechanical ventilations beds
-    monthlyMVbedsOcc = pd.read_excel (url, sheet_name='MV Beds Occupied')
+    # 20/5/21 they seem to have fucked up with the name of the sheet. 
+    # Will need to change this back to 'MV Beds Occupied'
+    monthlyMVbedsOccNew = pd.read_excel (url, sheet_name='MV Beds Occupied Covid-19')
     
-    monthlyMVbedsOcc = monthlyMVbedsOcc.iloc[[11,12], 5:].T
+    monthlyMVbedsOccNew = monthlyMVbedsOccNew.iloc[[11,12], 5:].T
     
-    monthlyMVbedsOcc.columns = ['Date', 'Mechanical ventilation beds occupied England']
+    monthlyMVbedsOccNew.columns = ['Date', 'Mechanical ventilation beds occupied England']
     
     # Make the row index equal to row number
-    monthlyMVbedsOcc.index = np.arange( len(monthlyMVbedsOcc) )
+    monthlyMVbedsOccNew.index = np.arange( len(monthlyMVbedsOccNew) )
     
-    # Save the dataframe as a pickle object
-    Save(monthlyMVbedsOcc, 'monthlyMVbedsOcc')
+    
         
-    monthlyMVbedsOccCovid = pd.read_excel (url, sheet_name='MV Beds Occupied Covid-19')
+    monthlyMVbedsOccCovidNew = pd.read_excel (url, sheet_name='MV Beds Occupied Covid')
     
-    monthlyMVbedsOccCovid = monthlyMVbedsOccCovid.iloc[[11,12], 5:].T
+    monthlyMVbedsOccCovidNew = monthlyMVbedsOccCovidNew.iloc[[11,12], 5:].T
     
-    monthlyMVbedsOccCovid.columns = ['Date', 'Mechanical ventilation beds occupied Covid-19 England']
+    monthlyMVbedsOccCovidNew.columns = ['Date', 'Mechanical ventilation beds occupied Covid-19 England']
     
     # Make the row index equal to row number
-    monthlyMVbedsOccCovid.index = np.arange( len(monthlyMVbedsOccCovid) )
+    monthlyMVbedsOccCovidNew.index = np.arange( len(monthlyMVbedsOccCovidNew) )
     
-     # Save the dataframe as a pickle object
-    Save(monthlyMVbedsOccCovid, 'monthlyMVbedsOccCovid')
-    
-    
+
     admissionsDict = { '0-5': 'Admissions 0-5',
                  '6-17':   'Admissions 6-17',
                  '18-64': 'Admissions 18-64',
                  '65-84': 'Admissions 65-84',
                  '85+': 'Admissions 85+'}
     
-    admissionsByAge= pd.DataFrame(columns = ['Date'])
+    admissionsByAgeNew= pd.DataFrame(columns = ['Date'])
     
     for sheet in admissionsDict:
     
-        admissions = pd.read_excel (url, sheet_name=admissionsDict[sheet] ).T
+        admissionsNew = pd.read_excel (url, sheet_name=admissionsDict[sheet] ).T
         
-        admissions= admissions.iloc[5:, 11:13]
+        admissionsNew= admissionsNew.iloc[5:, 11:13]
         
-        admissions.columns = ['Date', 'Daily hospital admissions with Covid-19 England age ' + sheet]
+        admissionsNew.columns = ['Date', 'Daily hospital admissions with Covid-19 England age ' + sheet]
         
-        admissionsByAge = pd.merge(admissionsByAge, admissions, how = 'outer')
+        admissionsByAgeNew = pd.merge(admissionsByAgeNew, admissionsNew, how = 'outer')
     
-    admissionsByAge.index = np.arange( len(admissionsByAge) )
+    admissionsByAgeNew.index = np.arange( len(admissionsByAgeNew) )
+  
+  
+    
+  
+    
+  
+    
+    
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/05/Covid-Publication-06-04-2021.xlsx'
+    
+    oldHospAd = pd.read_excel(url, sheet_name='Admissions Total')
+    
+    #Drop everything except rows 11 and 12, and all columns from 5 onwards.
+    #Row 11 has the date
+    #Row 12 has the number of hospital admissions
+    #The actual numbers start from column 5 onwards
+    oldHospAd  = oldHospAd .iloc[11:13, 5:   ].T
+    
+    #This takes the columns whose values are pandas timestamps, and makes the 
+    #column labels the corresponding date.
+    oldHospAd .columns = ['Date', 'Daily hospital admissions with Covid-19 England']
+
+    #Make the row index equal to row number
+    oldHospAd .index = np.arange( len(oldHospAd ) )
+
+    #Save the dataframe as a pickle object
+    Save(oldHospAd , 'oldHospAd')
+    
+    
+ 
+    monthlyMVbedsOccOld = pd.read_excel (url, sheet_name='MV Beds Occupied')
+    
+    monthlyMVbedsOccOld = monthlyMVbedsOccOld .iloc[[11,12], 5:].T
+    
+    monthlyMVbedsOccOld .columns = ['Date', 'Mechanical ventilation beds occupied England']
+    
+    # Make the row index equal to row number
+    monthlyMVbedsOccOld .index = np.arange( len(monthlyMVbedsOccOld ) )
+    
+    
+    
+        
+    monthlyMVbedsOccCovidOld  = pd.read_excel (url, sheet_name='MV Beds Occupied Covid-19')
+    
+    monthlyMVbedsOccCovidOld  = monthlyMVbedsOccCovidOld .iloc[[11,12], 5:].T
+    
+    monthlyMVbedsOccCovidOld .columns = ['Date', 'Mechanical ventilation beds occupied Covid-19 England']
+    
+    # Make the row index equal to row number
+    monthlyMVbedsOccCovidOld .index = np.arange( len(monthlyMVbedsOccCovidOld ) )
+    
+    
+    
+    monthlyMVbedsOcc = stackData(monthlyMVbedsOccOld, monthlyMVbedsOccNew, 'old')
+    
+    Save(monthlyMVbedsOcc, 'monthlyMVbedsOcc')
+    
+    
+    monthlyMVbedsOccCovid = stackData(monthlyMVbedsOccCovidOld, monthlyMVbedsOccCovidNew, 'old')
+    
+    Save(monthlyMVbedsOccCovid, 'monthlyMVbedsOccCovid')
+    
+   
+    admissionsByAgeOld= pd.DataFrame(columns = ['Date'])
+    
+    for sheet in admissionsDict:
+    
+        admissionsOld = pd.read_excel (url, sheet_name=admissionsDict[sheet] ).T
+        
+        admissionsOld= admissionsOld.iloc[5:, 11:13]
+        
+        admissionsOld.columns = ['Date', 'Daily hospital admissions with Covid-19 England age ' + sheet]
+        
+        admissionsByAgeOld = pd.merge(admissionsByAgeOld, admissionsOld, how = 'outer')
+    
+    admissionsByAgeOld.index = np.arange( len(admissionsByAgeOld) )
+   
+    
+    
+    
+    
+    
+    admissionsByAge = stackData(admissionsByAgeOld, admissionsByAgeNew, 'old')
+    
     # Save the dataframe as a pickle object
     
     Save(admissionsByAge, 'admissionsByAge')
@@ -232,113 +317,202 @@ def importMonthlyHosp():
 
 def importWeeklyHosp():
     
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/04/Weekly-covid-admissions-and-beds-publication-210422.xlsx'
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/04/Weekly-covid-admissions-and-beds-publication-210429-up-to-210406.xlsx'
     # Import and format the weeklyGABedsOccCovid data
     
-    weeklyGABedsOccCovid = pd.read_excel(url, sheet_name='Adult G&A Beds Occupied COVID').T
+    weeklyGABedsOccCovidOld = pd.read_excel(url, sheet_name='Adult G&A Beds Occupied COVID').T
 
     # Keep rows and columns of interest 
     
-    weeklyGABedsOccCovid= weeklyGABedsOccCovid.iloc[2:, 13:]
+    weeklyGABedsOccCovidOld= weeklyGABedsOccCovidOld.iloc[2:, 13:]
     
-    weeklyGABedsOccCovid = weeklyGABedsOccCovid.drop( np.arange(14,23), axis = 1 )
+    weeklyGABedsOccCovidOld = weeklyGABedsOccCovidOld.drop( np.arange(14,23), axis = 1 )
     
-    weeklyGABedsOccCovid.columns = weeklyGABedsOccCovid.loc['Unnamed: 2',]
+    weeklyGABedsOccCovidOld.columns = weeklyGABedsOccCovidOld.loc['Unnamed: 2',]
     
-    weeklyGABedsOccCovid = weeklyGABedsOccCovid.iloc[2:, ]
+    weeklyGABedsOccCovidOld = weeklyGABedsOccCovidOld.iloc[2:, ]
     
-    weeklyGABedsOccCovid= weeklyGABedsOccCovid.rename(columns={"Code": "Date"})
+    weeklyGABedsOccCovidOld= weeklyGABedsOccCovidOld.rename(columns={"Code": "Date"})
     
     # Make the row index equal to row number
-    weeklyGABedsOccCovid.index = np.arange( len(weeklyGABedsOccCovid) )
+    weeklyGABedsOccCovidOld.index = np.arange( len(weeklyGABedsOccCovidOld) )
     
-    # Save the dataframe as a pickle object
-    Save(weeklyGABedsOccCovid, 'weeklyGABedsOccCovid')
+
     
     # Import and format the weeklyBedsOcc data
-    weeklyGABedsOccNonCovid = pd.read_excel(url, sheet_name='Adult G&A Bed Occupied NonCOVID').T
+    weeklyGABedsOccNonCovidOld = pd.read_excel(url, sheet_name='Adult G&A Bed Occupied NonCOVID').T
 
     # Keep rows and columns of interest 
-    weeklyGABedsOccNonCovid= weeklyGABedsOccNonCovid.iloc[2:, 13:]
+    weeklyGABedsOccNonCovidOld= weeklyGABedsOccNonCovidOld.iloc[2:, 13:]
     
-    weeklyGABedsOccNonCovid = weeklyGABedsOccNonCovid.drop( np.arange(14,23), axis = 1 )
+    weeklyGABedsOccNonCovidOld = weeklyGABedsOccNonCovidOld.drop( np.arange(14,23), axis = 1 )
     
-    weeklyGABedsOccNonCovid.columns = weeklyGABedsOccNonCovid.loc['Unnamed: 2',]
+    weeklyGABedsOccNonCovidOld.columns = weeklyGABedsOccNonCovidOld.loc['Unnamed: 2',]
     
-    weeklyGABedsOccNonCovid = weeklyGABedsOccNonCovid.iloc[2:, ]
+    weeklyGABedsOccNonCovidOld = weeklyGABedsOccNonCovidOld.iloc[2:, ]
     
     
-    weeklyGABedsOccNonCovid= weeklyGABedsOccNonCovid.rename(columns={"Code": "Date"})
+    weeklyGABedsOccNonCovidOld= weeklyGABedsOccNonCovidOld.rename(columns={"Code": "Date"})
     
     # Make the row index equal to row number
-    weeklyGABedsOccNonCovid.index = np.arange( len(weeklyGABedsOccNonCovid) )
+    weeklyGABedsOccNonCovidOld.index = np.arange( len(weeklyGABedsOccNonCovidOld) )
     
-    # Save the dataframe as a pickle object
-    Save(weeklyGABedsOccNonCovid, 'weeklyGABedsOccNonCovid')
+
     
     # Import and format the weeklyBedsOccCovid data
-    weeklyBedsOccCovid = pd.read_excel(url, sheet_name='All beds COVID').T
+    weeklyBedsOccCovidOld = pd.read_excel(url, sheet_name='All beds COVID').T
 
     # Keep rows and columns of interest 
-    weeklyBedsOccCovid = weeklyBedsOccCovid.iloc[2:, 13:]
+    weeklyBedsOccCovidOld = weeklyBedsOccCovidOld.iloc[2:, 13:]
     
-    weeklyBedsOccCovid = weeklyBedsOccCovid.drop( np.arange(14,23), axis = 1 )
+    weeklyBedsOccCovidOld = weeklyBedsOccCovidOld.drop( np.arange(14,23), axis = 1 )
     
-    weeklyBedsOccCovid = weeklyBedsOccCovid.dropna(axis=1, how='all')
+    weeklyBedsOccCovidOld = weeklyBedsOccCovidOld.dropna(axis=1, how='all')
     
-    weeklyBedsOccCovid.columns = weeklyBedsOccCovid.loc['Unnamed: 2',]
+    weeklyBedsOccCovidOld.columns = weeklyBedsOccCovidOld.loc['Unnamed: 2',]
     
-    weeklyBedsOccCovid = weeklyBedsOccCovid.iloc[2:, ]
+    weeklyBedsOccCovidOld = weeklyBedsOccCovidOld.iloc[2:, ]
     
-    weeklyBedsOccCovid = weeklyBedsOccCovid.rename(columns={"Code": "Date"})
+    weeklyBedsOccCovidOld = weeklyBedsOccCovidOld.rename(columns={"Code": "Date"})
     
     # Make the row index equal to row number
-    weeklyBedsOccCovid.index = np.arange( len(weeklyBedsOccCovid) )
+    weeklyBedsOccCovidOld.index = np.arange( len(weeklyBedsOccCovidOld) )
     
-    # Save the dataframe as a pickle object
+
+
+    weeklyBedsUnoccupiedOld = pd.read_excel(url, sheet_name='Adult G&A Beds Unoccupied').T
+    
+    weeklyBedsUnoccupiedOld =  weeklyBedsUnoccupiedOld.iloc[2:, 13:]
+    
+    weeklyBedsUnoccupiedOld =  weeklyBedsUnoccupiedOld.drop( np.arange(14,23), axis = 1 )
+    
+    weeklyBedsUnoccupiedOld.columns =  weeklyBedsUnoccupiedOld.loc['Unnamed: 2',]
+    
+    weeklyBedsUnoccupiedOld =  weeklyBedsUnoccupiedOld.iloc[2:, ]
+    
+    weeklyBedsUnoccupiedOld= weeklyBedsUnoccupiedOld.rename(columns={"Code": "Date"})
+    
+    # Make the row index equal to row number
+    weeklyBedsUnoccupiedOld.index = np.arange( len(weeklyBedsUnoccupiedOld) )
+    
+    
+
+    
+
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/05/Weekly-covid-admissions-and-beds-publication-210513.xlsx'
+    # Import and format the weeklyGABedsOccCovid data
+    
+    weeklyGABedsOccCovidNew = pd.read_excel(url, sheet_name='Adult G&A Beds Occupied COVID').T
+
+    # Keep rows and columns of interest 
+    
+    weeklyGABedsOccCovidNew= weeklyGABedsOccCovidNew.iloc[2:, 13:]
+    
+    weeklyGABedsOccCovidNew = weeklyGABedsOccCovidNew.drop( np.arange(14,23), axis = 1 )
+    
+    weeklyGABedsOccCovidNew.columns = weeklyGABedsOccCovidNew.loc['Unnamed: 2',]
+    
+    weeklyGABedsOccCovidNew = weeklyGABedsOccCovidNew.iloc[2:, ]
+    
+    weeklyGABedsOccCovidNew= weeklyGABedsOccCovidNew.rename(columns={"Code": "Date"})
+    
+    # Make the row index equal to row number
+    weeklyGABedsOccCovidNew.index = np.arange( len(weeklyGABedsOccCovidNew) )
+    
+
+    
+    # Import and format the weeklyBedsOcc data
+    weeklyGABedsOccNonCovidNew = pd.read_excel(url, sheet_name='Adult G&A Bed Occupied NonCOVID').T
+
+    # Keep rows and columns of interest 
+    weeklyGABedsOccNonCovidNew= weeklyGABedsOccNonCovidNew.iloc[2:, 13:]
+    
+    weeklyGABedsOccNonCovidNew = weeklyGABedsOccNonCovidNew.drop( np.arange(14,23), axis = 1 )
+    
+    weeklyGABedsOccNonCovidNew.columns = weeklyGABedsOccNonCovidNew.loc['Unnamed: 2',]
+    
+    weeklyGABedsOccNonCovidNew = weeklyGABedsOccNonCovidNew.iloc[2:, ]
+    
+    
+    weeklyGABedsOccNonCovidNew= weeklyGABedsOccNonCovidNew.rename(columns={"Code": "Date"})
+    
+    # Make the row index equal to row number
+    weeklyGABedsOccNonCovidNew.index = np.arange( len(weeklyGABedsOccNonCovidNew) )
+    
+
+    
+    # Import and format the weeklyBedsOccCovid data
+    weeklyBedsOccCovidNew = pd.read_excel(url, sheet_name='All beds COVID').T
+
+    # Keep rows and columns of interest 
+    weeklyBedsOccCovidNew = weeklyBedsOccCovidNew.iloc[2:, 13:]
+    
+    weeklyBedsOccCovidNew = weeklyBedsOccCovidNew.drop( np.arange(14,23), axis = 1 )
+    
+    weeklyBedsOccCovidNew = weeklyBedsOccCovidNew.dropna(axis=1, how='all')
+    
+    weeklyBedsOccCovidNew.columns = weeklyBedsOccCovidNew.loc['Unnamed: 2',]
+    
+    weeklyBedsOccCovidNew = weeklyBedsOccCovidNew.iloc[2:, ]
+    
+    weeklyBedsOccCovidNew = weeklyBedsOccCovidNew.rename(columns={"Code": "Date"})
+    
+    # Make the row index equal to row number
+    weeklyBedsOccCovidNew.index = np.arange( len(weeklyBedsOccCovidNew) )
+
+
+    weeklyBedsUnoccupiedNew = pd.read_excel(url, sheet_name='Adult G&A Beds Unoccupied').T
+    
+    weeklyBedsUnoccupiedNew =  weeklyBedsUnoccupiedNew.iloc[2:, 13:]
+    
+    weeklyBedsUnoccupiedNew =  weeklyBedsUnoccupiedNew.drop( np.arange(14,23), axis = 1 )
+    
+    weeklyBedsUnoccupiedNew.columns =  weeklyBedsUnoccupiedNew.loc['Unnamed: 2',]
+    
+    weeklyBedsUnoccupiedNew =  weeklyBedsUnoccupiedNew.iloc[2:, ]
+    
+    weeklyBedsUnoccupiedNew= weeklyBedsUnoccupiedNew.rename(columns={"Code": "Date"})
+    
+    # Make the row index equal to row number
+    weeklyBedsUnoccupiedNew.index = np.arange( len(weeklyBedsUnoccupiedNew) )
+
+
+
+
+
+    weeklyGABedsOccCovid = stackData (weeklyGABedsOccCovidOld, weeklyGABedsOccCovidNew, 'old')
+
+    weeklyGABedsOccCovid['Date'] = weeklyGABedsOccCovid['Date'].apply(pd.to_datetime)
+
+    weeklyGABedsOccNonCovid = stackData (weeklyGABedsOccNonCovidOld, weeklyGABedsOccNonCovidNew, 'old')
+
+    weeklyGABedsOccNonCovid['Date'] = weeklyGABedsOccNonCovid['Date'].apply(pd.to_datetime)
+
+    weeklyBedsOccCovid = stackData (weeklyBedsOccCovidOld, weeklyBedsOccCovidNew, 'old')
+
+    weeklyBedsOccCovid['Date'] = weeklyBedsOccCovid['Date'].apply(pd.to_datetime)
+
+    weeklyBedsUnoccupied = stackData(weeklyBedsUnoccupiedOld, weeklyBedsUnoccupiedNew, 'old')
+
+    weeklyBedsUnoccupied['Date'] = weeklyBedsUnoccupied['Date'].apply(pd.to_datetime)
+
+
+    # merge them all
+    weeklyBedsOpen = weeklyGABedsOccCovid 
+    
+    weeklyBedsOpen.iloc[:, 1:] =weeklyBedsOpen.iloc[:, 1:] + weeklyGABedsOccNonCovid.iloc[:, 1:] + weeklyBedsUnoccupied.iloc[:, 1:] 
+
+                           
+                        
+
+    Save(weeklyGABedsOccCovid, 'weeklyGABedsOccCovid')
+    
+    Save(weeklyGABedsOccNonCovid, 'weeklyGABedsOccNonCovid')
+    
     Save(weeklyBedsOccCovid, 'weeklyBedsOccCovid')
     
-    
-    # Get weekly G&A beds open
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/02/UEC-Daily-SitRep-Acute-Web-File-Timeseries-2.xlsx'
-    
-    weeklyBedsOpen = pd.read_excel(url, sheet_name='G&A beds').T
-  
-    weeklyBedsOpen.columns = weeklyBedsOpen.loc['Unnamed: 3', :]
-    
-    weeklyBedsOpen = weeklyBedsOpen[  weeklyBedsOpen['Code'] == 'Total Beds Open']   
-    
-    weeklyBedsOpen = weeklyBedsOpen.iloc[:, 12: ]
-    
-    weeklyBedsOpen = weeklyBedsOpen.drop( weeklyBedsOpen.columns[range(1,5)], axis=1  )
-    
-    weeklyBedsOpen.rename(columns= {weeklyBedsOpen.columns[0] : 'Date' } , inplace=True)
-    
-    # Make the row index equal to row number
-    weeklyBedsOpen.index = np.arange( len(weeklyBedsOpen) ) 
-    
-    # Save the dataframe as a pickle object
     Save(weeklyBedsOpen, 'weeklyBedsOpen')
-    
-    
-    
-    criticalBeds = weeklyBedsOpen = pd.read_excel(url, sheet_name='Adult critical care').T
-    
-    criticalBeds = criticalBeds.iloc[5:, 12:15]
-    
-    
-    criticalBeds2 = criticalBeds[ criticalBeds[13] == 'CC Adult Open'  ][ [12,14]]
-    
-    criticalBeds2.columns = ['Date', 'Adult critical care beds open']
-    
-    criticalBeds2['Adult critical care beds occupied'] = criticalBeds[ criticalBeds[13] == 'CC Adult Occ'  ][14].values
-    
-    # Make the row index equal to row number
-    criticalBeds2.index = np.arange( len(criticalBeds2) ) 
-    
-    # Save the dataframe as a pickle object
-    Save(criticalBeds2, 'criticalBeds')
-    
+  
     return
 
 # importDailyHosp imports the dailt Hospital data, puts it into 
@@ -359,19 +533,19 @@ def importDailyHosp():
     df = pd.read_excel(url)   
     
     # Pick out relevant rows and columns for admissions
-    admissions = df.iloc[11:13, 2:   ].T
+    newHospAdDiag = df.iloc[11:13, 2:   ].T
     
     # Get rid of any NaN/NaT rows, which happened once for some reason
-    admissions = admissions.dropna(axis=0)
+    newHospAdDiag = newHospAdDiag.dropna(axis=0)
     
     # Rename columns appropriately
-    admissions.columns = ['Date', 'Daily hospital admissions plus hospital diagnoses with Covid-19 England']
+    newHospAdDiag.columns = ['Date', 'Daily hospital admissions plus hospital diagnoses with Covid-19 England']
     
     # Make the row index equal to row number
-    admissions.index = np.arange( len(admissions) )
+    newHospAdDiag.index = np.arange( len(newHospAdDiag) )
     
     # Save dataframe as a pickle object.
-    Save(admissions, 'newHospAd')
+    Save(newHospAdDiag, 'newHospAdDiag')
     
     # Pick out relevant rows and columns for mechanical ventilator beds (MVB)
     dailyMVbedsOccCovid = df.iloc[102:104, 2:   ].T
@@ -396,6 +570,26 @@ def importDailyHosp():
     
     # Save the dataframe as a pickle object
     Save(dailyBedsOccCovid, 'dailyBedsOccCovid')
+    
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/04/COVID-19-daily-admissions-and-beds-20210406-1.xlsx'
+    
+    df = pd.read_excel(url) 
+    
+    # Pick out relevant rows and columns for admissions
+    oldHospAdDiag = df.iloc[11:13, 2:   ].T
+    
+    # Get rid of any NaN/NaT rows, which happened once for some reason
+    oldHospAdDiag = oldHospAdDiag.dropna(axis=0)
+    
+    # Rename columns appropriately
+    oldHospAdDiag.columns = ['Date', 'Daily hospital admissions plus hospital diagnoses with Covid-19 England']
+    
+    # Make the row index equal to row number
+    oldHospAdDiag.index = np.arange( len(oldHospAdDiag) )
+    
+    # Save dataframe as a pickle object.
+    Save(oldHospAdDiag, 'oldHospAdDiag')
+    
     
     return
     

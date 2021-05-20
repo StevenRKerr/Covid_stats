@@ -42,9 +42,11 @@ OWID = iD.Open('OWID')
 
 # The DailyHosp is updated daily.
 # The file is downloaded automatically.
-#iD.importDailyHosp()
+iD.importDailyHosp()
 
-newHospAd = iD.Open('newHospAd')
+newHospAdDiag = iD.Open('newHospAdDiag')
+
+oldHospAdDiag = iD.Open('oldHospAdDiag')
 
 dailyBedsOccCovid = iD.Open('dailyBedsOccCovid')
 
@@ -57,7 +59,7 @@ pathways = iD.Open('pathways')
 
 # The WeeklyHosp is updated daily.
 # The file is downloaded automatically.
-#iD.importWeeklyHosp()
+iD.importWeeklyHosp()
 weeklyGABedsOccCovid = iD.Open('weeklyGABedsOccCovid')
 
 weeklyGABedsOccNonCovid = iD.Open('weeklyGABedsOccNonCovid')
@@ -66,7 +68,6 @@ weeklyBedsOccCovid = iD.Open('weeklyBedsOccCovid')
 
 weeklyBedsOpen = iD.Open('weeklyBedsOpen')
 
-criticalBeds = iD.Open('criticalBeds')
 
 
 # Flu and Covid surveilance is updated weekly
@@ -81,7 +82,10 @@ iD.importMort()
 Mort = iD.Open('Mort')
 
 # importMonthlyHosp is updated around the 12th of each month
-#iD.importMonthlyHosp()
+iD.importMonthlyHosp()
+
+newHospAd = iD.Open('newHospAd')
+
 oldHospAd = iD.Open('oldHospAd')
 
 monthlyBedsOcc = iD.Open('monthlyBedsOcc')
@@ -153,6 +157,11 @@ LCD = iD.Open('LCD')
 #iD.importHistBedsOcc()
 histBedsOpen = iD.Open('histBedsOpen') 
 
+
+start = min(weeklyBedsOpen['Date'])
+
+histBedsOpen = histBedsOpen[ histBedsOpen['Date'] <= start ]
+
 bedsOpen = pd.merge(histBedsOpen, weeklyBedsOpen, how = 'outer')
 
 bedsOpen[ bedsOpen == '-'  ] = np.nan
@@ -169,11 +178,14 @@ histBedsOcc = iD.Open('histBedsOcc')
 ################################# FORMATTING ############################
 
 # Combine deaths, oldHospAd and newHospAd
-df = pd.merge(deaths, oldHospAd)
+hospAd = iD.stackData(oldHospAd, newHospAd, 'old')
 
-df = iD.mergeFrames(deaths, oldHospAd )
+hospAdDiag = iD.stackData(oldHospAdDiag, newHospAdDiag, 'old')
 
-df = iD.mergeFrames(df, newHospAd)
+df = iD.mergeFrames(deaths, hospAd )
+
+df = iD.mergeFrames(df, hospAdDiag )
+
 
 
 # Combine cases with OWID
@@ -201,7 +213,7 @@ bedsOcc = iD.stackData(histBedsOcc, weeklyBedsOcc, 'new')
 
 bedsOcc.name = 'bedsOcc'
 
-bedsOccCovid = iD.stackData(monthlyBedsOccCovid, weeklyBedsOccCovid, 'old')
+bedsOccCovid = iD.stackData(weeklyBedsOccCovid, monthlyBedsOccCovid , 'old')
 
 bedsOccCovid.name = 'bedsOccCovid'
 
@@ -654,9 +666,10 @@ privBedsOccFig = px.line(frame, x='Date', y=frame.columns[1:],  \
                 template = "simple_white", 
                 color_discrete_sequence =['green', 'gold'])
     
-    
-frame = pd.merge( extract(monthlyBedsOccCovid, 'England', 'Non-NHS', '', 2020),
-                 extract(monthlyBedsOccCovid, 'England', 'Non-NHS', '', 2021), how='outer')
+ 
+  
+frame = pd.merge( extract(bedsOccCovid, 'England', 'Non-NHS', '', 2020),
+                 extract(bedsOccCovid, 'England', 'Non-NHS', '', 2021), how='outer')
     
 bar0 = px.bar(frame, x='Date', y=[frame.columns[1]],     \
                 color_discrete_sequence = ['blue'], template = "simple_white") 
@@ -848,21 +861,6 @@ vaccineFig.update_layout(
 )
 )
 
-# Deaths and hospital admissions figure
-criticalFig = px.line(criticalBeds, x="Date", y=criticalBeds.columns, \
-             template = "simple_white", color_discrete_sequence =['cornflowerblue', 'goldenrod'] )                                                 
-
-criticalFig.update_layout(
-    yaxis_title="",
-    legend_title="Variable:",
-    legend=dict(
-    yanchor="top",
-    y=0.99,
-    xanchor="left",
-    x=0.02
-)
-)
-
 
 
 #Create depression figure.
@@ -940,7 +938,3 @@ pio.write_html(pathwaysFig, file='HTML files/pathwaysFig.html', auto_open=True)
 pio.write_html(surveilanceFig, file='HTML files/surveilanceFig.html', auto_open=True) 
 
 pio.write_html(vaccineFig, file='HTML files/vaccineFig.html', auto_open=True) 
-
-pio.write_html(criticalFig, file='HTML files/criticalFig.html', auto_open=True) 
-
-
