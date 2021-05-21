@@ -497,10 +497,14 @@ def importWeeklyHosp():
     weeklyBedsUnoccupied['Date'] = weeklyBedsUnoccupied['Date'].apply(pd.to_datetime)
 
 
-    # merge them all
+    # add elementwise
     weeklyBedsOpen = weeklyGABedsOccCovid 
     
-    weeklyBedsOpen.iloc[:, 1:] =weeklyBedsOpen.iloc[:, 1:] + weeklyGABedsOccNonCovid.iloc[:, 1:] + weeklyBedsUnoccupied.iloc[:, 1:] 
+    weeklyBedsOpen.iloc[:, 1:] = weeklyBedsOpen.iloc[:, 1:].add(weeklyGABedsOccNonCovid.iloc[:, 1:], fill_value=0) 
+    
+    weeklyBedsOpen.iloc[:, 1:] = weeklyBedsOpen.iloc[:, 1:].add(weeklyBedsUnoccupied.iloc[:, 1:], fill_value= 0)
+    
+
 
                            
                         
