@@ -157,16 +157,12 @@ LCD = iD.Open('LCD')
 #iD.importHistBedsOcc()
 histBedsOpen = iD.Open('histBedsOpen') 
 
+histBedsOpen.name = 'histBedsOpen'
 
-start = min(weeklyBedsOpen['Date'])
+weeklyBedsOpen.name = 'weeklyBedsOpen'
 
-histBedsOpen = histBedsOpen[ histBedsOpen['Date'] <= start ]
+weeklyBedsOpen[ weeklyBedsOpen == '-'  ] = np.nan
 
-bedsOpen = pd.merge(histBedsOpen, weeklyBedsOpen, how = 'outer')
-
-bedsOpen[ bedsOpen == '-'  ] = np.nan
-
-bedsOpen.name = 'bedsOpen'
 
 histBedsOcc = iD.Open('histBedsOcc') 
 
@@ -287,7 +283,6 @@ with open('jsonDict.json', 'w') as file:
     json.dump(jsonDict, file)
 
 
-
 ####################### FUNCTIONS ##################################
 
 # Extract queries bedsOcc, monthlybedsOccCovid, and histBedsOpen
@@ -323,7 +318,9 @@ def extract(df, area, hosp, bed, year):
         heading = heading + 'occupied '
     elif df.name == 'bedsOccCovid' or df.name == 'monthlyBedsOccCovid':
         heading = heading + 'occupied Covid-19 '
-    elif df.name ==  'bedsOpen':
+    elif df.name ==  'weeklyBedsOpen':
+        heading = heading + 'occupied + unoccupied '
+    elif df.name == 'histBedsOpen':
         heading = heading + 'available '
      
     if area == 'England':
@@ -337,6 +334,8 @@ def extract(df, area, hosp, bed, year):
     cols = colMarker.index  
     
     output = df[ pd.DatetimeIndex(df['Date']).year == year ]
+    
+    cols = cols.intersection( output.columns )
     
     output[heading] = output[cols].sum(axis=1)
     
@@ -626,20 +625,23 @@ for reg in regions:
 
 
 # Beds available figure
-frame = pd.merge(extract(bedsOpen, 'England', 'NHS', 'G&A', 2021), extract(bedsOpen, 'England', 'NHS', 'G&A', 2020), how = 'outer')
+frame = pd.merge(extract(weeklyBedsOpen, 'England', 'NHS', 'G&A', 2021), extract(weeklyBedsOpen, 'England', 'NHS', 'G&A', 2020), how = 'outer')
+
+frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2020), how = 'outer' )
                  
-frame = pd.merge(frame, extract(bedsOpen, 'England', 'NHS', 'G&A', 2019) )
+frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2019), how = 'outer' )
 
-frame = pd.merge(frame, extract(bedsOpen, 'England', 'NHS', 'G&A', 2018)  )
+frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2018), how = 'outer'  )
 
-frame = pd.merge(frame, extract(bedsOpen, 'England', 'NHS', 'G&A', 2017)  )
+frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2017), how = 'outer'  )
 
-frame['Mean NHS overnight beds G&A available England 2017-2019'] = frame.iloc[:, 3:].mean(axis=1)
+frame['Mean NHS overnight beds G&A available England 2017-2019'] = frame.iloc[:, 4:].mean(axis=1)
 
+frame = frame.sort_values(by = ['Date'])
 
 NHSBedsOpenFig = px.line(frame, x='Date', y=frame.columns[1:],  \
                 template = "simple_white", 
-                color_discrete_sequence =[ 'gold', 'red', 'green', 'blue', 'fuchsia', 'darkviolet'])
+                color_discrete_sequence =[ 'gold', 'red', 'green', 'blue', 'fuchsia', 'darkviolet', 'navy'])
 
 
     
