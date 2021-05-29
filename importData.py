@@ -317,6 +317,7 @@ def importMonthlyHosp():
 
 def importWeeklyHosp():
     
+    # older data
     url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/04/Weekly-covid-admissions-and-beds-publication-210429-up-to-210406.xlsx'
     # Import and format the weeklyGABedsOccCovid data
     
@@ -398,8 +399,8 @@ def importWeeklyHosp():
     
 
     
-
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/05/Weekly-covid-admissions-and-beds-publication-210513.xlsx'
+    #newer data
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/05/Weekly-covid-admissions-and-beds-publication-210527.xlsx'
     # Import and format the weeklyGABedsOccCovid data
     
     weeklyGABedsOccCovidNew = pd.read_excel(url, sheet_name='Adult G&A Beds Occupied COVID').T
@@ -498,7 +499,7 @@ def importWeeklyHosp():
 
 
     # add elementwise
-    weeklyBedsOpen = weeklyGABedsOccCovid 
+    weeklyBedsOpen = weeklyGABedsOccCovid.copy()
     
     weeklyBedsOpen.iloc[:, 1:] = weeklyBedsOpen.iloc[:, 1:].add(weeklyGABedsOccNonCovid.iloc[:, 1:], fill_value=0) 
     
