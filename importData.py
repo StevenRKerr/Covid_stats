@@ -100,7 +100,7 @@ def stackData(old, new, precedence):
 def importMonthlyHosp():
     
     # This url contains a link to hospital admissions data.
-    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/05/Covid-Publication-13-05-2021.xlsx"
+    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/06/Covid-Publication-10-06-2021.xlsx"
     
     newHospAd = pd.read_excel(url, sheet_name='Admissions Total')
     
@@ -178,7 +178,7 @@ def importMonthlyHosp():
     # Import data on mechanical ventilations beds
     # 20/5/21 they seem to have fucked up with the name of the sheet. 
     # Will need to change this back to 'MV Beds Occupied'
-    monthlyMVbedsOccNew = pd.read_excel (url, sheet_name='MV Beds Occupied Covid-19')
+    monthlyMVbedsOccNew = pd.read_excel (url, sheet_name='MV Beds Occupied')
     
     monthlyMVbedsOccNew = monthlyMVbedsOccNew.iloc[[11,12], 5:].T
     
@@ -189,7 +189,7 @@ def importMonthlyHosp():
     
     
         
-    monthlyMVbedsOccCovidNew = pd.read_excel (url, sheet_name='MV Beds Occupied Covid')
+    monthlyMVbedsOccCovidNew = pd.read_excel (url, sheet_name='MV Beds Occupied Covid-19')
     
     monthlyMVbedsOccCovidNew = monthlyMVbedsOccCovidNew.iloc[[11,12], 5:].T
     
@@ -400,7 +400,7 @@ def importWeeklyHosp():
 
     
     #newer data
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/05/Weekly-covid-admissions-and-beds-publication-210527.xlsx'
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/06/Weekly-covid-admissions-and-beds-publication-210610.xlsx'
     # Import and format the weeklyGABedsOccCovid data
     
     weeklyGABedsOccCovidNew = pd.read_excel(url, sheet_name='Adult G&A Beds Occupied COVID').T
@@ -576,6 +576,8 @@ def importDailyHosp():
     # Save the dataframe as a pickle object
     Save(dailyBedsOccCovid, 'dailyBedsOccCovid')
     
+    
+    #older data
     url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/04/COVID-19-daily-admissions-and-beds-20210406-1.xlsx'
     
     df = pd.read_excel(url) 
