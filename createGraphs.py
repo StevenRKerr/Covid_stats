@@ -60,7 +60,7 @@ pathways = iD.Open('pathways')
 
 # The WeeklyHosp is updated daily.
 # The file is downloaded automatically.
-iD.importWeeklyHosp()
+#iD.importWeeklyHosp()
 weeklyGABedsOccCovid = iD.Open('weeklyGABedsOccCovid')
 
 weeklyGABedsOccNonCovid = iD.Open('weeklyGABedsOccNonCovid')
@@ -83,7 +83,7 @@ iD.importMort()
 Mort = iD.Open('Mort')
 
 # importMonthlyHosp is updated around the 12th of each month
-iD.importMonthlyHosp()
+#iD.importMonthlyHosp()
 
 newHospAd = iD.Open('newHospAd')
 
