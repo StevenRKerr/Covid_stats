@@ -99,6 +99,7 @@ def stackData(old, new, precedence):
 
 def importMonthlyHosp():
     
+    # newer data
     # This url contains a link to hospital admissions data.
     url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/06/Covid-Publication-10-06-2021.xlsx"
     
@@ -222,9 +223,6 @@ def importMonthlyHosp():
   
     
   
-    
-  
-    
     
     url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/05/Covid-Publication-06-04-2021.xlsx'
     
@@ -400,7 +398,7 @@ def importWeeklyHosp():
 
     
     #newer data
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/06/Weekly-covid-admissions-and-beds-publication-210610.xlsx'
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/06/Weekly-covid-admissions-and-beds-publication-210617.xlsx'
     # Import and format the weeklyGABedsOccCovid data
     
     weeklyGABedsOccCovidNew = pd.read_excel(url, sheet_name='Adult G&A Beds Occupied COVID').T
@@ -525,15 +523,16 @@ def importWeeklyHosp():
 
 def importDailyHosp():
     
+    # newer data
     # Get yesterday's date, because it is used in the PHE url
     yesterday = date.today() - datetime.timedelta(1)
     
     dateStr = str(yesterday).replace("-", "")
     
     # Create url of hospital admissions data
-#    url = ('https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/'  + str(yesterday.year) + "/" + str('{:02}'.format(yesterday.month)) + '/' "COVID-19-daily-admissions-and-beds-" + dateStr + '.xlsx')
-     
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/06/COVID-19-daily-admissions-and-beds-20210611.xlsx'
+    url = ('https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/'  + str(yesterday.year) + "/" + str('{:02}'.format(yesterday.month)) + '/' "COVID-19-daily-admissions-and-beds-" + dateStr + '.xlsx')
+        
+#    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/06/COVID-19-daily-admissions-and-beds-20210611.xlsx'
     
     df = pd.read_excel(url)   
     
@@ -703,7 +702,7 @@ def importMort():
 
 def importGDP():
     
-    url = 'https://www.ons.gov.uk/generator?uri=/economy/grossdomesticproductgdp/bulletins/gdpmonthlyestimateuk/february2021/7efda03f&format=csv'
+    url = 'https://www.ons.gov.uk/generator?uri=/economy/grossdomesticproductgdp/bulletins/gdpmonthlyestimateuk/april2021/878ce833&format=csv'
     
     r = requests.get(url)
     
@@ -723,7 +722,7 @@ def importGDP():
     df['Date'] = df['Date'].str.replace('Sept', 'Sep')
     
     # Convert the Date entries to a proper timedate
-    df['Date'] = pd.to_datetime( df.Date.astype(str), format= '%b %y')
+    df['Date'] = pd.to_datetime( df.Date.astype(str), format= '%b %Y')
        
     # Make the row index equal to row number
     df.index = np.arange( len(df) )
@@ -1379,7 +1378,7 @@ def importRed():
     # Redundancies measured in 1000s.
 #    redundancies['Redundancies in last 3 months'] = redundancies['Redundancies in last 3 months'].astype(float) *1000
 
-    url2 = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/april2021/5d9bf662&format=csv'
+    url2 = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/employmentintheuk/june2021/7fc8d16c&format=csv'
     
     r = requests.get(url2)
     
@@ -1465,7 +1464,7 @@ def importClaimants():
 
 def importPathways():
     
-    url = 'https://files.digital.nhs.uk/3D/089292/NHS%20Pathways%20Covid-19%20data%202021-04-22.csv'
+    url = 'https://files.digital.nhs.uk/F1/349AB4/NHS%20Pathways%20Covid-19%20data%202021-06-17.csv'
 
     calls = pd.read_csv(url)
 
@@ -1476,7 +1475,7 @@ def importPathways():
     calls = calls.groupby(['Call Date']).sum()
 
 
-    url = 'https://files.digital.nhs.uk/3C/453F69/111%20Online%20Covid-19%20data_2021-04-22.csv'
+    url = 'https://files.digital.nhs.uk/F8/9E35D4/111%20Online%20Covid-19%20data_2021-06-17.csv'
     
     online = pd.read_csv(url)
 
@@ -1507,9 +1506,9 @@ def importPathways():
 
 def importSurveilance():
     
-   url = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/979626/Weekly_Influenza_and_COVID19_report_data_w16.xlsx'
+   url = 'https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/994574/Weekly_Influenza_and_COVID19_report_data_w24.xlsx'
     
-   ICU = pd.read_excel(url, sheet_name = 'Figure 43. SARIWatch-ICUPHEC')
+   ICU = pd.read_excel(url, sheet_name = 'Figure 44. SARIWatch-ICUPHEC')
    
    start =  ICU.index[ ICU['Unnamed: 2'].str[:12] == '(a) COVID-19' ] [0] + 2
    
