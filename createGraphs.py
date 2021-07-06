@@ -43,7 +43,7 @@ OWID = iD.Open('OWID')
 
 # The DailyHosp is updated daily.
 # The file is downloaded automatically.
-#iD.importDailyHosp()
+iD.importDailyHosp()
 
 newHospAdDiag = iD.Open('newHospAdDiag')
 
@@ -136,7 +136,7 @@ UC = iD.Open('UC')
 
 # GDP data is updated monthly, approximately around the 10th of each month.
 # The file needs to be downloaded manually.
-iD.importGDP()
+#iD.importGDP()
 
 GDP = iD.Open('yearlyGDP')
 
@@ -450,8 +450,9 @@ UCFig.update_layout(
 
 
 # GDP figure
-GDPFig = px.line(GDP, x="Date", y=['Monthly GDP index UK 2020', 'Monthly GDP index UK 2019', \
-              'Monthly GDP index UK 2018', 'Monthly GDP index UK 2017'], range_x=['2007-01-01','2007-12-01'], \
+GDPFig = px.line(GDP, x="Date", y=['Monthly GDP index UK 2021' ,'Monthly GDP index UK 2020', \
+        'Monthly GDP index UK 2019', 'Monthly GDP index UK 2018', 'Monthly GDP index UK 2017'], \
+                 range_x=['2007-01-01','2007-12-01'], \
              template = "simple_white")
 
 GDPFig.update_layout(xaxis=dict(tickformat="%b"),

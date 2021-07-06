@@ -398,7 +398,7 @@ def importWeeklyHosp():
 
     
     #newer data
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/06/Weekly-covid-admissions-and-beds-publication-210617.xlsx'
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/07/Weekly-covid-admissions-and-beds-publication-210701.xlsx'
     # Import and format the weeklyGABedsOccCovid data
     
     weeklyGABedsOccCovidNew = pd.read_excel(url, sheet_name='Adult G&A Beds Occupied COVID').T
@@ -728,8 +728,8 @@ def importGDP():
     df.index = np.arange( len(df) )
     
     
-    # Start off with Dates from 2010 in the first column, and weekly deaths
-    # for 2010 in the second column.
+    # Start off with Dates from 2007 in the first column, and weekly deaths
+    # for 2007 in the second column.
     yearlyGDP = df[ df['Date'].dt.year == 2007 ]
     
     # Rename columns appropriately.
@@ -737,19 +737,19 @@ def importGDP():
     
 
     # Add columns for GDP for years 2018-2019
-    for year in range(2008, 2020):
+    for year in range(2008, 2021):
         yearlyGDP['Monthly GDP index UK ' + str(year)] = df[  df['Date'].dt.year == year ]['Monthly GDP index UK'].values
     
     
-    GDP2020 = df[  df['Date'].dt.year == 2020 ]['Monthly GDP index UK'].values
+    GDP2021 = df[  df['Date'].dt.year == 2021 ]['Monthly GDP index UK'].values
 
-    endGDP2020 = np.empty(12- len(GDP2020)  )
+    endGDP2021 = np.empty(12- len(GDP2021)  )
 
-    endGDP2020[:] = np.nan
+    endGDP2021[:] = np.nan
 
-    GDP2020 = np.concatenate( [GDP2020, endGDP2020] )
+    GDP2021 = np.concatenate( [GDP2021, endGDP2021] )
 
-    yearlyGDP['Monthly GDP index UK 2020'] = GDP2020
+    yearlyGDP['Monthly GDP index UK 2021'] = GDP2021
     
     # Make all non-date entries floats.
     yearlyGDP.iloc[0:, 1:] = yearlyGDP.iloc[0:, 1:].astype(float)
