@@ -101,7 +101,7 @@ def importMonthlyHosp():
     
     # newer data
     # This url contains a link to hospital admissions data.
-    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/06/Covid-Publication-10-06-2021.xlsx"
+    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/05/Covid-Publication-06-04-2021.xlsx"
     
     newHospAd = pd.read_excel(url, sheet_name='Admissions Total')
     
@@ -154,6 +154,7 @@ def importMonthlyHosp():
     
     # Save the dataframe as a pickle object
     Save(monthlyBedsOcc, 'monthlyBedsOcc')
+    
     
     # Import and format the monthlyBedsOccCovid data
     monthlyBedsOccCovid = pd.read_excel(url, sheet_name='Total Beds Occupied Covid').T
@@ -223,7 +224,7 @@ def importMonthlyHosp():
   
     
   
-    
+    # older data  
     url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/05/Covid-Publication-06-04-2021.xlsx'
     
     oldHospAd = pd.read_excel(url, sheet_name='Admissions Total')
@@ -398,7 +399,7 @@ def importWeeklyHosp():
 
     
     #newer data
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/07/Weekly-covid-admissions-and-beds-publication-210701.xlsx'
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/07/Weekly-covid-admissions-and-beds-publication-210715.xlsx'
     # Import and format the weeklyGABedsOccCovid data
     
     weeklyGABedsOccCovidNew = pd.read_excel(url, sheet_name='Adult G&A Beds Occupied COVID').T

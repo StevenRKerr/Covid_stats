@@ -41,7 +41,7 @@ OWID = iD.Open('OWID')
 
 # The DailyHosp is updated daily.
 # The file is downloaded automatically.
-iD.importDailyHosp()
+#iD.importDailyHosp()
 
 newHospAdDiag = iD.Open('newHospAdDiag')
 
@@ -58,7 +58,7 @@ pathways = iD.Open('pathways')
 
 # The WeeklyHosp is updated daily.
 # The file is downloaded automatically.
-#iD.importWeeklyHosp()
+iD.importWeeklyHosp()
 weeklyGABedsOccCovid = iD.Open('weeklyGABedsOccCovid')
 
 weeklyGABedsOccNonCovid = iD.Open('weeklyGABedsOccNonCovid')
@@ -208,7 +208,7 @@ bedsOcc = iD.stackData(histBedsOcc, weeklyBedsOcc, 'new')
 
 bedsOcc.name = 'bedsOcc'
 
-bedsOccCovid = iD.stackData(weeklyBedsOccCovid, monthlyBedsOccCovid , 'old')
+bedsOccCovid = iD.stackData(monthlyBedsOccCovid,  weeklyBedsOccCovid, 'old')
 
 bedsOccCovid.name = 'bedsOccCovid'
 
@@ -217,7 +217,7 @@ bedsOccCovid.name = 'bedsOccCovid'
 MVbedsOccCovid = iD.stackData(monthlyMVbedsOccCovid, dailyMVbedsOccCovid, 'new')
 
 # Combine MV beds occupied with MV beds occupied covid
-MVbeds = pd.merge(monthlyMVbedsOcc, MVbedsOccCovid, how='outer'  )
+MVbeds = pd.merge(MVbedsOccCovid, monthlyMVbedsOcc , how='outer')
 
 # Add an MV beds occupied non-covid column
 MVbeds['Mechanical ventilation beds occupied non-Covid-19 England'] =  MVbeds['Mechanical ventilation beds occupied England'] - MVbeds['Mechanical ventilation beds occupied Covid-19 England']
@@ -571,6 +571,8 @@ figNames = {'East of England': 'NHSBedsOccFigEoE',
             }
             
  
+
+
 reg = 'England'
           
 def createRegOccFig(reg):
@@ -721,11 +723,13 @@ unemploymentFig.update_layout(
 unemploymentFig.layout.yaxis.tickformat = ',.1%'
 
 
+
+
 # Mechanical ventilation beds figure
 MVbedsFig = px.line(MVbeds,  x="Date",  y=['Mechanical ventilation beds occupied England' , \
                     'Mechanical ventilation beds occupied Covid-19 England',  \
               'Mechanical ventilation beds occupied non-Covid-19 England'],                            
-                     range_x=['2020-04-02',lastDate], template = "simple_white" )
+                      template = "simple_white" )
 
 
 MVbedsFig.update_layout(
