@@ -101,7 +101,7 @@ def importMonthlyHosp():
     
     # newer data
     # This url contains a link to hospital admissions data.
-    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/05/Covid-Publication-06-04-2021.xlsx"
+    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/07/Covid-Publication-08-07-2021.xlsx"
     
     newHospAd = pd.read_excel(url, sheet_name='Admissions Total')
     
@@ -174,8 +174,7 @@ def importMonthlyHosp():
     # Make the row index equal to row number
     monthlyBedsOccCovid.index = np.arange( len(monthlyBedsOccCovid) )
     
-    # Save the dataframe as a pickle object
-    Save(monthlyBedsOccCovid, 'monthlyBedsOccCovid')
+ 
     
     # Import data on mechanical ventilations beds
     # 20/5/21 they seem to have fucked up with the name of the sheet. 
@@ -257,6 +256,31 @@ def importMonthlyHosp():
     monthlyMVbedsOccOld .index = np.arange( len(monthlyMVbedsOccOld ) )
     
     
+    # working here
+    
+    # Import and format the monthlyBedsOccCovidOld data
+    monthlyBedsOccCovidOld = pd.read_excel(url, sheet_name='Total Beds Occupied Covid').T
+    
+    # Keep rows and columns of interest 
+    monthlyBedsOccCovidOld = monthlyBedsOccCovidOld.iloc[2:, 11:]
+    
+    monthlyBedsOccCovidOld = monthlyBedsOccCovidOld.drop( np.arange(12,22), axis = 1 )
+    
+    monthlyBedsOccCovidOld.columns = monthlyBedsOccCovidOld.loc['Unnamed: 2',]
+    
+    monthlyBedsOccCovidOld = monthlyBedsOccCovidOld.iloc[2:, ]
+    
+    
+    monthlyBedsOccCovidOld = monthlyBedsOccCovidOld.rename(columns={"Code": "Date"})
+    
+    # Make the row index equal to row number
+    monthlyBedsOccCovidOld.index = np.arange( len(monthlyBedsOccCovidOld) )
+    
+   
+    
+
+    
+    
     
         
     monthlyMVbedsOccCovidOld  = pd.read_excel (url, sheet_name='MV Beds Occupied Covid-19')
@@ -270,6 +294,13 @@ def importMonthlyHosp():
     
     
     
+    
+    
+    monthlyBedsOccCovid = stackData(monthlyBedsOccCovidOld, monthlyBedsOccCovid, 'old')
+    
+    Save(monthlyBedsOccCovid, 'monthlyBedsOccCovid')
+    
+
     monthlyMVbedsOcc = stackData(monthlyMVbedsOccOld, monthlyMVbedsOccNew, 'old')
     
     Save(monthlyMVbedsOcc, 'monthlyMVbedsOcc')
@@ -399,7 +430,7 @@ def importWeeklyHosp():
 
     
     #newer data
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/07/Weekly-covid-admissions-and-beds-publication-210715.xlsx'
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/07/Weekly-covid-admissions-and-beds-publication-210722.xlsx'
     # Import and format the weeklyGABedsOccCovid data
     
     weeklyGABedsOccCovidNew = pd.read_excel(url, sheet_name='Adult G&A Beds Occupied COVID').T
