@@ -643,14 +643,16 @@ def importMort():
     
     # Import is using np.array because there are some weird formatting issues
     # if you try with pandas dataframe
-    array = np.genfromtxt(url, delimiter = ',', dtype =str)
-    
+    #array = np.genfromtxt(url, delimiter = ',', dtype =str)
+            
+    df = pd.read_csv('https://www.mortality.org/Public/STMF/Outputs/stmf.csv', skiprows = 2)
+      
     # Importing mortality.org data automatically creates a new folder for some
     # reason. Delete it.
-    shutil.rmtree('www.mortality.org')
+    #shutil.rmtree('www.mortality.org')
     
     # Now stick it into a dataframe
-    df = pd.DataFrame(data = array[1:, :] , columns = array[0, :])
+    #df = pd.DataFrame(data = array[1:, :] , columns = array[0, :])
     
     #  EW is England and Wales, NIR is Northern Ireland, SC is Scotland
     dfEW = df[ df['CountryCode']  == 'GBRTENW'  ]
