@@ -17,8 +17,7 @@ import datetime
 from datetime import date
 import math
 
-############################# IMPORT ################################
-
+############################# IMPORTS ################################
 
 # ONS data is updated daily
 # The file is downloaded automatically.
@@ -53,7 +52,6 @@ dailyMVbedsOccCovid = iD.Open('dailyMVbedsOccCovid')
 
 # NHS pathways data is updated daily
 #iD.importPathways()
-
 pathways = iD.Open('pathways')
 
 # The WeeklyHosp is updated daily.
@@ -66,7 +64,6 @@ weeklyGABedsOccNonCovid = iD.Open('weeklyGABedsOccNonCovid')
 weeklyBedsOccCovid = iD.Open('weeklyBedsOccCovid')
 
 weeklyBedsOpen = iD.Open('weeklyBedsOpen')
-
 
 
 # Flu and Covid surveilance is updated weekly
@@ -146,7 +143,6 @@ IandP = iD.Open('IandP')
 #iD.importLCD()
 LCD = iD.Open('LCD') 
 
-
 # AvgBedsOcc never needs to be updated
 # iD.importAvgBedsOcc()
 # avgBedsOcc = iD.Open('avgBedsOcc')
@@ -167,7 +163,6 @@ histBedsOcc = iD.Open('histBedsOcc')
 
 
 # retail is never updated
-#
 # retail = pd.read_csv('Data/Retail.csv')
 
 ################################# FORMATTING ############################
@@ -180,7 +175,6 @@ hospAdDiag = iD.stackData(oldHospAdDiag, newHospAdDiag, 'old')
 df = iD.mergeFrames(deaths, hospAd )
 
 df = iD.mergeFrames(df, hospAdDiag )
-
 
 
 # Combine cases with OWID
@@ -203,7 +197,6 @@ weeklyBedsOcc = weeklyGABedsOccCovid
 weeklyBedsOcc.iloc[:, 1:] = weeklyGABedsOccCovid.iloc[:, 1:] + weeklyGABedsOccNonCovid.iloc[:, 1:]
 
 
-
 bedsOcc = iD.stackData(histBedsOcc, weeklyBedsOcc, 'new')
 
 bedsOcc.name = 'bedsOcc'
@@ -223,15 +216,13 @@ MVbeds = pd.merge(MVbedsOccCovid, monthlyMVbedsOcc , how='outer')
 MVbeds['Mechanical ventilation beds occupied non-Covid-19 England'] =  MVbeds['Mechanical ventilation beds occupied England'] - MVbeds['Mechanical ventilation beds occupied Covid-19 England']
 
 
-
-# totalCoronaDeaths is what it says.
-
 totalCoronaDeaths2020 = deaths['Daily Covid-19 deaths UK'][deaths['Date'].dt.year == 2020 ].sum()
 
 totalCoronaDeaths2021 = deaths['Daily Covid-19 deaths UK'][deaths['Date'].dt.year == 2021 ].sum()
 
+
 # Add a column to IandP and LCD that is constant and equal to total 
-# Covid-19 deaths. This is useful for plotting purposes
+# Covid-19 deaths.
 IandP.insert(1, 'Covid-19 deaths 2020 UK'  , totalCoronaDeaths2020  )
 
 IandP.insert(1, 'Covid-19 deaths 2021 UK'  , totalCoronaDeaths2021  )
@@ -240,10 +231,6 @@ LCD.insert(1, 'Covid-19 deaths 2020 UK'  , totalCoronaDeaths2020  )
 
 LCD.insert(1, 'Covid-19 deaths 2021 UK'  , totalCoronaDeaths2021  )
 
-
-
-# This line is to make all the columns of IandP, LCD the same type, so they 
-# can be  plotted together on the same plot by plotly.
 IandP['Yearly influenza and pneumonia deaths England and Wales'] = IandP['Yearly influenza and pneumonia deaths England and Wales'].astype(np.int)
 
 LCD.iloc[:, 1:] = LCD.iloc[:, 1:].astype(np.int)
@@ -259,13 +246,11 @@ totalNonCoronaED2021 = (yearlyMort['Weekly deaths UK 2021'] - yearlyMort['Mean w
 totalED2021 = (yearlyMort['Weekly deaths UK 2021'] - yearlyMort['Mean weekly deaths UK 2015-2019']).sum()
 
 
-
 totalTests = float(tests.loc[0, 'Cumulative tests UK'])
 
 totalCases = float(cases['Daily new Covid-19 cases UK'].sum())
 
 # Create a dictionary with some death related variables of interest.
-
 jsonDict = { "TCD20": '{:,}'.format(totalCoronaDeaths2020), 
         "TNCED20": '{:,}'.format(round(totalNonCoronaED2020,2)),
         "TED20": '{:,}'.format(round(totalED2020,2)),
@@ -275,18 +260,13 @@ jsonDict = { "TCD20": '{:,}'.format(totalCoronaDeaths2020),
         "tests": '{:,}'.format(math.trunc(totalTests)),
         "newpos": '{:,}'.format(math.trunc(totalCases))}
 
-# Save that dictinary in json format. This can then be passed to other
-# applications.
-
 with open('jsonDict.json', 'w') as file:
     json.dump(jsonDict, file)
-
 
 ####################### FUNCTIONS ##################################
 
 # Extract queries bedsOcc, monthlybedsOccCovid, and histBedsOpen
 # according to area, NHS or private, and by year.
-
 def extract(df, area, hosp, bed, year):
     
     colMarker = hospMeta.copy()
@@ -366,8 +346,7 @@ fig1.update_layout(
     y=1.4,
     xanchor="left",
     x=0.02
-)
-    
+    )    
 )
 
 
@@ -383,9 +362,8 @@ testsFig.update_layout(
     y=0.99,
     xanchor="left",
     x=0.02
+    )
 )
-)
-
 
 
 # Cases figure
@@ -404,7 +382,7 @@ casesFig.update_layout(
     y=0.99,
     xanchor="left",
     x=0.02
-)
+    )
 )
 
 
@@ -420,10 +398,11 @@ testPosRateFig.update_layout(
     y=0.99,
     xanchor="right",
     x=0.99
-)
+    )
 )
 
 testPosRateFig.layout.yaxis.tickformat = ',.0%'
+
 
 # Universal Credit figure
 UCFig = px.line(UC, x="Date", y=['Weekly universal credit claims UK'], range_x=['2020-01-01', date.today()], \
@@ -442,9 +421,8 @@ UCFig.update_layout(
     y=0.99,
     xanchor="right",
     x=0.99
+    )
 )
-)
-
 
 
 # GDP figure
@@ -461,9 +439,8 @@ GDPFig.update_layout(xaxis=dict(tickformat="%b"),
     y=0.5,
     xanchor="right",
     x=0.99
+    )
 )
-)
-
 
 
 # Influenza and Pneumonia figure
@@ -479,9 +456,8 @@ IandPFig.update_layout(
     y=0.99,
     xanchor="right",
     x=0.99
+    )
 )
-)
-
 
 
 # yearly mortality figure
@@ -493,11 +469,6 @@ yearlyMortCols = ['Weekly deaths UK 2019',
                   'Mean weekly deaths 2015-2019<br>plus Covid-19 deaths UK 2021']
                  
 meanDeathsFig = px.line(yearlyMort, x="Date", y= yearlyMortCols, range_x=['2015-01-01','2015-12-24'], template = "simple_white" )
-
-meanDeathsFig.update_layout(
-    
-)
-
 
 meanDeathsFig.update_layout(xaxis=dict(tickformat="%d %b"),
             yaxis_title="Weekly deaths",
@@ -520,7 +491,6 @@ deathByAgeFig.update_layout(
 )
 
 
-
 # Leading cause of death figure
 LCDcols = list(LCD.columns)
 
@@ -535,7 +505,7 @@ LCDFig.update_layout(
     y=1.25,
     xanchor="right",
     x=0.99
-)
+    )
 )
 
 
@@ -552,7 +522,7 @@ govSpendingFig.update_layout(
     y=0.8,
     xanchor="left",
     x=0.02
-)
+    )
 )
 
 # Regional beds occupied figures
@@ -570,10 +540,6 @@ figNames = {'East of England': 'NHSBedsOccFigEoE',
             'England': 'NHSBedsOccFigE',
             }
             
- 
-
-
-reg = 'England'
           
 def createRegOccFig(reg):
     frame = pd.merge(extract(bedsOcc, reg, 'NHS', 'G&A', 2021), extract(bedsOcc, reg, 'NHS', 'G&A', 2020), how='outer')
@@ -616,26 +582,23 @@ def createRegOccFig(reg):
         y=1.5,
         xanchor="left",
         x=0.1
-    )
+        )
     )   
     
     return fig
+
     
 for reg in regions:
  
     pio.write_html(createRegOccFig(reg), file='HTML files/Hospitals/' + figNames[reg] + '.html', auto_open=False) 
 
 
+
 # Beds available figure
 frame = pd.merge(extract(weeklyBedsOpen, 'England', 'NHS', 'G&A', 2021), extract(weeklyBedsOpen, 'England', 'NHS', 'G&A', 2020), how = 'outer')
 
-frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2020), how = 'outer' )
-                 
-frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2019), how = 'outer' )
-
-frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2018), how = 'outer'  )
-
-frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', 2017), how = 'outer'  )
+for year in range(2017, 2021):
+    frame = pd.merge(frame, extract(histBedsOpen, 'England', 'NHS', 'G&A', year), how = 'outer' )
 
 frame['Mean NHS overnight beds G&A available England 2017-2019'] = frame.iloc[:, 4:].mean(axis=1)
 
@@ -645,8 +608,6 @@ NHSBedsOpenFig = px.line(frame, x='Date', y=frame.columns[1:],  \
                 template = "simple_white", 
                 color_discrete_sequence =[ 'gold', 'red', 'green', 'blue', 'fuchsia', 'darkviolet', 'navy'])
 
-
-    
 NHSBedsOpenFig.update_layout(
     xaxis=dict(tickformat="%b %d"),
     yaxis_title="",
@@ -657,7 +618,7 @@ NHSBedsOpenFig.update_layout(
     y=1.35,
     xanchor="left",
     x=0.1
-)
+    )
 )    
     
     
@@ -696,7 +657,7 @@ privBedsOccFig.update_layout(
     y=1.35,
     xanchor="left",
     x=0.1
-)
+    )
 )        
     
 
@@ -717,12 +678,10 @@ unemploymentFig.update_layout(
     y=0.99,
     xanchor="right",
     x=0.99
-)
+    )
 )
 
 unemploymentFig.layout.yaxis.tickformat = ',.1%'
-
-
 
 
 # Mechanical ventilation beds figure
@@ -740,7 +699,7 @@ MVbedsFig.update_layout(
     y=0.99,
     xanchor="center",
     x=0.5
-)
+    )
 )    
 
 
@@ -748,7 +707,6 @@ MVbedsFig.update_layout(
 deathCompFig = px.line(deathComp,  x="Date",  y=['Weekly deaths within 28 days of a positive test' , \
         'Weekly deaths with Covid-19 on death certificate',] , color_discrete_sequence =[ 'lime', 'crimson'], \
                        template = "simple_white" )
-
 
 deathCompFig.update_layout(
     yaxis_title="",
@@ -758,9 +716,8 @@ deathCompFig.update_layout(
     y=1.1,
     xanchor="right",
     x=0.99
-)
+    )
 )    
-
 
 
 # Redundancies figure
@@ -777,7 +734,7 @@ redFig.update_layout(
     y=0.99,
     xanchor="center",
     x=0.5
-)
+    )
 )
 
 # Claimants figure
@@ -792,7 +749,7 @@ claimantsFig.update_layout(
     y=0.99,
     xanchor="center",
     x=0.5
-)
+    )
 )
 
 # Admissiong by age figure
@@ -809,7 +766,7 @@ admissionsByAgeFig.update_layout(
     y=1.35,
     xanchor="left",
     x=0.1
-)
+    )
 )            
     
   
@@ -827,13 +784,12 @@ pathwaysFig.update_layout(
     y=1,
     xanchor="center",
     x=0.5
+    )    
 )
-    
-)
 
 
 
-# Surveilacne figure
+# Surveilance figure
 surveilanceFig = px.line(ICU, x="Date", y=ICU.columns[1:], template = "simple_white" )
 
 surveilanceFig.update_layout(
@@ -844,14 +800,11 @@ surveilanceFig.update_layout(
     y=1,
     xanchor="left",
     x=0.02
-)
-    
+    )    
 )
 
  
-# Vaccine fig
-
-# Deaths and hospital admissions figure
+# Vaccine figure
 vaccineFig = px.line(OWID, x="Date", y=['Individuals vaccinated', 'Individuals fully vaccinated'], \
              template = "simple_white", color_discrete_sequence =['gold', 'green'], \
                 range_x=['2021-01-01', str(date.today())  ]   )
@@ -864,38 +817,36 @@ vaccineFig.update_layout(
     y=0.99,
     xanchor="left",
     x=0.02
-)
+    )
 )
 
 
 
 #Create depression figure.
 #This only needs to be done once - the figure is not dynamic
+'''
+depression = iD.Open('depression')
 
-#depression = iD.Open('depression')
+depressionFig = px.bar(depression, x="Prevalence", y='Group', \
+                   color = 'Time period',   template = "simple_white", 
+                   barmode = 'group', orientation = 'h' )
 
+depressionFig.update_layout(
+   yaxis_title="",
+    legend_title="Variable:",
+    legend_traceorder= 'reversed',
+    legend=dict(
+    yanchor="top",
+    y=1.2,
+    xanchor="left",
+    x=0.02
+    )
+)   
 
-#depressionFig = px.bar(depression, x="Prevalence", y='Group', \
-#                   color = 'Time period',   template = "simple_white", 
-#                   barmode = 'group', orientation = 'h' )
+depressionFig.layout.xaxis.ticksuffix = '%'
 
-#depressionFig.update_layout(
-#   yaxis_title="",
-#    legend_title="Variable:",
-#    legend_traceorder= 'reversed',
-#    legend=dict(
-#    yanchor="top",
-#    y=1.2,
-#    xanchor="left",
-#    x=0.02
-#)
-    
-#)
-
-#depressionFig.layout.xaxis.ticksuffix = '%'
-
-#pio.write_html(depressionFig, file='HTML files/depressionFig.html', auto_open=True) 
-
+pio.write_html(depressionFig, file='HTML files/depressionFig.html', auto_open=True) 
+'''
 
 
 

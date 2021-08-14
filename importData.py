@@ -15,16 +15,14 @@ import numpy as np
 import ssl
 from datetime import date
 import datetime
-import shutil
 import os
 
 os.chdir('C:/Users/Steven/Desktop/Git/Covid_stats' )
 
 # This handles ssl certificates of urls we are downloading data from.
-
 ssl._create_default_https_context = ssl._create_unverified_context
 
-############################## FUNCTIONS ###############################
+####################### GENERAL FUNCTIONS ###############################
 
 # Save saves Object as filename.pkl in "Pickle files"
 def Save(Object, filename):
@@ -43,27 +41,22 @@ def Open(filename):
 
     return pickle.load(file)    
 
-# The function mergeData does an outer merge of all the data sets, filling in
+# mergeFrames does an outer merge of all the data sets, filling in
 # with missing value wherever appropriate.
 def mergeFrames(df1, df2):
 
     df = pd.merge(df1, df2, how='outer')
 
     # Sort by date
-
     df= df.sort_values('Date')
     
-    # Make sure everything that isn't the date is stored as a float
-    
+    # Make sure everything that isn't the date is stored as a float   
     df.iloc[:, 1:] = df.iloc[:, 1:].astype(float)
     
-    # Make the row index equal to row number
-    
+    # Make the row index equal to row number   
     df.index = np.arange( len(df) )
     
     return df
-
-
 
 
 # Stacks data for different potentially overlapping time periods
@@ -86,120 +79,112 @@ def stackData(old, new, precedence):
      
     # Stacks old and new vertically
     df = pd.concat( [ old, new ], axis=0)
-    
-    # Make the row index equal to row number
+
     df.index = np.arange( len(df) )
     
     return df
+
+# format_1, format_2 and format_3 are used repeatedly to format data pulled
+# from different sheets of excel pages 
+
+def format_1(df, col_name):
     
+    df = df.iloc[11:13, 5:].T
+    
+    df.columns = ['Date', col_name]
+    
+    df.index = np.arange(len(df))
+    
+    return df
+
+
+def format_2(df):
+    
+    df = df.iloc[2:, 11:]
+    
+    df = df.drop(np.arange(12,22), axis = 1 )
+    
+    df.columns = df.loc['Unnamed: 2',]
+    
+    df = df.iloc[2:, ]
+        
+    df = df.rename(columns={"Code": "Date"})
+    
+    df.index = np.arange(len(df))
+    
+    return df
+
+
+def format_3(df):
+    
+    df = df.iloc[2:, 13:]
+    
+    df = df.drop( np.arange(14,23), axis = 1 )
+    
+    df.columns = df.loc['Unnamed: 2',]
+    
+    df = df.iloc[2:, ]
+    
+    df= df.rename(columns={"Code": "Date"})
+    
+    return df
+
 ################################ IMPORTS ########################################
 
-# importMonthlyHosp imports monthly hospital data, puts it into a 
-# more useful format and saves it.
 
 def importMonthlyHosp():
     
-    # newer data
-    # This url contains a link to hospital admissions data.
-    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/07/Covid-Publication-08-07-2021.xlsx"
+    # newer data.
+    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/08/Covid-Publication-12-08-2021.xlsx"
+    
     
     newHospAd = pd.read_excel(url, sheet_name='Admissions Total')
     
-    #Drop everything except rows 11 and 12, and all columns from 5 onwards.
-    #Row 11 has the date
-    #Row 12 has the number of hospital admissions
-    #The actual numbers start from column 5 onwards
-    newHospAd  = newHospAd .iloc[11:13, 5:   ].T
-    
-    #This takes the columns whose values are pandas timestamps, and makes the 
-    #column labels the corresponding date.
-    newHospAd .columns = ['Date', 'Daily hospital admissions with Covid-19 England']
+    newHospAd = format_1(newHospAd)
 
-    #Make the row index equal to row number
-    newHospAd .index = np.arange( len(newHospAd ) )
-
-    #Save the dataframe as a pickle object
     Save(newHospAd , 'newHospAd')
     
     
     # import and format the monthlyBedsOcc data
     monthlyBedsOcc = pd.read_excel (url, sheet_name='Total Beds Occupied').T
 
-    # Keep rows and columns of interest 
     monthlyBedsOcc = monthlyBedsOcc.iloc[1:, 11:]
     
     monthlyBedsOcc = monthlyBedsOcc.drop( np.arange(12,22), axis = 1 )
     
     monthlyBedsOcc.columns = monthlyBedsOcc.loc['Unnamed: 2',]
     
+    
     # Create a dataframe that is a hospital region lookup table
     hospMeta = monthlyBedsOcc.iloc[0, 1:].T
     
     Save(hospMeta, 'hospMeta')
     
-    # Drop some more rows
+    
     monthlyBedsOcc = monthlyBedsOcc.iloc[3:, ]
     
     monthlyBedsOcc = monthlyBedsOcc.rename(columns={"Code": "Date"})
-    
-    # For reasons unknown, the December 2020 data spuriously starts in March
-    # with zeroes. Drop any of that data
-    drop = monthlyBedsOcc.index[  ~(monthlyBedsOcc['Date'] >= pd.Timestamp(2020, 4, 2, 0)) \
-                                & ~(monthlyBedsOcc['Date'].isna())  ]
-    
-    monthlyBedsOcc = monthlyBedsOcc.drop( drop, axis=0  )
-    
-    # Make the row index equal to row number
+     
     monthlyBedsOcc.index = np.arange( len(monthlyBedsOcc) )
-    
-    # Save the dataframe as a pickle object
+
     Save(monthlyBedsOcc, 'monthlyBedsOcc')
     
-    
-    # Import and format the monthlyBedsOccCovid data
+     
     monthlyBedsOccCovid = pd.read_excel(url, sheet_name='Total Beds Occupied Covid').T
     
-    # Keep rows and columns of interest 
-    monthlyBedsOccCovid = monthlyBedsOccCovid.iloc[2:, 11:]
+    monthlyBedsOccCovid = format_2(monthlyBedsOccCovid)
     
-    monthlyBedsOccCovid = monthlyBedsOccCovid.drop( np.arange(12,22), axis = 1 )
-    
-    monthlyBedsOccCovid.columns = monthlyBedsOccCovid.loc['Unnamed: 2',]
-    
-    monthlyBedsOccCovid = monthlyBedsOccCovid.iloc[2:, ]
-    
-    
-    monthlyBedsOccCovid = monthlyBedsOccCovid.rename(columns={"Code": "Date"})
-    
-    # Make the row index equal to row number
-    monthlyBedsOccCovid.index = np.arange( len(monthlyBedsOccCovid) )
-    
- 
-    
-    # Import data on mechanical ventilations beds
-    # 20/5/21 they seem to have fucked up with the name of the sheet. 
-    # Will need to change this back to 'MV Beds Occupied'
     monthlyMVbedsOccNew = pd.read_excel (url, sheet_name='MV Beds Occupied')
     
-    monthlyMVbedsOccNew = monthlyMVbedsOccNew.iloc[[11,12], 5:].T
+    monthlyMVbedsOccNew = format_1(monthlyMVbedsOccNew, 'Mechanical ventilation beds occupied England')
     
-    monthlyMVbedsOccNew.columns = ['Date', 'Mechanical ventilation beds occupied England']
-    
-    # Make the row index equal to row number
-    monthlyMVbedsOccNew.index = np.arange( len(monthlyMVbedsOccNew) )
-    
-    
-        
+      
     monthlyMVbedsOccCovidNew = pd.read_excel (url, sheet_name='MV Beds Occupied Covid-19')
     
-    monthlyMVbedsOccCovidNew = monthlyMVbedsOccCovidNew.iloc[[11,12], 5:].T
+    monthlyMVbedsOccNew = format_1(monthlyMVbedsOccCovidNew, 'Mechanical ventilation beds occupied Covid-19 England')
     
-    monthlyMVbedsOccCovidNew.columns = ['Date', 'Mechanical ventilation beds occupied Covid-19 England']
     
-    # Make the row index equal to row number
-    monthlyMVbedsOccCovidNew.index = np.arange( len(monthlyMVbedsOccCovidNew) )
-    
-
+    # Create addmissions by age dataframe from newer data
     admissionsDict = { '0-5': 'Admissions 0-5',
                  '6-17':   'Admissions 6-17',
                  '18-64': 'Admissions 18-64',
@@ -221,81 +206,34 @@ def importMonthlyHosp():
     admissionsByAgeNew.index = np.arange( len(admissionsByAgeNew) )
   
   
-    
-  
-    # older data  
+    '''
+    # older data
+    # It appears this doesn't ever get updated
     url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/05/Covid-Publication-06-04-2021.xlsx'
     
     oldHospAd = pd.read_excel(url, sheet_name='Admissions Total')
     
-    #Drop everything except rows 11 and 12, and all columns from 5 onwards.
-    #Row 11 has the date
-    #Row 12 has the number of hospital admissions
-    #The actual numbers start from column 5 onwards
-    oldHospAd  = oldHospAd .iloc[11:13, 5:   ].T
     
-    #This takes the columns whose values are pandas timestamps, and makes the 
-    #column labels the corresponding date.
-    oldHospAd .columns = ['Date', 'Daily hospital admissions with Covid-19 England']
-
-    #Make the row index equal to row number
-    oldHospAd .index = np.arange( len(oldHospAd ) )
-
-    #Save the dataframe as a pickle object
+    oldHospAd = format_1(oldHospAd, 'Daily hospital admissions with Covid-19 England')
+    
     Save(oldHospAd , 'oldHospAd')
     
     
- 
     monthlyMVbedsOccOld = pd.read_excel (url, sheet_name='MV Beds Occupied')
     
-    monthlyMVbedsOccOld = monthlyMVbedsOccOld .iloc[[11,12], 5:].T
+    monthlyMVbedsOccOld = format_1(monthlyMVbedsOccOld, 'Mechanical ventilation beds occupied England')
     
-    monthlyMVbedsOccOld .columns = ['Date', 'Mechanical ventilation beds occupied England']
-    
-    # Make the row index equal to row number
-    monthlyMVbedsOccOld .index = np.arange( len(monthlyMVbedsOccOld ) )
-    
-    
-    # working here
-    
-    # Import and format the monthlyBedsOccCovidOld data
+  
     monthlyBedsOccCovidOld = pd.read_excel(url, sheet_name='Total Beds Occupied Covid').T
     
-    # Keep rows and columns of interest 
-    monthlyBedsOccCovidOld = monthlyBedsOccCovidOld.iloc[2:, 11:]
+    monthlyBedsOccCovidOld = format_2(monthlyBedsOccCovidOld)
     
-    monthlyBedsOccCovidOld = monthlyBedsOccCovidOld.drop( np.arange(12,22), axis = 1 )
-    
-    monthlyBedsOccCovidOld.columns = monthlyBedsOccCovidOld.loc['Unnamed: 2',]
-    
-    monthlyBedsOccCovidOld = monthlyBedsOccCovidOld.iloc[2:, ]
-    
-    
-    monthlyBedsOccCovidOld = monthlyBedsOccCovidOld.rename(columns={"Code": "Date"})
-    
-    # Make the row index equal to row number
-    monthlyBedsOccCovidOld.index = np.arange( len(monthlyBedsOccCovidOld) )
-    
-   
-    
-
-    
-    
-    
-        
+         
     monthlyMVbedsOccCovidOld  = pd.read_excel (url, sheet_name='MV Beds Occupied Covid-19')
     
-    monthlyMVbedsOccCovidOld  = monthlyMVbedsOccCovidOld .iloc[[11,12], 5:].T
+    monthlyMVbedsOccCovidOld = format_1(monthlyMVbedsOccCovidOld, 'Mechanical ventilation beds occupied Covid-19 England' )
     
-    monthlyMVbedsOccCovidOld .columns = ['Date', 'Mechanical ventilation beds occupied Covid-19 England']
-    
-    # Make the row index equal to row number
-    monthlyMVbedsOccCovidOld .index = np.arange( len(monthlyMVbedsOccCovidOld ) )
-    
-    
-    
-    
-    
+
     monthlyBedsOccCovid = stackData(monthlyBedsOccCovidOld, monthlyBedsOccCovid, 'old')
     
     Save(monthlyBedsOccCovid, 'monthlyBedsOccCovid')
@@ -311,6 +249,7 @@ def importMonthlyHosp():
     Save(monthlyMVbedsOccCovid, 'monthlyMVbedsOccCovid')
     
    
+    # Create admissions by age dataframe from newer data
     admissionsByAgeOld= pd.DataFrame(columns = ['Date'])
     
     for sheet in admissionsDict:
@@ -326,188 +265,62 @@ def importMonthlyHosp():
     admissionsByAgeOld.index = np.arange( len(admissionsByAgeOld) )
    
     
-    
-    
-    
-    
     admissionsByAge = stackData(admissionsByAgeOld, admissionsByAgeNew, 'old')
     
-    # Save the dataframe as a pickle object
-    
     Save(admissionsByAge, 'admissionsByAge')
+    '''
     
     return
 
-
-
-
-
-# importWeeklyHosp imports the dailt Hospital data, puts it into 
-# a more useful format and saves it.
 
 def importWeeklyHosp():
     
     # older data
     url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/04/Weekly-covid-admissions-and-beds-publication-210429-up-to-210406.xlsx'
-    # Import and format the weeklyGABedsOccCovid data
+
     
     weeklyGABedsOccCovidOld = pd.read_excel(url, sheet_name='Adult G&A Beds Occupied COVID').T
 
-    # Keep rows and columns of interest 
-    
-    weeklyGABedsOccCovidOld= weeklyGABedsOccCovidOld.iloc[2:, 13:]
-    
-    weeklyGABedsOccCovidOld = weeklyGABedsOccCovidOld.drop( np.arange(14,23), axis = 1 )
-    
-    weeklyGABedsOccCovidOld.columns = weeklyGABedsOccCovidOld.loc['Unnamed: 2',]
-    
-    weeklyGABedsOccCovidOld = weeklyGABedsOccCovidOld.iloc[2:, ]
-    
-    weeklyGABedsOccCovidOld= weeklyGABedsOccCovidOld.rename(columns={"Code": "Date"})
-    
-    # Make the row index equal to row number
-    weeklyGABedsOccCovidOld.index = np.arange( len(weeklyGABedsOccCovidOld) )
-    
-
-    
-    # Import and format the weeklyBedsOcc data
+    weeklyGABedsOccCovidOld = format_3(weeklyGABedsOccCovidOld)
+  
+      
     weeklyGABedsOccNonCovidOld = pd.read_excel(url, sheet_name='Adult G&A Bed Occupied NonCOVID').T
 
-    # Keep rows and columns of interest 
-    weeklyGABedsOccNonCovidOld= weeklyGABedsOccNonCovidOld.iloc[2:, 13:]
-    
-    weeklyGABedsOccNonCovidOld = weeklyGABedsOccNonCovidOld.drop( np.arange(14,23), axis = 1 )
-    
-    weeklyGABedsOccNonCovidOld.columns = weeklyGABedsOccNonCovidOld.loc['Unnamed: 2',]
-    
-    weeklyGABedsOccNonCovidOld = weeklyGABedsOccNonCovidOld.iloc[2:, ]
-    
-    
-    weeklyGABedsOccNonCovidOld= weeklyGABedsOccNonCovidOld.rename(columns={"Code": "Date"})
-    
-    # Make the row index equal to row number
-    weeklyGABedsOccNonCovidOld.index = np.arange( len(weeklyGABedsOccNonCovidOld) )
+    weeklyGABedsOccNonCovidOld = format_3(weeklyGABedsOccNonCovidOld)
     
 
-    
-    # Import and format the weeklyBedsOccCovid data
     weeklyBedsOccCovidOld = pd.read_excel(url, sheet_name='All beds COVID').T
 
-    # Keep rows and columns of interest 
-    weeklyBedsOccCovidOld = weeklyBedsOccCovidOld.iloc[2:, 13:]
+    weeklyBedsOccCovidOld = format_3(weeklyBedsOccCovidOld)
     
-    weeklyBedsOccCovidOld = weeklyBedsOccCovidOld.drop( np.arange(14,23), axis = 1 )
-    
-    weeklyBedsOccCovidOld = weeklyBedsOccCovidOld.dropna(axis=1, how='all')
-    
-    weeklyBedsOccCovidOld.columns = weeklyBedsOccCovidOld.loc['Unnamed: 2',]
-    
-    weeklyBedsOccCovidOld = weeklyBedsOccCovidOld.iloc[2:, ]
-    
-    weeklyBedsOccCovidOld = weeklyBedsOccCovidOld.rename(columns={"Code": "Date"})
-    
-    # Make the row index equal to row number
-    weeklyBedsOccCovidOld.index = np.arange( len(weeklyBedsOccCovidOld) )
-    
-
 
     weeklyBedsUnoccupiedOld = pd.read_excel(url, sheet_name='Adult G&A Beds Unoccupied').T
     
-    weeklyBedsUnoccupiedOld =  weeklyBedsUnoccupiedOld.iloc[2:, 13:]
-    
-    weeklyBedsUnoccupiedOld =  weeklyBedsUnoccupiedOld.drop( np.arange(14,23), axis = 1 )
-    
-    weeklyBedsUnoccupiedOld.columns =  weeklyBedsUnoccupiedOld.loc['Unnamed: 2',]
-    
-    weeklyBedsUnoccupiedOld =  weeklyBedsUnoccupiedOld.iloc[2:, ]
-    
-    weeklyBedsUnoccupiedOld= weeklyBedsUnoccupiedOld.rename(columns={"Code": "Date"})
-    
-    # Make the row index equal to row number
-    weeklyBedsUnoccupiedOld.index = np.arange( len(weeklyBedsUnoccupiedOld) )
-    
-    
+    weeklyBedsUnoccupiedOld = format_3(weeklyBedsUnoccupiedOld)
 
-    
+       
     #newer data
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/08/Weekly-covid-admissions-and-beds-publication-210805.xlsx'
-    # Import and format the weeklyGABedsOccCovid data
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/08/Weekly-covid-admissions-and-beds-publication-210812.xlsx'
+
     
     weeklyGABedsOccCovidNew = pd.read_excel(url, sheet_name='Adult G&A Beds Occupied COVID').T
 
-    # Keep rows and columns of interest 
+    weeklyGABedsOccCovidNew = format_3(weeklyGABedsOccCovidNew)
+  
     
-    weeklyGABedsOccCovidNew= weeklyGABedsOccCovidNew.iloc[2:, 13:]
-    
-    weeklyGABedsOccCovidNew = weeklyGABedsOccCovidNew.drop( np.arange(14,23), axis = 1 )
-    
-    weeklyGABedsOccCovidNew.columns = weeklyGABedsOccCovidNew.loc['Unnamed: 2',]
-    
-    weeklyGABedsOccCovidNew = weeklyGABedsOccCovidNew.iloc[2:, ]
-    
-    weeklyGABedsOccCovidNew= weeklyGABedsOccCovidNew.rename(columns={"Code": "Date"})
-    
-    # Make the row index equal to row number
-    weeklyGABedsOccCovidNew.index = np.arange( len(weeklyGABedsOccCovidNew) )
-    
-
-    
-    # Import and format the weeklyBedsOcc data
     weeklyGABedsOccNonCovidNew = pd.read_excel(url, sheet_name='Adult G&A Bed Occupied NonCOVID').T
 
-    # Keep rows and columns of interest 
-    weeklyGABedsOccNonCovidNew= weeklyGABedsOccNonCovidNew.iloc[2:, 13:]
-    
-    weeklyGABedsOccNonCovidNew = weeklyGABedsOccNonCovidNew.drop( np.arange(14,23), axis = 1 )
-    
-    weeklyGABedsOccNonCovidNew.columns = weeklyGABedsOccNonCovidNew.loc['Unnamed: 2',]
-    
-    weeklyGABedsOccNonCovidNew = weeklyGABedsOccNonCovidNew.iloc[2:, ]
-    
-    
-    weeklyGABedsOccNonCovidNew= weeklyGABedsOccNonCovidNew.rename(columns={"Code": "Date"})
-    
-    # Make the row index equal to row number
-    weeklyGABedsOccNonCovidNew.index = np.arange( len(weeklyGABedsOccNonCovidNew) )
+    weeklyGABedsOccNonCovidNew = format_3(weeklyGABedsOccNonCovidNew)
     
 
-    
-    # Import and format the weeklyBedsOccCovid data
     weeklyBedsOccCovidNew = pd.read_excel(url, sheet_name='All beds COVID').T
 
-    # Keep rows and columns of interest 
-    weeklyBedsOccCovidNew = weeklyBedsOccCovidNew.iloc[2:, 13:]
-    
-    weeklyBedsOccCovidNew = weeklyBedsOccCovidNew.drop( np.arange(14,23), axis = 1 )
-    
-    weeklyBedsOccCovidNew = weeklyBedsOccCovidNew.dropna(axis=1, how='all')
-    
-    weeklyBedsOccCovidNew.columns = weeklyBedsOccCovidNew.loc['Unnamed: 2',]
-    
-    weeklyBedsOccCovidNew = weeklyBedsOccCovidNew.iloc[2:, ]
-    
-    weeklyBedsOccCovidNew = weeklyBedsOccCovidNew.rename(columns={"Code": "Date"})
-    
-    # Make the row index equal to row number
-    weeklyBedsOccCovidNew.index = np.arange( len(weeklyBedsOccCovidNew) )
-
+    weeklyBedsOccCovidNew = format_3(weeklyBedsOccCovidNew)
+ 
 
     weeklyBedsUnoccupiedNew = pd.read_excel(url, sheet_name='Adult G&A Beds Unoccupied').T
     
-    weeklyBedsUnoccupiedNew =  weeklyBedsUnoccupiedNew.iloc[2:, 13:]
-    
-    weeklyBedsUnoccupiedNew =  weeklyBedsUnoccupiedNew.drop( np.arange(14,23), axis = 1 )
-    
-    weeklyBedsUnoccupiedNew.columns =  weeklyBedsUnoccupiedNew.loc['Unnamed: 2',]
-    
-    weeklyBedsUnoccupiedNew =  weeklyBedsUnoccupiedNew.iloc[2:, ]
-    
-    weeklyBedsUnoccupiedNew= weeklyBedsUnoccupiedNew.rename(columns={"Code": "Date"})
-    
-    # Make the row index equal to row number
-    weeklyBedsUnoccupiedNew.index = np.arange( len(weeklyBedsUnoccupiedNew) )
-
-
+    weeklyBedsUnoccupiedNew = format_3(weeklyBedsUnoccupiedNew)  
 
 
 
@@ -536,10 +349,6 @@ def importWeeklyHosp():
     weeklyBedsOpen.iloc[:, 1:] = weeklyBedsOpen.iloc[:, 1:].add(weeklyBedsUnoccupied.iloc[:, 1:], fill_value= 0)
     
 
-
-                           
-                        
-
     Save(weeklyGABedsOccCovid, 'weeklyGABedsOccCovid')
     
     Save(weeklyGABedsOccNonCovid, 'weeklyGABedsOccNonCovid')
@@ -550,8 +359,6 @@ def importWeeklyHosp():
   
     return
 
-# importDailyHosp imports the dailt Hospital data, puts it into 
-# a more useful format and saves it.
 
 def importDailyHosp():
     
@@ -563,97 +370,61 @@ def importDailyHosp():
     
     # Create url of hospital admissions data
     url = ('https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/'  + str(yesterday.year) + "/" + str('{:02}'.format(yesterday.month)) + '/' "COVID-19-daily-admissions-and-beds-" + dateStr + '.xlsx')
-        
-#    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/06/COVID-19-daily-admissions-and-beds-20210611.xlsx'
     
     df = pd.read_excel(url)   
     
-    # Pick out relevant rows and columns for admissions
     newHospAdDiag = df.iloc[11:13, 2:   ].T
-    
-    # Get rid of any NaN/NaT rows, which happened once for some reason
+
     newHospAdDiag = newHospAdDiag.dropna(axis=0)
-    
-    # Rename columns appropriately
+
     newHospAdDiag.columns = ['Date', 'Daily hospital admissions plus hospital diagnoses with Covid-19 England']
     
-    # Make the row index equal to row number
     newHospAdDiag.index = np.arange( len(newHospAdDiag) )
     
-    # Save dataframe as a pickle object.
     Save(newHospAdDiag, 'newHospAdDiag')
     
-    # Pick out relevant rows and columns for mechanical ventilator beds (MVB)
+
     dailyMVbedsOccCovid = df.iloc[102:104, 2:   ].T
     
-    # Rename columns appropriately
     dailyMVbedsOccCovid.columns = ['Date', 'Mechanical ventilation beds occupied Covid-19 England']
     
-    # Make the row index equal to row number
     dailyMVbedsOccCovid.index = np.arange( len(dailyMVbedsOccCovid) )
     
-    # Save the dataframe as a pickle object
     Save(dailyMVbedsOccCovid, 'dailyMVbedsOccCovid')
     
-    # Pick out beds occupid with covid patients data
+    
     dailyBedsOccCovid = df.iloc[87:89, 2:   ].T
     
-    # Rename columns appropriately
     dailyBedsOccCovid.columns = ['Date', 'Hospital beds occupied Covid-19 England']
     
-    # Make the row index equal to row number
     dailyBedsOccCovid.index = np.arange( len(dailyBedsOccCovid) )
     
-    # Save the dataframe as a pickle object
     Save(dailyBedsOccCovid, 'dailyBedsOccCovid')
     
-    
+    '''
     #older data
     url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/04/COVID-19-daily-admissions-and-beds-20210406-1.xlsx'
     
     df = pd.read_excel(url) 
     
-    # Pick out relevant rows and columns for admissions
     oldHospAdDiag = df.iloc[11:13, 2:   ].T
-    
-    # Get rid of any NaN/NaT rows, which happened once for some reason
+
     oldHospAdDiag = oldHospAdDiag.dropna(axis=0)
-    
-    # Rename columns appropriately
+
     oldHospAdDiag.columns = ['Date', 'Daily hospital admissions plus hospital diagnoses with Covid-19 England']
     
-    # Make the row index equal to row number
     oldHospAdDiag.index = np.arange( len(oldHospAdDiag) )
-    
-    # Save dataframe as a pickle object.
+
     Save(oldHospAdDiag, 'oldHospAdDiag')
-    
-    
+    '''
+        
     return
     
 
-# importMort imports the mortality data, puts it into a more useful format
-# and saves it.
-
-
 def importMort():
-    
-    # This url contains link to frequently updated data
-    url = 'https://www.mortality.org/Public/STMF/Outputs/stmf.csv'
-    
-    # Import is using np.array because there are some weird formatting issues
-    # if you try with pandas dataframe
-    #array = np.genfromtxt(url, delimiter = ',', dtype =str)
-            
+           
     df = pd.read_csv('https://www.mortality.org/Public/STMF/Outputs/stmf.csv', skiprows = 2)
-      
-    # Importing mortality.org data automatically creates a new folder for some
-    # reason. Delete it.
-    #shutil.rmtree('www.mortality.org')
-    
-    # Now stick it into a dataframe
-    #df = pd.DataFrame(data = array[1:, :] , columns = array[0, :])
-    
+   
     #  EW is England and Wales, NIR is Northern Ireland, SC is Scotland
     dfEW = df[ df['CountryCode']  == 'GBRTENW'  ]
     
@@ -704,8 +475,7 @@ def importMort():
         
         return df
          
-    # Prune EW, NI and SC data, then add together into dfUK 
-        
+    # Prune EW, NI and SC data, then add together into dfUK        
     dfEW = prune(dfEW, startDate, endDate)
     
     dfNI = prune(dfNI, startDate, endDate)
@@ -716,23 +486,12 @@ def importMort():
     
     dfUK.iloc[:, 1] = dfEW.iloc[:, 1] + dfNI.iloc[:, 1] + dfSC.iloc[:, 1]
     
-    # Rename Total column to Deaths. 
     dfUK = dfUK.rename(columns={"DTotal": "Weekly deaths UK"} )
 
-    # Save the dataframe as a pickle object
     Save(dfUK, 'Mort')
     
     return
     
-
-
-
-# importGDP imports the GDP data, puts it into a more useful format
-# and saves it.
-
-# There is an annoying issue with March 2017, which has 
-# 2017MAR in the date column rather than 2017 MAR, so that has to be 
-# fixed manually.
 
 def importGDP():
     
@@ -742,34 +501,26 @@ def importGDP():
     
     df = pd.read_csv(io.StringIO(r.text))
   
-    # Rename columns appropriately
     df.columns = ['Date', 'Monthly GDP index UK'] 
     
-    # The actual numbers start from row 6 onwards, so drop everything before that.
     df = df.iloc[6:, :]
     
-    # Rename to remove fourth letters cos theyre fucking idiots
     df['Date'] = df['Date'].str.replace('June', 'Jun')
     
     df['Date'] = df['Date'].str.replace('July', 'Jul')
     
     df['Date'] = df['Date'].str.replace('Sept', 'Sep')
     
-    # Convert the Date entries to a proper timedate
     df['Date'] = pd.to_datetime( df.Date.astype(str), format= '%b %Y')
        
-    # Make the row index equal to row number
     df.index = np.arange( len(df) )
-    
-    
+      
     # Start off with Dates from 2007 in the first column, and weekly deaths
     # for 2007 in the second column.
     yearlyGDP = df[ df['Date'].dt.year == 2007 ]
     
-    # Rename columns appropriately.
     yearlyGDP = yearlyGDP.rename(columns={"Monthly GDP index UK": "Monthly GDP index UK 2007"} )
     
-
     # Add columns for GDP for years 2018-2019
     for year in range(2008, 2021):
         yearlyGDP['Monthly GDP index UK ' + str(year)] = df[  df['Date'].dt.year == year ]['Monthly GDP index UK'].values
@@ -785,18 +536,13 @@ def importGDP():
 
     yearlyGDP['Monthly GDP index UK 2021'] = GDP2021
     
-    # Make all non-date entries floats.
     yearlyGDP.iloc[0:, 1:] = yearlyGDP.iloc[0:, 1:].astype(float)
    
-    # Save the dataframe as a pickle object
     Save(yearlyGDP, 'yearlyGDP')
     
     return
  
-
     
-# importOWID imports the OWID data, puts it into a more useful format
-# and saves it.
 def importOWID():
     
     # This url contains link to daily updated data
@@ -806,92 +552,59 @@ def importOWID():
     
     df = pd.read_csv(io.StringIO(r.text))
         
-    # Select all records from the UK
     df = df.loc[ df['location'] == 'United Kingdom']
     
-    # Select only those columns that are of interest
     df = df[  ['date', 'positive_rate', 'people_vaccinated', 'people_fully_vaccinated' ] ]
     
-    # Convert date column to timedates
     df['date'] = pd.to_datetime( df.date.astype(str), format= '%Y-%m-%d')
     
-    # Rename 'date' to 'Date', just for consistency
-    df.columns = ['Date', 'Positive test rate UK', 'Individuals vaccinated', 'Individuals fully vaccinated'  ]
+    df.columns = ['Date', 'Positive test rate UK', 'Individuals vaccinated', 'Individuals fully vaccinated']
     
-    # Make the row index equal to row number
     df.index = np.arange( len(df) )
     
-    # Save the dataframe as a pickle object
     Save(df, 'OWID')
     
     return
     
-
-    
-# importUC imports the Universal credit claims data, puts it into a more useful format
-# and saves it.  
-
+ 
 def importUC():
     
     df = pd.read_excel(r'Data/UC claims.xlsx')
     
-    # Row 5 contains dates, and row 7 contains number of claims
-    # The last column contains totals, which I don't want
-    # The data only starts from column 2 onwards
-    # Get rid of everything else.
     df = df.iloc[ [5,7], 2:-1  ].T
     
-    # Rename columns appropriately
     df.columns = [ 'Date', 'Weekly universal credit claims UK'  ]
     
     # Some of the dates randomly have the string ' (r)' added at the end
     # so get rid of that.
     df['Date'] = df['Date'].str.rstrip(' (r)')
     
-    # Turn the date column into a timedate object
     df['Date'] = pd.to_datetime( df.Date.astype(str), format= '%B %d, %Y')
 
-    # Make the row index equal to row number
     df.index = np.arange( len(df) )
   
-    # Save the dataframe as a pickle object
     Save(df, 'UC')
     
     return
 
 
-
-# importIandP imports influenza + pneumonia mortality data, puts it into a more 
-# useful format and saves it.
-
 def importIandP():
     
     df = pd.read_excel(r'Data/Influenza and pneumonia deaths.xlsx', sheet_name='Table 5')
     
-    # Data starts in row 4, and ends in row 123
-    # Only the first and second columns are of interest.
-    # They are the data, and the total number of influenza + pneumonia deaths
-    # Get rid of everything else
     df = df.iloc[4:123, :2]
     
-    # Rename columns
     df.columns = [ 'Date', 'Yearly influenza and pneumonia deaths England and Wales'  ] 
     
-    # Convert years into timedates
     df['Date'] = pd.to_datetime( df.Date.astype(str), format= '%Y')
     
-    # Make the row index equal to row number
     df.index = np.arange( len(df) )
     
-    # Save the dataframe as a pickle object
     Save(df, 'IandP')
     
     return
     
     
-# importLCD imports leading cause of death data, puts it into a more 
-# useful format and saves it.
-
 def importLCD():
     
     # LCDM is leading cause of death for males
@@ -900,7 +613,6 @@ def importLCD():
     
     LCDF = pd.read_excel (r'Data/LCD female.xlsx', sheet_name='Table 5')
 
-    # ACtual data starts in row 14. Discard everything else, and transpose
     LCDM = LCDM.iloc[14:, :].T
 
     LCDF = LCDF.iloc[14:, :].T
@@ -911,69 +623,51 @@ def importLCD():
     # Make the non-date entries equal to the sum of male and female deaths
     df.iloc[:, 1:] = LCDM.iloc[1:, 1:] + LCDF.iloc[1:, 1:]
     
-    # Give columns appropriate names
     df.columns = LCDF.iloc[0]
     
-    # Drop the 0th row. It just contains column names
     df.index = np.arange( len(df) )
     
     df = df.drop([0])
     
-    # Make the row index equal to row number
     df.index = np.arange( len(df) )
     
-    # Rename the 'Leading cause' column to 'Date'.
     df = df.rename( columns = {"Leading cause ": "Date" } )
     
     # Entries in the Date column correspond to year, but not all of them are
     # integeres. This coerces them to integers
     df['Date'] = df['Date'].astype(int)
     
-    # Convert the Data column to datetime objects
     df['Date'] = pd.to_datetime( df.Date.astype(str), format= '%Y')
     
     # The index column has a name that is unnecessary, delete to keep things neat
     df.columns.name = None
     
-    # Save the dataframe as a pickle object
     Save(df, 'LCD')
     
     return
    
 
-
-# importdeathByAge imports death by age data, puts it into a more 
-# useful format and saves it.
-
 def importdeathByAge():
     
     df = pd.read_excel(r'Data/Deaths by age.xlsx')
     
-    # Data starts in row 6
     df = df.iloc[2:, [2,4, 6]]
     
     df.columns = ['Date', 'Age group', 'Deaths']
     
     df['Date'] = pd.to_datetime( df['Date'].map(lambda x: x[15:]), format = '%d-%b-%y')
     
-    # Label columns appropriately
     deathByAge = df.groupby(['Age group']).sum()
     
     deathByAge['Age group'] = deathByAge.index
     
     deathByAge['Age group'] = deathByAge['Age group'].replace(to_replace = '-', value =" to ", regex = True)
     
-    # Make the row index equal to row number
     deathByAge.index = np.arange( len(deathByAge) )
     
-    # Save the dataframe as a pickle object
     Save(deathByAge, 'deathByAge')
     
     return
-
-
-# importGovSpending imports government spending data, puts it into a more 
-# useful format and saves it.
 
 
 def importGovSpending():
@@ -987,20 +681,16 @@ def importGovSpending():
     
     VAT = pd.read_excel(r'Data/Vat deferral.xls')
     
-    # Merge dataframes
+    
     df = pd.merge(CJRS, SEIS, how='outer')
     
     df = pd.merge(df, businessLoans, how = 'outer')
     
     df = pd.merge(df, VAT, how = 'outer')
     
-    # Sort by date
     df = df.sort_values(by='Date')
     
-    # Make the row index equal to row number
     df.index = np.arange( len(df) )
-    
-    # Fill in the NaNs where possible
     
     for index in df.index:
         
@@ -1024,28 +714,21 @@ def importGovSpending():
     df['Total value of approved business loans'] = df['Value of facilities approved CBILS'] + df['Value of facilities approved CBLILS'] \
         + df['Value of facilities approved BBLS'] + df['Value of convertible loans approved FF'] + df['Total value of VAT deferred']
         
-    df.insert(22, 'Total NHS spending UK 2018-2019'  , 152900000000  )
+    df.insert(22, 'Total NHS spending UK 2018-2019', 152900000000  )
     
-     # Save the dataframe as a pickle object
     Save(df, 'govSpending')
     
     return
 
 
-
-# importBeds imports NHS bed data, puts it into a more useful format and saves it.
 def importAvgBedsOcc():
     
-    #dfON is overnight beds
     df = pd.read_excel(r'Data/Avg bed occupancy.xls', sheet_name = 'Open Overnight')
     
-    # Pick out the data that is of interest
     df = df.iloc[13:54, [1, 2, 4, 10 ]]
     
-    # Rename columns more appropriately
     df.columns = ['Year', 'Quarter', 'Total available', 'Total occupied'  ]
     
-    # Make the row index equal to row number
     df.index = np.arange( len(df) )
     
     # Create columns for the dataframe that we want
@@ -1054,15 +737,13 @@ def importAvgBedsOcc():
     for year in  range(2010, 2021):   
         columns.append( 'Quarterly mean overnight NHS beds available England ' + str(year) )
         columns.append(  'Quarterly mean overnight NHS beds occupied England ' + str(year) )
-        
-     # beds is the dataframe we want   
+         
     beds = pd.DataFrame(columns = columns)
      
     # Make the first columns of beds equal to the dates of the year. 
     beds['Date'] = pd.date_range(start = '2020-01-01', end = '2020-12-31', freq='D')
     
-    # dayRange returns the range of days that are for each quarter in 2020
-    
+    # dayRange returns the range of days that are for each quarter in 2020   
     def dayRange(quarter):
         if quarter == 1:
             return [0, 91]
@@ -1092,30 +773,21 @@ def importAvgBedsOcc():
     # put the meat into beds
     beds.iloc[:, 1:] = bedsMeat
     
-    
-    # Save the dataframe as a pickle object
     Save(beds, 'avgBedsOcc')
     
     return
 
 
-
-# Import historic daily bed occupied and available data, and format.
-
 def importHistBedsOcc():
     
     bedsOpen = pd.read_excel(r'Data/Bed occupancy.xlsx', sheet_name = 'G&A_Beds_Open_crosstab').T
 
-    # Make columns equal to hospital code
     bedsOpen.columns = bedsOpen.loc['Unnamed: 2', :]
     
-    # keep rows of interest
     bedsOpen = bedsOpen.iloc[3:, :]
     
-    # Insert Date column
     bedsOpen.insert(loc=0, column='Date', value= bedsOpen.index  )
     
-    # Make the row index equal to row number
     bedsOpen.index = np.arange( len(bedsOpen) )
     
     
@@ -1151,32 +823,22 @@ def importHistBedsOcc():
     
     bedsOpen = pd.merge(bedsOpen, bedsOpen2, how= 'outer')
     
-    # Save the dataframe as a pickle object
     Save(bedsOpen, 'histBedsOpen')
     
     bedsOcc = pd.read_excel(r'Data/Bed occupancy.xlsx', sheet_name = 'G&A_Beds_Occupied_crosstab').T
 
-    
-    # Make columns equal to hospital code
     bedsOcc.columns = bedsOcc.loc['Unnamed: 2', :]
     
-    # keep rows of interest
     bedsOcc = bedsOcc.iloc[3:, :]
     
-    # Insert Date column
     bedsOcc.insert(loc=0, column='Date', value= bedsOcc.index  )
     
-    # Make the row index equal to row number
     bedsOcc.index = np.arange( len(bedsOcc) )
     
-    # Save the dataframe as a pickle object
     Save(bedsOcc, 'histBedsOcc')
     
     return
 
-
-
-# createYearlyMort creates a dataframe of year by year mortality, and saves it.
 
 def createYearlyMort(Mort, deaths):
     
@@ -1186,13 +848,11 @@ def createYearlyMort(Mort, deaths):
     # for 2015 in the second column.
     yearlyMort = Mort[ Mort['Date'].dt.year == 2015 ][['Date', 'Weekly deaths UK']]
     
-    # Rename columns appropriately.
     yearlyMort = yearlyMort.rename(columns={"Weekly deaths UK": "Weekly deaths UK 2015"})
     
-    # Make the row index equal to row number
     yearlyMort.index = np.arange( len(yearlyMort.index))
 
-    # Add columns for weekly deaths for years 2016-2019
+    # Add columns for weekly deaths for years 2016-2020
     for year in range(2016, 2021):
                     
         yearlyMort['Weekly deaths UK ' + str(year)] = Mort[  Mort['Date'].dt.year == year ]['Weekly deaths UK'].values[-52:]
@@ -1213,8 +873,6 @@ def createYearlyMort(Mort, deaths):
     # Add a column that has weekly mean deaths for 2015-2019
     yearlyMort['Mean weekly deaths UK 2015-2019'] = yearlyMort.iloc[:, 1:6].mean(axis=1)
     
-    
-    # Initialise a dataframe
     deaths2020 = pd.DataFrame()
      
     # Make the first columns of deaths2020 equal to the dates of the year. 
@@ -1235,7 +893,6 @@ def createYearlyMort(Mort, deaths):
         
         weeklyCoronaDeaths2020[ week ] = deaths2020.iloc[ 7*week : (7*week)+6, 1 ].sum()
                
-    # Initialise a dataframe
     deaths2021 = pd.DataFrame()
      
     # Make the first columns of deaths2020 equal to the dates of the year. 
@@ -1270,8 +927,6 @@ def createYearlyMort(Mort, deaths):
     return 
 
 
-
-
 def importUnemployment():
     
     url = 'https://www.ons.gov.uk/generator?format=csv&uri=/employmentandlabourmarket/peoplenotinwork/unemployment/timeseries/mgsx/lms'
@@ -1280,10 +935,8 @@ def importUnemployment():
     
     df = pd.read_csv(io.StringIO(r.text))
     
-    # Unemployment by month starts in row 255
     df = df.iloc[255:, :]
 
-    # Rename columns appropriately
     df.columns = ['Date', 'Unemployment rate (seasonally adjusted)']
     
     # Make unemployment a number between zero and one.
@@ -1291,18 +944,14 @@ def importUnemployment():
     
     # For reasons unknown, some of them are in the wrong format.
     df = df[ df['Date'].str.len() == 8 ]
-    
-    # Turns date column into proper datetime objects
+
     df['Date'] =   pd.to_datetime(df.Date.astype(str), format='%Y %b')
     
-    # Make the row index equal to row number
     df.index = np.arange( len(df) )
     
-    # Save the dataframe as a pickle object
     Save(df, 'Unemployment')
     
     return
-
 
 
 def importONS():
@@ -1317,9 +966,8 @@ def importONS():
     
     deaths['Date'] =  pd.to_datetime( deaths.Date, format = '%Y-%m-%d'  )
     
-    # Save the dataframe as a pickle object
-    
     Save(deaths, 'deaths')
+    
     
     url = 'https://coronavirus.data.gov.uk/api/v1/data?filters=areaName=United%2520Kingdom;areaType=overview&structure=%7B%22areaType%22:%22areaType%22,%22areaName%22:%22areaName%22,%22areaCode%22:%22areaCode%22,%22date%22:%22date%22,%22newVirusTests%22:%22newVirusTests%22,%22cumVirusTests%22:%22cumVirusTests%22%7D&format=csv'
     
@@ -1330,8 +978,7 @@ def importONS():
     tests.columns = ['Date', 'Daily tests UK', 'Cumulative tests UK' ]
 
     tests['Date'] =  pd.to_datetime( tests.Date, format = '%Y-%m-%d'  )
-    
-    # Save the dataframe as a pickle object
+
     Save(tests, 'tests')
     
     
@@ -1344,23 +991,19 @@ def importONS():
     cases.columns = ['Date', 'Daily new Covid-19 cases UK']
     
     cases['Date'] =  pd.to_datetime( cases.Date, format = '%Y-%m-%d'  )
-
-    # Save the dataframe as a pickle object
-    
+ 
     Save(cases, 'cases')
     
     
     url = 'https://api.coronavirus.data.gov.uk/v1/data?filters=areaName=United%2520Kingdom;areaType=overview&structure=%7B%22areaType%22:%22areaType%22,%22areaName%22:%22areaName%22,%22areaCode%22:%22areaCode%22,%22date%22:%22date%22,%22newOnsDeathsByRegistrationDate%22:%22newOnsDeathsByRegistrationDate%22,%22cumOnsDeathsByRegistrationDate%22:%22cumOnsDeathsByRegistrationDate%22%7D&format=csv'
     
+    #deaths with covid on the death certificate
     deathsCert = pd.read_csv(url)
     
-    # Picks out relevant columns
     deathsCert = deathsCert.iloc[:, 3:5]
-    
-    # Rename columns appropriately
+
     deathsCert.columns = ['Date', 'Weekly deaths with Covid-19 on death certificate']
     
-    # Date column of deathsCert is not a datetime, so convert it
     deathsCert['Date'] = pd.to_datetime(  deathsCert.Date, format = '%Y-%m-%d') 
     
     # deathsComp will allow comparison of the two different ways of counting deaths
@@ -1378,7 +1021,6 @@ def importONS():
    # Drop any entries with na in the 'Weekly deaths with Covid-19 on death certificate' column
     deathComp = deathComp[deathComp['Weekly deaths with Covid-19 on death certificate'].notna()] 
     
-    # Save the dataframe as a pickle object
     Save(deathComp, 'deathComp')
     
     return
@@ -1387,30 +1029,33 @@ def importONS():
 
 def importRed():
     
-#    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/january2021/0636c13e&format=csv'
+    '''
+    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/january2021/0636c13e&format=csv'
 
-#    r = requests.get(url)
+    r = requests.get(url)
     
-#    redundancies = pd.read_csv(io.StringIO(r.text))
+    redundancies = pd.read_csv(io.StringIO(r.text))
 
-    # keep relevant rows
-#    redundancies = redundancies.iloc[6:, :]
+    #keep relevant rows
+    redundancies = redundancies.iloc[6:, :]
     
-#    redundancies.columns = ['date', 'Redundancies in last 3 months']
+    redundancies.columns = ['date', 'Redundancies in last 3 months']
     
-#    redundancies.insert(0, 'Date', pd.to_datetime(redundancies.date.str[:4], format='%Y')  \
-#    + pd.to_timedelta(  ( (redundancies.date.str[6].astype(int)-1) * 13 + redundancies.date.str[-2:].astype('int')).astype(str) + ' W') )
+    redundancies.insert(0, 'Date', pd.to_datetime(redundancies.date.str[:4], format='%Y')  \
+    + pd.to_timedelta(  ( (redundancies.date.str[6].astype(int)-1) * 13 + redundancies.date.str[-2:].astype('int')).astype(str) + ' W') )
     
-#    redundancies = redundancies.drop('date', axis = 1 )
+    redundancies = redundancies.drop('date', axis = 1 )
        
     #rename appropriately
-    #redundancies.columns = ['Date', 'Redundancies in last 3 months']
+    redundancies.columns = ['Date', 'Redundancies in last 3 months']
 
-    # Convert date column to a datetime object
-    #redundancies['Date'] = pd.to_datetime( redundancies['Date'].str[4:] )
+    #Convert date column to a datetime object
+    redundancies['Date'] = pd.to_datetime( redundancies['Date'].str[4:] )
     
-    # Redundancies measured in 1000s.
-#    redundancies['Redundancies in last 3 months'] = redundancies['Redundancies in last 3 months'].astype(float) *1000
+    #Redundancies measured in 1000s.
+    redundancies['Redundancies in last 3 months'] = redundancies['Redundancies in last 3 months'].astype(float) *1000
+    '''
+
 
     url2 = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/employmentintheuk/july2021/97d6896a&format=csv'
     
@@ -1418,26 +1063,17 @@ def importRed():
     
     redundancies2 = pd.read_csv(io.StringIO(r.text))
     
-    # keep relevant rows
     redundancies2 = redundancies2.iloc[6:, :]
     
-    #rename appropriately
     redundancies2.columns = ['Date', 'Redundancies in last 3 months']
 
-    # Convert date column to a datetime object
     redundancies2['Date'] = pd.to_datetime( redundancies2['Date'].str[-8:] )
     
     # Redundancies measured in 1000s.
     redundancies2['Redundancies in last 3 months'] = redundancies2['Redundancies in last 3 months'].astype(float) *1000
 
-#    redundancies = stackData(redundancies2, redundancies, 'new' )
-
-    #redundancies = pd.merge(redundancies, redundancies2, how = 'outer')
-    
-    # Make the row index equal to row number
     redundancies2.index = np.arange( len(redundancies2) )
-    
-    # Save the dataframe as a pickle object
+
     Save(redundancies2, 'Redundancies')
     
     return
@@ -1448,19 +1084,14 @@ def importJSA():
     
     JSA = pd.read_excel(r'Data/Claimants.xlsx')
     
-    # Keep relevant rows and columns
     JSA = JSA.iloc[10:96, 1:3]
-    
-    # Rename columns appropriately
+
     JSA.columns = ['Date', 'Number of JSA claimants']
     
-    # Convert date column to datetime object
     JSA['Date'] = pd.to_datetime( JSA.Date.astype(str), format= '%B %Y')
     
-    # Make the row index equal to row number
     JSA.index = np.arange( len(JSA) )
-    
-    # Save the dataframe as a pickle object
+
     Save(JSA, 'JSA')
     
     return
@@ -1474,22 +1105,17 @@ def importClaimants():
     
     claimants = pd.read_csv(io.StringIO(r.text))
 
-    # Keep relevant rows
     claimants = claimants.iloc[6:, :]
     
-    # Rename columns appropriately
     claimants.columns = ['Date', 'Claimant count, seasonally adjusted']
     
-    # Make Date column a datetime object
     claimants['Date'] = pd.to_datetime( claimants.Date.astype(str), format= '%B %Y')
     
     # Claimant count is measured in thousands
     claimants['Claimant count, seasonally adjusted'] = claimants['Claimant count, seasonally adjusted'].astype(float) *1000
-    
-    # Make the row index equal to row number
+
     claimants.index = np.arange( len(claimants) )
     
-    # Save the dataframe as a pickle object
     Save(claimants, 'claimants')
     
     return
@@ -1524,18 +1150,14 @@ def importPathways():
     
     pathways['Date'] = pathways.index
 
-    # Make the row index equal to row number
     pathways.index = np.arange( len(pathways) )
     
     pathways = pathways.rename(columns={"TriageCount": "Daily potential Covid-19 telephone triages England", \
                                         "Total": "Daily potential Covid-19 online assessments England"})
 
-    # Save the dataframe as a pickle object
     Save(pathways, 'pathways')
 
     return
-
-
 
 
 def importSurveilance():
@@ -1562,8 +1184,6 @@ def importSurveilance():
    
    return
   
-    
-
      
 def importDepression():
     
@@ -1589,10 +1209,3 @@ def importDepression():
     Save(depression, 'depression') 
     
     return
-    
-    
-    
-    
-    
-    
-    
