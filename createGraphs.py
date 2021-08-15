@@ -40,7 +40,7 @@ OWID = iD.Open('OWID')
 
 # The DailyHosp is updated daily.
 # The file is downloaded automatically.
-iD.importDailyHosp()
+#iD.importDailyHosp()
 
 newHospAdDiag = iD.Open('newHospAdDiag')
 
@@ -57,6 +57,7 @@ pathways = iD.Open('pathways')
 # The WeeklyHosp is updated daily.
 # The file is downloaded automatically.
 #iD.importWeeklyHosp()
+
 weeklyGABedsOccCovid = iD.Open('weeklyGABedsOccCovid')
 
 weeklyGABedsOccNonCovid = iD.Open('weeklyGABedsOccNonCovid')
@@ -805,7 +806,7 @@ surveilanceFig.update_layout(
 
  
 # Vaccine figure
-vaccineFig = px.line(OWID, x="Date", y=['Individuals vaccinated', 'Individuals fully vaccinated'], \
+vaccineFig = px.line(OWID, x="Date", y=['Individuals one-dose-vaccinated', 'Individuals two-dose-vaccinated'], \
              template = "simple_white", color_discrete_sequence =['gold', 'green'], \
                 range_x=['2021-01-01', str(date.today())  ]   )
 

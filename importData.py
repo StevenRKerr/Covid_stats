@@ -85,7 +85,7 @@ def stackData(old, new, precedence):
     return df
 
 # format_1, format_2 and format_3 are used repeatedly to format data pulled
-# from different sheets of excel pages 
+# from different sheets of excel files
 
 def format_1(df, col_name):
     
@@ -140,7 +140,7 @@ def importMonthlyHosp():
     
     newHospAd = pd.read_excel(url, sheet_name='Admissions Total')
     
-    newHospAd = format_1(newHospAd)
+    newHospAd = format_1(newHospAd, 'Daily hospital admissions with Covid-19 England')
 
     Save(newHospAd , 'newHospAd')
     
@@ -174,7 +174,7 @@ def importMonthlyHosp():
     
     monthlyBedsOccCovid = format_2(monthlyBedsOccCovid)
     
-    monthlyMVbedsOccNew = pd.read_excel (url, sheet_name='MV Beds Occupied')
+    monthlyMVbedsOccNew = pd.read_excel(url, sheet_name='MV Beds Occupied')
     
     monthlyMVbedsOccNew = format_1(monthlyMVbedsOccNew, 'Mechanical ventilation beds occupied England')
     
@@ -558,7 +558,7 @@ def importOWID():
     
     df['date'] = pd.to_datetime( df.date.astype(str), format= '%Y-%m-%d')
     
-    df.columns = ['Date', 'Positive test rate UK', 'Individuals vaccinated', 'Individuals fully vaccinated']
+    df.columns = ['Date', 'Positive test rate UK', 'Individuals one-dose-vaccinated', 'Individuals two-dose-vaccinated']
     
     df.index = np.arange( len(df) )
     
@@ -878,7 +878,6 @@ def createYearlyMort(Mort, deaths):
     # Make the first columns of deaths2020 equal to the dates of the year. 
     deaths2020['Date'] = pd.date_range(start = '2020-01-01', end = '2020-12-31', freq='D')
     
-    # Merge deaths and deaths2020
     deaths2020 = pd.merge(deaths2020, deaths[ pd.DatetimeIndex( deaths['Date']).year == 2020 ], how='outer' )
     
     # noWeeks is the number of weeks for which we have weekly deaths in 2020
@@ -898,7 +897,6 @@ def createYearlyMort(Mort, deaths):
     # Make the first columns of deaths2020 equal to the dates of the year. 
     deaths2021['Date'] = pd.date_range(start = '2021-01-01', end = '2021-12-31', freq='D')
     
-    # Merge deaths and deaths2020
     deaths2021 = pd.merge(deaths2021, deaths[ pd.DatetimeIndex( deaths['Date']).year == 2021 ], how='outer' )
     
     # noWeeks is the number of weeks for which we have weekly deaths in 2020
@@ -921,7 +919,6 @@ def createYearlyMort(Mort, deaths):
     yearlyMort['Mean weekly deaths 2015-2019<br>plus Covid-19 deaths UK 2021'] = \
               weeklyCoronaDeaths2021 + yearlyMort['Mean weekly deaths UK 2015-2019']
                 
-    # Save the dataframe as a pickle object
     Save(yearlyMort, 'yearlyMort')
     
     return 
