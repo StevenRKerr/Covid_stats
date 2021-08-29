@@ -300,7 +300,7 @@ def importWeeklyHosp():
 
        
     #newer data
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/08/Weekly-covid-admissions-and-beds-publication-210812.xlsx'
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/08/Weekly-covid-admissions-and-beds-publication-210826.xlsx'
 
     
     weeklyGABedsOccCovidNew = pd.read_excel(url, sheet_name='Adult G&A Beds Occupied COVID').T
