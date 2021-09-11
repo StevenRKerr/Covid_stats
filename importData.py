@@ -135,7 +135,7 @@ def format_3(df):
 def importMonthlyHosp():
     
     # newer data.
-    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/08/Covid-Publication-12-08-2021.xlsx"
+    url = "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/09/Covid-Publication-09-09-2021.xlsx"
     
     
     newHospAd = pd.read_excel(url, sheet_name='Admissions Total')
@@ -146,7 +146,7 @@ def importMonthlyHosp():
     
     
     # import and format the monthlyBedsOcc data
-    monthlyBedsOcc = pd.read_excel (url, sheet_name='Total Beds Occupied').T
+    monthlyBedsOcc = pd.read_excel(url, sheet_name='Total Beds Occupied').T
 
     monthlyBedsOcc = monthlyBedsOcc.iloc[1:, 11:]
     
@@ -154,6 +154,8 @@ def importMonthlyHosp():
     
     monthlyBedsOcc.columns = monthlyBedsOcc.loc['Unnamed: 2',]
     
+    # There is a column with name nan in one month - drop it
+    monthlyBedsOcc = monthlyBedsOcc.loc[:, monthlyBedsOcc.columns.notnull()]
     
     # Create a dataframe that is a hospital region lookup table
     hospMeta = monthlyBedsOcc.iloc[0, 1:].T
@@ -300,7 +302,7 @@ def importWeeklyHosp():
 
        
     #newer data
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/09/Weekly-covid-admissions-and-beds-publication-210902.xlsx'
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/09/Weekly-covid-admissions-and-beds-publication-210909.xlsx'
 
     
     weeklyGABedsOccCovidNew = pd.read_excel(url, sheet_name='Adult G&A Beds Occupied COVID').T

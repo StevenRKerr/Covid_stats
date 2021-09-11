@@ -590,7 +590,7 @@ def createRegOccFig(reg):
 
     
 for reg in regions:
- 
+    
     pio.write_html(createRegOccFig(reg), file='HTML files/Hospitals/' + figNames[reg] + '.html', auto_open=False) 
 
 
