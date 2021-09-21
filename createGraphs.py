@@ -40,7 +40,7 @@ OWID = iD.Open('OWID')
 
 # The DailyHosp is updated daily.
 # The file is downloaded automatically.
-#iD.importDailyHosp()
+iD.importDailyHosp()
 
 newHospAdDiag = iD.Open('newHospAdDiag')
 
@@ -56,7 +56,7 @@ pathways = iD.Open('pathways')
 
 # The WeeklyHosp is updated daily.
 # The file is downloaded automatically.
-iD.importWeeklyHosp()
+#iD.importWeeklyHosp()
 
 weeklyGABedsOccCovid = iD.Open('weeklyGABedsOccCovid')
 
