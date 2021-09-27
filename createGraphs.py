@@ -56,7 +56,7 @@ pathways = iD.Open('pathways')
 
 # The WeeklyHosp is updated daily.
 # The file is downloaded automatically.
-iD.importWeeklyHosp()
+#iD.importWeeklyHosp()
 
 weeklyGABedsOccCovid = iD.Open('weeklyGABedsOccCovid')
 
