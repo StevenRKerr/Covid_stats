@@ -265,12 +265,16 @@ def importMonthlyHosp():
         admissionsByAgeOld = pd.merge(admissionsByAgeOld, admissionsOld, how = 'outer')
     
     admissionsByAgeOld.index = np.arange( len(admissionsByAgeOld) )
-   
     
+    Save(admissionsByAgeOld, 'admissionsByAgeOld')
+    '''
+           
+    admissionsByAgeOld = Open('admissionsByAgeOld')
+       
     admissionsByAge = stackData(admissionsByAgeOld, admissionsByAgeNew, 'old')
     
     Save(admissionsByAge, 'admissionsByAge')
-    '''
+
     
     return
 
@@ -302,7 +306,7 @@ def importWeeklyHosp():
 
        
     #newer data
-    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/09/Weekly-covid-admissions-and-beds-publication-210923.xlsx'
+    url = 'https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2021/10/Weekly-covid-admissions-and-beds-publication-211007.xlsx'
 
     
     weeklyGABedsOccCovidNew = pd.read_excel(url, sheet_name='Adult G&A Beds Occupied COVID').T
@@ -497,7 +501,7 @@ def importMort():
 
 def importGDP():
     
-    url = 'https://www.ons.gov.uk/generator?uri=/economy/grossdomesticproductgdp/bulletins/gdpmonthlyestimateuk/may2021/e2947586&format=csv'
+    url = 'https://www.ons.gov.uk/generator?uri=/economy/grossdomesticproductgdp/bulletins/gdpmonthlyestimateuk/july2021/4a661f3f&format=csv'
     
     r = requests.get(url)
     
@@ -1029,7 +1033,7 @@ def importONS():
 def importRed():
     
     '''
-    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/january2021/0636c13e&format=csv'
+    url = 'https://www.ons.gov.uk/generator?uri=/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/employmentintheuk/september2021/9e08a429&format=csv'
 
     r = requests.get(url)
     
@@ -1123,7 +1127,7 @@ def importClaimants():
 
 def importPathways():
     
-    url = 'https://files.digital.nhs.uk/11/BD1AFA/NHS%20Pathways%20Covid-19%20data%20%202021-08-05.csv'
+    url = 'https://files.digital.nhs.uk/92/D854E8/NHS%20Pathways%20Covid-19%20data%202021-10-07.csv'
 
     calls = pd.read_csv(url)
 
@@ -1134,7 +1138,7 @@ def importPathways():
     calls = calls.groupby(['Call Date']).sum()
 
 
-    url = 'https://files.digital.nhs.uk/22/FF905B/111%20Online%20Covid-19%20data_2021-08-05.csv'
+    url = 'https://files.digital.nhs.uk/8D/69F32C/111%20Online%20Covid-19%20data_2021-10-07.csv'
     
     online = pd.read_csv(url)
 
